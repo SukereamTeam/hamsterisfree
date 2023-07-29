@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -62,27 +62,6 @@ public static class CommonExtension
         var tempList = new List<T>(list);
         tempList.Remove(element);
         return tempList;
-    }
-
-    public static string ToLocalizedText(this string key)
-    {
-        return LocalizedTextManager.GetText(key.ToUpper().Trim()).Replace("\\n", "\n").Trim();
-    }
-
-    public static string ToLocalizedText(this string key, params object[] args)
-    {
-        string formattedText = string.Empty;
-        try
-        {
-            formattedText = string.Format(key.ToLocalizedText(), args);
-        }
-        catch (System.Exception e)
-        {
-            formattedText = key;
-            Debug.LogError(string.Format("{0} : Exception - {1}", formattedText, e.ToString()));
-        }
-
-        return formattedText;
     }
 
     public static long MegabytesToBytes(this int megabytes)
