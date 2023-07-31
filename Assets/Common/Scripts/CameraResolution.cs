@@ -4,19 +4,21 @@ using UnityEngine;
 
 public class CameraResolution : MonoBehaviour
 {
-    
-    void Start()
+    [SerializeField]
+    private Vector2Int fixedRatio = Vector2Int.zero;
+
+    private void Start()
     {
-        SetResolution(); // 초기에 게임 해상도 고정
+        SetResolution();
     }
 
-    public void SetResolution()
+    private void SetResolution()
     {
-        int setWidth = 9; // 사용자 설정 너비
-        int setHeight = 16; // 사용자 설정 높이
+        int setWidth = fixedRatio.x;        // 설정 너비
+        int setHeight = fixedRatio.y;       // 설정 높이
 
-        int deviceWidth = Screen.width; // 기기 너비 저장
-        int deviceHeight = Screen.height; // 기기 높이 저장
+        int deviceWidth = Screen.width;     // 기기 너비 저장
+        int deviceHeight = Screen.height;   // 기기 높이 저장
 
         Screen.SetResolution(setWidth, (int)(((float)deviceHeight / deviceWidth) * setWidth), true);
 
