@@ -28,7 +28,7 @@ public abstract class TileBase : MonoBehaviour
     protected Vector2 position;
 
     protected TileType tileType;
-    public TileType TileType => this.TileType;
+    public TileType TileType => this.tileType;
 
     protected Sprite tileSprite;
     protected SpriteRenderer spriteRenderer;
@@ -43,4 +43,5 @@ public abstract class TileBase : MonoBehaviour
         this.transform.localPosition = this.position;
     }
 
+    public abstract void TileTriggerEvent();
 }

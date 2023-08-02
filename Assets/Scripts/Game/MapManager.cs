@@ -50,7 +50,7 @@ public class MapManager : MonoBehaviour
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
         var exitTile = Instantiate<GameObject>(exitPrefab, this.transform);
-        var exitScript = exitTile.GetComponent<TileBase>();
+        var exitScript = exitTile.GetComponent<ExitTile>();
         exitScript.Initialize(TileType.Exit, "", randomPos);
 
         // TODO

@@ -33,4 +33,9 @@ public class SeedTile : TileBase
         
     }
 
+    public override void TileTriggerEvent()
+    {
+        // Check 타일 지나감
+    }
+
 }

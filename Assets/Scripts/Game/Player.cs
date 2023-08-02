@@ -21,31 +21,21 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
+
+
             var mousePosition = Input.mousePosition;
 
             int layerMask = 0; //(1 << LayerMask.NameToLayer(""));
             Ray ray = gameCamera.ScreenPointToRay(mousePosition);
 
-            var raycastResult = Physics.RaycastAll(ray, Mathf.Infinity, Physics.AllLayers);
+            var raycastResult = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
             foreach(var obj in raycastResult)
             {
                 Debug.Log($"{obj.transform.name}");
 
                 var tile = obj.transform.GetComponent<TileBase>();
-
-                if (tile.TileType == TileType.Monster)
-                {
-
-                }
-                else if (tile.TileType == TileType.Seed)
-                {
-
-                }
-                else if (tile.TileType == TileType.Exit)
-                {
-                    Debug.Log("Game End");
-                }
+                tile.TileTriggerEvent();
             }
         }
     }
