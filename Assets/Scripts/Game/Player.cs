@@ -14,29 +14,36 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        var mousePosition = Input.mousePosition;
+
+        int layerMask = 0; //(1 << LayerMask.NameToLayer(""));
+        Ray ray = gameCamera.ScreenPointToRay(mousePosition);
+
+        var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
+
+        if (raycastResult.IsNull())
+            return;
+
+
+        var tile = raycastResult.transform.GetComponent<TileBase>();
+        
+
         if (Input.GetMouseButtonDown(0))
         {
-
+            if (tile.TileType == TileType.Seed)
+            {
+                GameManager.Instance.MapManager.IsFade = true;
+            }
         }
 
         if (Input.GetMouseButton(0))
         {
+            tile.TileTriggerEvent();
+        }
 
+        if (Input.GetMouseButtonUp(0))
+        {
 
-            var mousePosition = Input.mousePosition;
-
-            int layerMask = 0; //(1 << LayerMask.NameToLayer(""));
-            Ray ray = gameCamera.ScreenPointToRay(mousePosition);
-
-            var raycastResult = Physics2D.RaycastAll(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
-
-            foreach(var obj in raycastResult)
-            {
-                Debug.Log($"{obj.transform.name}");
-
-                var tile = obj.transform.GetComponent<TileBase>();
-                tile.TileTriggerEvent();
-            }
         }
     }
 

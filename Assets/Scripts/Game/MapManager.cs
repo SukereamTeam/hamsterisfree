@@ -13,13 +13,21 @@ public class MapManager : MonoBehaviour
     private GameObject exitPrefab = null;
 
 
+    private bool isFade = false;
+    public bool IsFade
+    {
+        get => this.isFade;
+        set => this.isFade = value;
+    }
+
+    
 
 
     private void Awake()
     {
         ChangeNameOutlineTiles();
 
-        SetExitTile();
+        CreateExitTile();
 
 
     }
@@ -42,7 +50,7 @@ public class MapManager : MonoBehaviour
 
     }
 
-    private void SetExitTile()
+    private void CreateExitTile()
     {
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
 

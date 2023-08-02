@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-
+    [SerializeField]
+    private MapManager mapManager = null;
+    public MapManager MapManager => this.mapManager;
 
     private bool isGameStart = false;
     public bool IsGameStart
@@ -13,10 +15,5 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isGameStart = value;
     }
 
-    private bool isFade = false;
-    public bool IsFade
-    {
-        get => this.isFade;
-        set => this.isFade = value;
-    }
+    
 }
