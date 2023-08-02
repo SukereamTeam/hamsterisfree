@@ -6,40 +6,23 @@ using UnityEngine;
 public class MapManager : MonoBehaviour
 {
     // 맵 생성
-
-    [SerializeField]
-    private Vector2Int mapSize;
-
     [SerializeField]
     private Transform[] outlineTiles = null;
 
     [SerializeField]
     private GameObject exitPrefab = null;
 
-    [SerializeField]
-    private GameObject seedPrefab = null;
-
-    [SerializeField]
-    private GameObject monsterPrefab = null;
-
-
-
-    private List<List<(int, int)>> seedPosition = new List<List<(int, int)>>();
 
 
 
     private void Awake()
     {
-        this.mapSize = new Vector2Int(8, 12);
-
         ChangeNameOutlineTiles();
 
         SetExitTile();
 
-        AddSeedPositionTest(1);
-    }
 
-    
+    }
 
     private void ChangeNameOutlineTiles()
     {
@@ -51,6 +34,11 @@ public class MapManager : MonoBehaviour
 
     private void SetSeedTile()
     {
+        // 배경 타일에서 하위 Tile은 (1, 0) (2, 0) (3, 0) 식으로 되어 있고
+        // 상위 부모님이 y값을 가지고 있음
+
+        // List<List<(int, int)>> intPairs = new List<List<(int, int)>>(3); valueTuple
+        // 
 
     }
 
@@ -61,24 +49,17 @@ public class MapManager : MonoBehaviour
         var random = UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
-        var exitTileObj = Instantiate<GameObject>(exitPrefab, randomPos, Quaternion.identity, this.transform);
+        var exitTile = Instantiate<GameObject>(exitPrefab, this.transform);
+        var exitScript = exitTile.GetComponent<TileBase>();
+        exitScript.Initialize(TileType.Exit, "", randomPos);
 
+        // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
     }
 
-    private void AddSeedPositionTest(int seedSpaceSize)
+    private void CreateTile()
     {
-        seedPosition = new List<List<(int, int)>>(seedSpaceSize);
 
-        var testPosition = new List<(int, int)> { (0, 0), (3, 0) };
-
-        for (int i = 0; i < seedSpaceSize; i++)
-        {
-            seedPosition[i].Add(testPosition[i]);
-
-        }
-
-        SetSeedTile();
     }
 }

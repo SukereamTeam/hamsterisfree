@@ -7648,7 +7648,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1828366064
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7806,7 +7806,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1975502250
 Transform:
   m_ObjectHideFlags: 0
@@ -7867,9 +7867,7 @@ MonoBehaviour:
   - {fileID: 1126285322}
   - {fileID: 9385843}
   - {fileID: 532496544}
-  exitTile: {fileID: 1242813034118986203, guid: 5b4701f9c0486f44e9edae527c15c5be, type: 3}
-  seedTile: {fileID: 0}
-  monsterTile: {fileID: 0}
+  exitPrefab: {fileID: 1242813034118986203, guid: 5b4701f9c0486f44e9edae527c15c5be, type: 3}
 --- !u!1 &1987922894
 GameObject:
   m_ObjectHideFlags: 0

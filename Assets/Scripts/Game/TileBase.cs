@@ -2,27 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileBase : MonoBehaviour
+
+public enum TileType
 {
-    // 공통
-    // Sprite
-    // SpriteRenderer
-    // TileType
-    // Collider
+    Normal = 0,
+    Exit,
+    Seed,
+    Monster
+}
 
-    // 씨앗 타일
-    // 먹었는지 체크하는 bool 변수
+public enum TilePattern
+{
+    Random = 0,
+    Vertical,
+    Horizontal,
+    Corner,
+    Snake,
+    Border
+}
 
-    // 몬스터 타일
-    // Animator
-    // 
 
-    private TileType tileType;
+public abstract class TileBase : MonoBehaviour
+{
+    protected string tileName;
+    protected Vector2 position;
 
-    public void InitializeTile()
+    protected TileType tileType;
+    public TileType TileType => this.TileType;
+
+    protected Sprite tileSprite;
+    protected SpriteRenderer spriteRenderer;
+    protected BoxCollider2D tileCollider;
+    protected Animator animator;
+
+    public virtual void Initialize(TileType _Type, string _SpritePath, Vector2 _Pos)
     {
+        this.tileType = _Type;
 
+        this.position = _Pos;
+        this.transform.localPosition = this.position;
     }
-
 
 }
