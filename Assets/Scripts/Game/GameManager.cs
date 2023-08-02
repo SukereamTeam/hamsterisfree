@@ -15,5 +15,19 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isGameStart = value;
     }
 
-    
+
+
+
+    private void Start()
+    {
+        
+    }
+
+    private void Update()
+    {
+        if (this.isGameStart)
+        {
+            Debug.Log("Start Now !!!");
+        }
+    }
 }

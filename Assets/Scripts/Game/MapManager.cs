@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
+using DG.Tweening;
 
 public class MapManager : MonoBehaviour
 {
@@ -10,11 +12,16 @@ public class MapManager : MonoBehaviour
     private Transform[] outlineTiles = null;
 
     [SerializeField]
+    private SpriteRenderer fadeRenderer;
+
+    [SerializeField]
     private GameObject exitPrefab = null;
 
 
-    private bool isFade = false;
-    public bool IsFade
+
+
+    private IReactiveProperty<bool> isFade = new ReactiveProperty<bool>(false);
+    public IReactiveProperty<bool> IsFade
     {
         get => this.isFade;
         set => this.isFade = value;
@@ -26,10 +33,16 @@ public class MapManager : MonoBehaviour
     private void Awake()
     {
         ChangeNameOutlineTiles();
+    }
 
+    private void Start()
+    {
         CreateExitTile();
 
-
+        this.isFade.Subscribe(_ =>
+        {
+            FadeMap();
+        }).AddTo(this);
     }
 
     private void ChangeNameOutlineTiles()
@@ -40,14 +53,23 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private void SetSeedTile()
+    private void FadeMap()
     {
-        // 배경 타일에서 하위 Tile은 (1, 0) (2, 0) (3, 0) 식으로 되어 있고
-        // 상위 부모님이 y값을 가지고 있음
+        Debug.Log($"FadeMap / isFade : {this.isFade.Value}");
 
-        // List<List<(int, int)>> intPairs = new List<List<(int, int)>>(3); valueTuple
-        // 
-
+        if (this.isFade.Value == true)
+        {
+            this.fadeRenderer.DOFade(1f, 3f).OnComplete(() =>
+            {
+                this.isFade.Value = false;
+                GameManager.Instance.IsGameStart = true;
+            });
+        }
+        else
+        {
+            this.fadeRenderer.DOKill(true);
+            this.fadeRenderer.color = new Color(1f, 1f, 1f, 0f);
+        }
     }
 
     private void CreateExitTile()
@@ -68,6 +90,16 @@ public class MapManager : MonoBehaviour
 
     private void CreateTile()
     {
+
+    }
+
+    private void SetSeedTile()
+    {
+        // 배경 타일에서 하위 Tile은 (1, 0) (2, 0) (3, 0) 식으로 되어 있고
+        // 상위 부모님이 y값을 가지고 있음
+
+        // List<List<(int, int)>> intPairs = new List<List<(int, int)>>(3); valueTuple
+        // 
 
     }
 }

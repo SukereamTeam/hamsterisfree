@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
-        if (raycastResult.IsNull())
+        if (raycastResult.collider.IsNull())
             return;
 
 
@@ -30,9 +30,10 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (tile.TileType == TileType.Seed)
+            //if (tile.TileType == TileType.Seed)
+            if (tile.IsNotNull())
             {
-                GameManager.Instance.MapManager.IsFade = true;
+                GameManager.Instance.MapManager.IsFade.Value = true;
             }
         }
 
@@ -43,7 +44,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-
+            GameManager.Instance.MapManager.IsFade.Value = false;
         }
     }
 

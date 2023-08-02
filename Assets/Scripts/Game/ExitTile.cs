@@ -23,7 +23,7 @@ public class ExitTile : TileBase
 
     public override void TileTriggerEvent()
     {
-        Debug.Log("Game End");
+        //Debug.Log("Game End");
 
         // 별 갯수 계산해서
         // 완료 처리 or 무반응
