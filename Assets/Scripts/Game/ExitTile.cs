@@ -27,5 +27,8 @@ public class ExitTile : TileBase
 
         // 별 갯수 계산해서
         // 완료 처리 or 무반응
+
+        GameManager.Instance.IsGame.Value = false;
+        GameManager.Instance.MapManager.IsFade.Value = false;
     }
 }

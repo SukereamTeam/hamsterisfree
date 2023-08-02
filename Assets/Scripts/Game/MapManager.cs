@@ -15,6 +15,9 @@ public class MapManager : MonoBehaviour
     private SpriteRenderer fadeRenderer;
 
     [SerializeField]
+    private float fadeTime = 0f;
+
+    [SerializeField]
     private GameObject exitPrefab = null;
 
 
@@ -27,7 +30,10 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
-    
+    private IReactiveProperty<bool> isCanStart = new ReactiveProperty<bool>(false);
+    public IReactiveProperty<bool> IsCanStart { get => isCanStart; }
+
+
 
 
     private void Awake()
@@ -38,6 +44,7 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         CreateExitTile();
+
 
         this.isFade.Subscribe(_ =>
         {
@@ -59,15 +66,15 @@ public class MapManager : MonoBehaviour
 
         if (this.isFade.Value == true)
         {
-            this.fadeRenderer.DOFade(1f, 3f).OnComplete(() =>
+            this.fadeRenderer.DOFade(1f, fadeTime).OnComplete(() =>
             {
-                this.isFade.Value = false;
-                GameManager.Instance.IsGameStart = true;
+                this.isCanStart.Value = true;
             });
         }
         else
         {
             this.fadeRenderer.DOKill(true);
+
             this.fadeRenderer.color = new Color(1f, 1f, 1f, 0f);
         }
     }
@@ -90,16 +97,6 @@ public class MapManager : MonoBehaviour
 
     private void CreateTile()
     {
-
-    }
-
-    private void SetSeedTile()
-    {
-        // 배경 타일에서 하위 Tile은 (1, 0) (2, 0) (3, 0) 식으로 되어 있고
-        // 상위 부모님이 y값을 가지고 있음
-
-        // List<List<(int, int)>> intPairs = new List<List<(int, int)>>(3); valueTuple
-        // 
 
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -8,11 +9,12 @@ public class GameManager : MonoSingleton<GameManager>
     private MapManager mapManager = null;
     public MapManager MapManager => this.mapManager;
 
-    private bool isGameStart = false;
-    public bool IsGameStart
+
+    private IReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
+    public IReactiveProperty<bool> IsGame
     {
-        get => this.isGameStart;
-        set => this.isGameStart = value;
+        get => this.isGame;
+        set => this.isGame = value;
     }
 
 
@@ -20,14 +22,13 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Start()
     {
-        
+        IsGame.Value = true;
+
+
     }
 
     private void Update()
     {
-        if (this.isGameStart)
-        {
-            Debug.Log("Start Now !!!");
-        }
+
     }
 }
