@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UniRx;
 
@@ -22,13 +23,23 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Start()
     {
-        IsGame.Value = true;
+        this.isGame.Value = true;
 
-
+        this.isGame
+            .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
+            .Where(x => x == false)
+            .Subscribe(_ =>
+            {
+                GameEndFlow();
+            }).AddTo(this);
     }
 
-    private void Update()
+    private void GameEndFlow()
     {
+        Debug.Log("### Game End ###");
 
+        // TODO
+        // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
+        GameManager.Instance.MapManager.IsFade.Value = false;
     }
 }

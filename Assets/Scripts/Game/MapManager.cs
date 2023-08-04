@@ -16,6 +16,7 @@ public class MapManager : MonoBehaviour
 
     [SerializeField]
     private float fadeTime = 0f;
+    public float FadeTime => this.fadeTime;
 
     [SerializeField]
     private GameObject exitPrefab = null;
@@ -30,8 +31,6 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
-    private IReactiveProperty<bool> isCanStart = new ReactiveProperty<bool>(false);
-    public IReactiveProperty<bool> IsCanStart { get => isCanStart; }
 
 
 
@@ -46,10 +45,12 @@ public class MapManager : MonoBehaviour
         CreateExitTile();
 
 
-        this.isFade.Subscribe(_ =>
-        {
-            FadeMap();
-        }).AddTo(this);
+        this.isFade
+            .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
+            .Subscribe(_ =>
+            {
+                FadeMap();
+            }).AddTo(this);
     }
 
     private void ChangeNameOutlineTiles()
@@ -66,10 +67,7 @@ public class MapManager : MonoBehaviour
 
         if (this.isFade.Value == true)
         {
-            this.fadeRenderer.DOFade(1f, fadeTime).OnComplete(() =>
-            {
-                this.isCanStart.Value = true;
-            });
+            this.fadeRenderer.DOFade(1f, fadeTime);
         }
         else
         {

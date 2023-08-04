@@ -29,6 +29,7 @@ public class ExitTile : TileBase
         // 완료 처리 or 무반응
 
         GameManager.Instance.IsGame.Value = false;
-        GameManager.Instance.MapManager.IsFade.Value = false;
+
+        
     }
 }
