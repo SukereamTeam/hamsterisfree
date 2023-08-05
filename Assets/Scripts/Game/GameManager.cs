@@ -4,6 +4,15 @@ using System;
 using UnityEngine;
 using UniRx;
 
+
+public enum Direction
+{
+    Left = 0,
+    Right,
+    Top,
+    Bottom
+}
+
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField]

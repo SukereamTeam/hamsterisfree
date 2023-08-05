@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using UniRx;
 using DG.Tweening;
 
@@ -9,10 +10,13 @@ public class MapManager : MonoBehaviour
 {
     // 맵 생성
     [SerializeField]
+    private Transform backTileRoot = null;
+
+    [SerializeField]
     private Transform[] outlineTiles = null;
 
     [SerializeField]
-    private SpriteRenderer fadeRenderer;
+    private SpriteRenderer mask;
 
     [SerializeField]
     private float fadeTime = 0f;
@@ -42,7 +46,13 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
+        SetBackgroundTiles();
+
+        SetOutlineTiles();
+
         CreateExitTile();
+
+        SetMask();
 
 
         this.isFade
@@ -52,6 +62,8 @@ public class MapManager : MonoBehaviour
                 FadeMap();
             }).AddTo(this);
     }
+
+    
 
     private void ChangeNameOutlineTiles()
     {
@@ -67,13 +79,76 @@ public class MapManager : MonoBehaviour
 
         if (this.isFade.Value == true)
         {
-            this.fadeRenderer.DOFade(1f, fadeTime);
+            this.mask.DOFade(1f, fadeTime);
         }
         else
         {
-            this.fadeRenderer.DOKill(true);
+            this.mask.DOKill(true);
 
-            this.fadeRenderer.color = new Color(1f, 1f, 1f, 0f);
+            this.mask.color = new Color(1f, 1f, 1f, 0f);
+        }
+    }
+
+    private void SetBackgroundTiles()
+    {
+        var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Center");
+
+        var renderers = backTileRoot.GetComponentsInChildren<SpriteRenderer>();
+
+        renderers.ToList().ForEach(x => x.sprite = sprite);
+    }
+
+    private void SetOutlineTiles()
+    {
+        for (int i = 0; i < outlineTiles.Length; i++)
+        {
+            if (i < 9)
+            {
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Left");
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+
+                if (i % 2 == 1)
+                {
+                    renderer.flipY = true;
+                }
+            }
+            else if (i < 15)
+            {
+                //bottom
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Bottom");
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+
+                if (i % 2 == 1)
+                {
+                    renderer.flipX = true;
+                }
+            }
+            else if (i < 24)
+            {
+                //right
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Right");
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+
+                if (i % 2 == 0)
+                {
+                    renderer.flipY = true;
+                }
+            }
+            else
+            {
+                //top
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Top");
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+
+                if (i % 2 == 0)
+                {
+                    renderer.flipX = true;
+                }
+            }
         }
     }
 
@@ -91,6 +166,12 @@ public class MapManager : MonoBehaviour
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
+    }
+
+    private void SetMask()
+    {
+        var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Mask");
+        mask.sprite = sprite;
     }
 
     private void CreateTile()

@@ -11,15 +11,6 @@ public enum TileType
     Monster
 }
 
-public enum TilePattern
-{
-    Random = 0,
-    Vertical,
-    Horizontal,
-    Corner,
-    Snake,
-    Border
-}
 
 
 public abstract class TileBase : MonoBehaviour
