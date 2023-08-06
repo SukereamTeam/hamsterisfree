@@ -26,7 +26,11 @@ public class Player : MonoBehaviour
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
+
     private Line currentLine;
+    private int lineLayer = -1;
+
+
 
     // TODO
     // Line Renderer로 선 그리기
@@ -35,6 +39,11 @@ public class Player : MonoBehaviour
 
     // TODO
     // background bounds 밖으로 input 나가면 return;
+
+    private void Start()
+    {
+        this.lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
+    }
 
     private void Update()
     {
@@ -131,9 +140,24 @@ public class Player : MonoBehaviour
 
     private void DrawLine()
     {
+        //Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+        //var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, this.lineLayer);
+
+
         Vector2 mousePosition = gameCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        this.currentLine.AddPoint(mousePosition);
+        var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
+
+        if (raycastResult)
+        {
+
+            this.currentLine.AddPoint(mousePosition);
+        }
+        else
+        {
+            //EndDraw();
+        }
+
 
     }
 
