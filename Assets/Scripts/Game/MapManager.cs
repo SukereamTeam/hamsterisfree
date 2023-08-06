@@ -10,10 +10,16 @@ public class MapManager : MonoBehaviour
 {
     // 맵 생성
     [SerializeField]
-    private Transform backTileRoot = null;
+    private SpriteRenderer background = null;
+
+    [SerializeField]
+    private Transform[] backTiles = null;
 
     [SerializeField]
     private Transform[] outlineTiles = null;
+
+    [SerializeField]
+    private SpriteRenderer[] edgeTiles = null;
 
     [SerializeField]
     private SpriteRenderer mask;
@@ -46,7 +52,9 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        SetBackgroundTiles();
+        SetBackground();
+
+        this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform).ToArray();
 
         SetOutlineTiles();
 
@@ -89,13 +97,11 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private void SetBackgroundTiles()
+    private void SetBackground()
     {
         var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Center");
 
-        var renderers = backTileRoot.GetComponentsInChildren<SpriteRenderer>();
-
-        renderers.ToList().ForEach(x => x.sprite = sprite);
+        this.background.sprite = sprite;
     }
 
     private void SetOutlineTiles()
@@ -104,7 +110,7 @@ public class MapManager : MonoBehaviour
         {
             if (i < 9)
             {
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Left");
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_LeftTest");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
 
@@ -149,6 +155,21 @@ public class MapManager : MonoBehaviour
                     renderer.flipX = true;
                 }
             }
+        }
+
+
+        var edgeSpritePath = string.Empty;
+
+        for (int i = 0; i < Enum.GetValues(typeof(Direction)).Length; i++)
+        {
+            var horizontal = i < 2 ? string.Format("Top") : string.Format("Bottom");
+            var vertical = i < 2 ? i : i - 2;
+
+            edgeSpritePath = $"Images/Map/Forest/Forest_{horizontal}{Enum.GetName(typeof(Direction), vertical)}";
+
+            var sprite = Resources.Load<Sprite>(edgeSpritePath);
+
+            this.edgeTiles[i].sprite = sprite;
         }
     }
 

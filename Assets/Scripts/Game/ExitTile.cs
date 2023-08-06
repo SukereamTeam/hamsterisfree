@@ -11,6 +11,8 @@ public class ExitTile : TileBase
     {
         base.Initialize(_Type, _SpritePath, _Pos);
 
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+
         // TODO
         // sprite 나중엔 데이터테이블 경로로 빼야함 지금은 serializeField이지만...
         // Resources.load
