@@ -54,7 +54,7 @@ public class MapManager : MonoBehaviour
     {
         SetBackground();
 
-        this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform).ToArray();
+        this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform && x.name.Contains("Tile_")).ToArray();
 
         SetOutlineTiles();
 
@@ -87,7 +87,7 @@ public class MapManager : MonoBehaviour
 
         if (this.isFade.Value == true)
         {
-            this.mask.DOFade(1f, fadeTime);
+            this.mask.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));
         }
         else
         {
@@ -110,14 +110,9 @@ public class MapManager : MonoBehaviour
         {
             if (i < 9)
             {
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_LeftTest");
+                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Left");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
-
-                if (i % 2 == 1)
-                {
-                    renderer.flipY = true;
-                }
             }
             else if (i < 15)
             {
@@ -125,11 +120,6 @@ public class MapManager : MonoBehaviour
                 var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Bottom");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
-
-                if (i % 2 == 1)
-                {
-                    renderer.flipX = true;
-                }
             }
             else if (i < 24)
             {
@@ -137,11 +127,6 @@ public class MapManager : MonoBehaviour
                 var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Right");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
-
-                if (i % 2 == 0)
-                {
-                    renderer.flipY = true;
-                }
             }
             else
             {
@@ -149,11 +134,6 @@ public class MapManager : MonoBehaviour
                 var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Top");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
-
-                if (i % 2 == 0)
-                {
-                    renderer.flipX = true;
-                }
             }
         }
 

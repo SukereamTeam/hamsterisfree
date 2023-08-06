@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     private Camera gameCamera = null;
 
 
-    private readonly float dragDistance = 0.2f;
+    private readonly float dragDistance = 0.3f;
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
@@ -17,6 +17,9 @@ public class Player : MonoBehaviour
     // Line Renderer로 선 그리기
     // 페이드 완료 되어야 게임 시작
     // 몬스터타일 선택 하면 게임 오버
+
+    // TODO
+    // background bounds 밖으로 input 나가면 return;
 
     private void Update()
     {
