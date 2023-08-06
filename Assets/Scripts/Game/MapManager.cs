@@ -11,6 +11,7 @@ public class MapManager : MonoBehaviour
     // 맵 생성
     [SerializeField]
     private SpriteRenderer background = null;
+    public SpriteRenderer Background => this.background;
 
     [SerializeField]
     private Transform[] backTiles = null;

@@ -8,10 +8,25 @@ public class Player : MonoBehaviour
     private Camera gameCamera = null;
 
 
+    [Space(30)]
+    [SerializeField]
+    private GameObject linePrefab;
+
+    [SerializeField]
+    private Gradient lineColor;
+
+    [SerializeField]
+    private float linePointMinDistance;
+
+    [SerializeField]
+    private float lineWidth;
+
+
     private readonly float dragDistance = 0.3f;
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
+    private Line currentLine;
 
     // TODO
     // Line Renderer로 선 그리기
@@ -34,6 +49,10 @@ public class Player : MonoBehaviour
 
             this.mouseDownTime = Time.time;
             this.mouseDownPos = Input.mousePosition;
+
+            //BlockMouseOutBounds(Input.mousePosition);
+
+            BeginDraw();
         }
 
         if (Input.GetMouseButton(0))
@@ -56,14 +75,17 @@ public class Player : MonoBehaviour
                 {
                     tile.TileTriggerEvent();
                 }
-                
             }
+
+            if (this.currentLine != null)
+                DrawLine();
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-
             GameManager.Instance.MapManager.IsFade.Value = false;
+
+            EndDraw();
         }
     }
 
@@ -84,5 +106,49 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    
+    private void BlockMouseOutBounds(Vector3 _MousePosition)
+    {
+        var backPos = GameManager.Instance.MapManager.Background.transform.position;
+
+        var screenPos = gameCamera.WorldToScreenPoint(backPos);
+
+        var top = gameCamera.WorldToViewportPoint(GameManager.Instance.MapManager.Background.bounds.max);
+    }
+
+
+
+    //----- Line Render
+    private void BeginDraw()
+    {
+        this.currentLine = Instantiate(linePrefab, this.transform).GetComponent<Line>();
+
+        this.currentLine.SetLineColor(this.lineColor);
+        this.currentLine.SetPointMinDistance(this.linePointMinDistance);
+        this.currentLine.SetLineWidth(this.lineWidth);
+
+
+    }
+
+    private void DrawLine()
+    {
+        Vector2 mousePosition = gameCamera.ScreenToWorldPoint(Input.mousePosition);
+
+        this.currentLine.AddPoint(mousePosition);
+
+    }
+
+    private void EndDraw()
+    {
+        if (this.currentLine != null)
+        {
+            if (this.currentLine.PointCount < 2)
+            {
+                Destroy(this.currentLine.gameObject);
+            }
+            else
+            {
+                this.currentLine = null;
+            }
+        }
+    }
 }
