@@ -18,16 +18,18 @@ public class Line : MonoBehaviour
 
 
 
-    public void AddPoint(Vector2 newPoint)
+    public void AddPoint(Vector2 _NewPoint)
     {
-        if (PointCount >= 1 && Vector2.Distance(newPoint, GetLastPoint()) < pointsMinDistance)
+        if (PointCount >= 1 && Vector2.Distance(_NewPoint, GetLastPoint()) < pointsMinDistance)
+        {
             return;
+        }
 
-        points.Add(newPoint);
+        points.Add(_NewPoint);
         PointCount++;
 
-        lineRenderer.positionCount = PointCount;
-        lineRenderer.SetPosition(PointCount - 1, newPoint);
+        this.lineRenderer.positionCount = PointCount;
+        this.lineRenderer.SetPosition(PointCount - 1, _NewPoint);
     }
 
     public Vector2 GetLastPoint()
@@ -35,19 +37,27 @@ public class Line : MonoBehaviour
         return (Vector2)lineRenderer.GetPosition(PointCount - 1);
     }
 
-    public void SetLineColor(Gradient colorGradient)
+    public void SetLineColor(Gradient _ColorGradient)
     {
-        this.lineRenderer.colorGradient = colorGradient;
+        this.lineRenderer.colorGradient = _ColorGradient;
     }
 
-    public void SetPointMinDistance(float distance)
+    public void SetPointMinDistance(float _Distance)
     {
-        this.pointsMinDistance = distance;
+        this.pointsMinDistance = _Distance;
     }
 
-    public void SetLineWidth(float width)
+    public void SetLineWidth(float _Width)
     {
-        this.lineRenderer.startWidth = width;
-        this.lineRenderer.endWidth = width;
+        this.lineRenderer.startWidth = _Width;
+        this.lineRenderer.endWidth = _Width;
+    }
+
+    public void Clear()
+    {
+        this.lineRenderer.positionCount = 0;
+        this.points.Clear();
+
+        PointCount = 0;
     }
 }

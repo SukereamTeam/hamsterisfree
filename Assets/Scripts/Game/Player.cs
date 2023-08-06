@@ -37,6 +37,18 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            var result = RaycastGameScreen(Input.mousePosition);
+
+            if (result.Item1.collider.IsNull())
+            {
+                // GameScreen 영역을 벗어나면
+                Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                GameManager.Instance.MapManager.IsFade.Value = false;
+                this.lineManager.EndDraw();
+
+                return;
+            }
+
             GameManager.Instance.MapManager.IsFade.Value = true;
 
             this.mouseDownTime = Time.time;
