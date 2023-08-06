@@ -7,19 +7,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Camera gameCamera = null;
 
-
-    [Space(30)]
     [SerializeField]
-    private GameObject linePrefab;
-
-    [SerializeField]
-    private Gradient lineColor;
-
-    [SerializeField]
-    private float linePointMinDistance;
-
-    [SerializeField]
-    private float lineWidth;
+    private LineManager lineManager = null;
 
 
     private readonly float dragDistance = 0.3f;
@@ -27,18 +16,12 @@ public class Player : MonoBehaviour
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
 
-    private Line currentLine;
     private int lineLayer = -1;
 
 
 
     // TODO
-    // Line Renderer로 선 그리기
-    // 페이드 완료 되어야 게임 시작
     // 몬스터타일 선택 하면 게임 오버
-
-    // TODO
-    // background bounds 밖으로 input 나가면 return;
 
     private void Start()
     {
@@ -59,13 +42,23 @@ public class Player : MonoBehaviour
             this.mouseDownTime = Time.time;
             this.mouseDownPos = Input.mousePosition;
 
-            //BlockMouseOutBounds(Input.mousePosition);
-
-            BeginDraw();
+            this.lineManager.BeginDraw();
         }
 
         if (Input.GetMouseButton(0))
         {
+            var result = RaycastGameScreen(Input.mousePosition);
+
+            if (result.Item1.collider.IsNull())
+            {
+                // GameScreen 영역을 벗어나면
+                Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                GameManager.Instance.MapManager.IsFade.Value = false;
+                this.lineManager.EndDraw();
+
+                return;
+            }
+
             Vector3 offset = Input.mousePosition - this.mouseDownPos;
             float sqrLen = offset.sqrMagnitude;
 
@@ -86,17 +79,21 @@ public class Player : MonoBehaviour
                 }
             }
 
-            if (this.currentLine != null)
-                DrawLine();
+
+            GameManager.Instance.MapManager.Mask.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.Mask.transform.position.z);
+
+            if (this.lineManager.CurrentLine != null)
+                this.lineManager.DrawLine(result.Item2);
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             GameManager.Instance.MapManager.IsFade.Value = false;
 
-            EndDraw();
+            this.lineManager.EndDraw();
         }
     }
+
 
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
@@ -115,64 +112,12 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    private void BlockMouseOutBounds(Vector3 _MousePosition)
+    private (RaycastHit2D, Vector2) RaycastGameScreen(Vector3 _MousePosition)
     {
-        var backPos = GameManager.Instance.MapManager.Background.transform.position;
-
-        var screenPos = gameCamera.WorldToScreenPoint(backPos);
-
-        var top = gameCamera.WorldToViewportPoint(GameManager.Instance.MapManager.Background.bounds.max);
-    }
-
-
-
-    //----- Line Render
-    private void BeginDraw()
-    {
-        this.currentLine = Instantiate(linePrefab, this.transform).GetComponent<Line>();
-
-        this.currentLine.SetLineColor(this.lineColor);
-        this.currentLine.SetPointMinDistance(this.linePointMinDistance);
-        this.currentLine.SetLineWidth(this.lineWidth);
-
-
-    }
-
-    private void DrawLine()
-    {
-        //Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
-        //var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, this.lineLayer);
-
-
-        Vector2 mousePosition = gameCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePosition = gameCamera.ScreenToWorldPoint(_MousePosition);
 
         var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
 
-        if (raycastResult)
-        {
-
-            this.currentLine.AddPoint(mousePosition);
-        }
-        else
-        {
-            //EndDraw();
-        }
-
-
-    }
-
-    private void EndDraw()
-    {
-        if (this.currentLine != null)
-        {
-            if (this.currentLine.PointCount < 2)
-            {
-                Destroy(this.currentLine.gameObject);
-            }
-            else
-            {
-                this.currentLine = null;
-            }
-        }
+        return (raycastResult, mousePosition);
     }
 }

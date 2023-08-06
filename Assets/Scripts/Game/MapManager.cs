@@ -24,6 +24,7 @@ public class MapManager : MonoBehaviour
 
     [SerializeField]
     private SpriteRenderer mask;
+    public SpriteRenderer Mask => this.mask;
 
     [SerializeField]
     private float fadeTime = 0f;
