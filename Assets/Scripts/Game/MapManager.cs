@@ -157,12 +157,12 @@ public class MapManager : MonoBehaviour
 
         var edgeSpritePath = string.Empty;
 
-        for (int i = 0; i < Enum.GetValues(typeof(Direction)).Length; i++)
+        for (int i = 0; i < Enum.GetValues(typeof(Define.Direction)).Length; i++)
         {
             var horizontal = i < 2 ? string.Format("Top") : string.Format("Bottom");
             var vertical = i < 2 ? i : i - 2;
 
-            edgeSpritePath = $"Images/Map/Forest/Forest_{horizontal}{Enum.GetName(typeof(Direction), vertical)}";
+            edgeSpritePath = $"Images/Map/Forest/Forest_{horizontal}{Enum.GetName(typeof(Define.Direction), vertical)}";
 
             var sprite = Resources.Load<Sprite>(edgeSpritePath);
 
@@ -185,7 +185,7 @@ public class MapManager : MonoBehaviour
 
         var exitTile = Instantiate<GameObject>(exitPrefab, this.transform);
         var exitScript = exitTile.GetComponent<ExitTile>();
-        exitScript.Initialize(TileType.Exit, "", randomPos);
+        exitScript.Initialize(Define.TileType.Exit, "", randomPos);
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가

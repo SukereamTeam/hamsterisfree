@@ -3,13 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum TileType
-{
-    Normal = 0,
-    Exit,
-    Seed,
-    Monster
-}
+
 
 
 
@@ -18,15 +12,15 @@ public abstract class TileBase : MonoBehaviour
     protected string tileName;
     protected Vector2 position;
 
-    protected TileType tileType;
-    public TileType TileType => this.tileType;
+    protected Define.TileType tileType;
+    public Define.TileType TileType => this.tileType;
 
     protected Sprite tileSprite;
     protected SpriteRenderer spriteRenderer;
     protected BoxCollider2D tileCollider;
     protected Animator animator;
 
-    public virtual void Initialize(TileType _Type, string _SpritePath, Vector2 _Pos)
+    public virtual void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
     {
         this.tileType = _Type;
 
