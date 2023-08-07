@@ -54,15 +54,15 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        SetBackground();
+        //SetBackground();
 
-        this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform && x.name.Contains("Tile_")).ToArray();
+        //this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform && x.name.Contains("Tile_")).ToArray();
 
-        SetOutlineTiles();
+        //SetOutlineTiles();
 
-        CreateExitTile();
+        //CreateExitTile();
 
-        SetMask();
+        //SetMask();
 
 
         this.isFade
@@ -99,20 +99,35 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private void SetBackground()
+
+
+    //------------ Setting Stage Data
+
+    public void SetStage(int stageIndex)
     {
-        var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Center");
+        var data = (StageData)CommonManager.Instance.DataContainer.StageTable.DicData[stageIndex.ToString()];
+
+        SetBackground(data.MapName);
+        SetOutlineTiles(data.MapName);
+        SetMask(data.MapName);
+
+        CreateExitTile();
+    }
+
+    private void SetBackground(string _MapName)
+    {
+        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Center");
 
         this.background.sprite = sprite;
     }
 
-    private void SetOutlineTiles()
+    private void SetOutlineTiles(string _MapName)
     {
         for (int i = 0; i < outlineTiles.Length; i++)
         {
             if (i < 9)
             {
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Left");
+                var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Left");
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
@@ -155,6 +170,12 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    private void SetMask(string _MapName)
+    {
+        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Mask");
+        mask.sprite = sprite;
+    }
+
     private void CreateExitTile()
     {
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
@@ -171,11 +192,7 @@ public class MapManager : MonoBehaviour
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
     }
 
-    private void SetMask()
-    {
-        var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Mask");
-        mask.sprite = sprite;
-    }
+    
 
     private void CreateTile()
     {

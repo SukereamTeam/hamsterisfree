@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+
+public enum SeedType
+{
+    Normal = 0,
+    Heart
+}
+
+
 public class SeedTile : TileBase
 {
     [SerializeField]

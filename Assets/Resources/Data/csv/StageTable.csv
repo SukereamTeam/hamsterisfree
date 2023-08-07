@@ -1,0 +1,3 @@
+스테이지 번호(index),스테이지 유형,맵,"Seed Pos(pos, empty = 0)","Monster Pos (Type, Size, pos(or empty = random fixed))"
+Index,StageType,MapName,SeedPos,MonsterPos
+0,Heart,Forest,"((0, 0), (3, 0))",NULL
