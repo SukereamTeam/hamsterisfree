@@ -19,7 +19,7 @@ public class SeedTile : TileBase
 
     }
 
-    public override void Initialize(TileType _Type, string _SpritePath, Vector2 _Pos)
+    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
     {
         base.Initialize(_Type, _SpritePath, _Pos);
 
