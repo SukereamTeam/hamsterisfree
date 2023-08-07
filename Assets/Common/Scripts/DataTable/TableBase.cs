@@ -8,11 +8,12 @@ public struct ObjectData
 {
     // "Normal_((0, 0), (3, 0))"
     public string Type;
+    public int Size;
     public List<Tuple<int, int>> Pos;
 }
 
 
-public abstract class TableBase : MonoBehaviour
+public abstract class TableBase
 {
     public abstract void SetTable(string key, string name, string value);
 

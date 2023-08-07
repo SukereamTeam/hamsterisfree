@@ -11,8 +11,8 @@ public struct StageData
     public int Index;
     public string StageType;
     public string MapName;
-    public ObjectData SeedList;
-    public ObjectData MonsterList;
+    public List<ObjectData> SeedList;
+    public List<ObjectData> MonsterList;
 }
 
 public class StageTable : TableBase
@@ -44,24 +44,22 @@ public class StageTable : TableBase
                 break;
             case "SeedData":
                 {
-                    data.SeedList = new ObjectData();
+                    data.SeedList = new List<ObjectData>();
 
-                    if (_Value.Equals("NULL"))
+                    if (_Value.Equals("NULL") == false)
                     {
-                        return;
+                        data.SeedList = GetListData(_Value);
                     }
-                    data.SeedList = GetListData(_Value);
                 }
                 break;
             case "MonsterData":
                 {
-                    data.MonsterList = new ObjectData();
+                    data.MonsterList = new List<ObjectData>();
 
-                    if (_Value.Equals("NULL"))
+                    if (_Value.Equals("NULL") == false)
                     {
-                        return;
+                        data.MonsterList = GetListData(_Value);
                     }
-                    data.MonsterList = GetListData(_Value);
                 }
                 break;
 
@@ -74,25 +72,39 @@ public class StageTable : TableBase
 
 
 
-    public ObjectData GetListData(string _Value)
+    public List<ObjectData> GetListData(string _Value)
     {
-        ObjectData data = new ObjectData();
+        List<ObjectData> list = new List<ObjectData>();
 
-        var splitData = _Value.Split('_');
+        var splitList = _Value.Split('+');
 
-        for (int i = 0; i < splitData.Length; i++)
+        for (int i = 0; i < splitList.Length; i++)
         {
-            if (i == 0)
+            var splitData = splitList[i].Replace("(", "").Replace(")", "").Split('_');
+
+            ObjectData data = new ObjectData();
+            for (int j = 0; j < splitData.Length; j++)
             {
-                data.Type = splitData[i];
+                if (j == 0)
+                {
+                    data.Type = splitData[j];
+                }
+                else if (j == 1)
+                {
+                    data.Size = Int32.Parse(splitData[j]);
+                }
+                else
+                {
+                    data.Pos = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
+                }
             }
-            else
-            {
-                data.Pos = new List<Tuple<int, int>>(ParsingPosition(_Value));
-            }
+
+            list.Add(data);
         }
 
-        return data;
+        
+
+        return list;
     }
 
     private List<Tuple<int, int>> ParsingPosition(string _Value)
@@ -101,7 +113,7 @@ public class StageTable : TableBase
 
         // "((0, 0), (3, 0))"
 
-        string[] pairs = _Value.Replace("(", "").Replace(")", "").Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] pairs = _Value.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
         // "0030"
 
         for (int i = 0; i < pairs.Length; i += 2)

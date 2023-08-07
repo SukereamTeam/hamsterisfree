@@ -16,6 +16,8 @@ public class CommonManager : MonoSingleton<CommonManager>
 
         this.isInit = true;
 
+        this.dataContainer = this.transform.gameObject.AddComponent<DataContainer>();
+
         // Table Load
         this.dataContainer.Initialize();
     }
