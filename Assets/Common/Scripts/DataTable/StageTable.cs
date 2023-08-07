@@ -11,8 +11,8 @@ public struct StageData
     public int Index;
     public string StageType;
     public string MapName;
-    public List<ObjectData> SeedList;
-    public List<ObjectData> MonsterList;
+    public List<TableBase.ObjectData> SeedList;
+    public List<TableBase.ObjectData> MonsterList;
 }
 
 public class StageTable : TableBase
@@ -78,26 +78,30 @@ public class StageTable : TableBase
 
         var splitList = _Value.Split('+');
 
+        (string, int, List<Tuple<int, int>>) value = ("", -1, new List<Tuple<int, int>>());
+
         for (int i = 0; i < splitList.Length; i++)
         {
             var splitData = splitList[i].Replace("(", "").Replace(")", "").Split('_');
 
-            ObjectData data = new ObjectData();
+            
             for (int j = 0; j < splitData.Length; j++)
             {
                 if (j == 0)
                 {
-                    data.Type = splitData[j];
+                    value.Item1 = splitData[j];
                 }
                 else if (j == 1)
                 {
-                    data.Size = Int32.Parse(splitData[j]);
+                    value.Item2 = Int32.Parse(splitData[j]);
                 }
                 else
                 {
-                    data.Pos = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
+                    value.Item3 = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
                 }
             }
+
+            ObjectData data = new ObjectData(value.Item1, value.Item2, value.Item3);
 
             list.Add(data);
         }

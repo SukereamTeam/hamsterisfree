@@ -26,4 +26,6 @@ public class Define : MonoBehaviour
         Seed,
         Monster
     }
+
+
 }
