@@ -125,7 +125,7 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
 
 
 
-    public List<ObjectData> GetListData(string _Value)
+    private List<ObjectData> GetListData(string _Value)
     {
         List<ObjectData> list = new List<ObjectData>(0);
 
