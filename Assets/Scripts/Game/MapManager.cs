@@ -105,13 +105,16 @@ public class MapManager : MonoBehaviour
 
     public void SetStage(int stageIndex)
     {
-        var data = (StageTable.StageData)DataContainer.StageTable.DicData[stageIndex.ToString()];
+        if (DataContainer.StageTable.DicData.ContainsKey(stageIndex.ToString()))
+        {
+            var data = DataContainer.StageTable.DicData[stageIndex.ToString()];
 
-        SetBackground(data.MapName);
-        SetOutlineTiles(data.MapName);
-        SetMask(data.MapName);
+            SetBackground(data.MapName);
+            SetOutlineTiles(data.MapName);
+            SetMask(data.MapName);
 
-        CreateExitTile();
+            CreateExitTile();
+        }
     }
 
     private void SetBackground(string _MapName)
