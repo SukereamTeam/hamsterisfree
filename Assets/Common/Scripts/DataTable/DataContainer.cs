@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-public class DataContainer : MonoBehaviour
+public static class DataContainer
 {
     // TODO
     // 엑셀 데이터 형식 : 0, seed, monster
@@ -31,11 +31,11 @@ public class DataContainer : MonoBehaviour
     static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
     static char[] TRIM_CHARS = { '\"' };
 
-    public StageTable StageTable { get; private set; }
-    public SeedTable SeedTable { get; private set; }
+    public static StageTable StageTable { get; private set; }
+    public static SeedTable SeedTable { get; private set; }
 
 
-    public void Initialize()
+    public static void Initialize()
     {
         StageTable = new StageTable();
         ReadCSV(StageTable, "StageTable");

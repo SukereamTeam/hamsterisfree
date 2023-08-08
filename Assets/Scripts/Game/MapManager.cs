@@ -105,7 +105,7 @@ public class MapManager : MonoBehaviour
 
     public void SetStage(int stageIndex)
     {
-        var data = (StageTable.StageData)CommonManager.Instance.DataContainer.StageTable.DicData[stageIndex.ToString()];
+        var data = (StageTable.StageData)DataContainer.StageTable.DicData[stageIndex.ToString()];
 
         SetBackground(data.MapName);
         SetOutlineTiles(data.MapName);
