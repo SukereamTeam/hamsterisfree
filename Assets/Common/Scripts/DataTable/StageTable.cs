@@ -166,12 +166,13 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
 
     private List<Tuple<int, int>> ParsingPosition(string _Value)
     {
-        List<Tuple<int, int>> tuplePos = new List<Tuple<int, int>>(0);
-
         // "((0, 0), (3, 0))"
-
         string[] pairs = _Value.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        
         // "0030"
+
+        List<Tuple<int, int>> tuplePos = new List<Tuple<int, int>>(pairs.Length);
+
 
         for (int i = 0; i < pairs.Length; i += 2)
         {
