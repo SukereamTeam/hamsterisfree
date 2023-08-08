@@ -35,6 +35,9 @@ public static class DataContainer
     public static SeedTable SeedTable { get; private set; }
 
 
+
+
+
     public static void Initialize()
     {
         StageTable = new StageTable();
@@ -42,9 +45,9 @@ public static class DataContainer
     }
 
 
-    public static List<Dictionary<string, object>> ReadCSV(TableBase _TableBase, string _FileName)
+    public static List<Dictionary<string, T>> ReadCSV<T, S>(TableBase<T, S> _TableBase, string _FileName)
     {
-        var list = new List<Dictionary<string, object>>();
+        var list = new List<Dictionary<string, T>>();
         var table = Resources.Load<TextAsset>($"Data/csv/{_FileName}");
 
         var lines = Regex.Split(table.text, LINE_SPLIT_RE);
@@ -62,7 +65,7 @@ public static class DataContainer
                 continue;
             }
 
-            var tableData = new Dictionary<string, object>();
+            var tableData = new Dictionary<string, T>();
 
             for (var j = 0; j < headers.Length && j < values.Length; j++)
             {

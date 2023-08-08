@@ -6,7 +6,7 @@ using UnityEngine;
 using System.Text;
 
 
-public class StageTable : TableBase
+public class StageTable : TableBase<StageTable, StageTable.StageData>
 {
     private int index;
     private string stageType;
@@ -32,13 +32,35 @@ public class StageTable : TableBase
             MonsterList = new List<ObjectData>(0);
         }
 
-        public StageData(int _Index, string _StageType, string _MapName, List<TableBase.ObjectData> _SeedList, List<TableBase.ObjectData> _MonsterList)
+        public StageData(int _Index, string _StageType, string _MapName, List<ObjectData> _SeedList, List<ObjectData> _MonsterList)
         {
             Index = _Index;
             StageType = _StageType;
             MapName = _MapName;
             SeedList = new List<ObjectData>(_SeedList);
             MonsterList = new List<ObjectData>(_MonsterList);
+        }
+    }
+
+    public record ObjectData
+    {
+        // "Normal_1_((0, 0), (3, 0))"
+        public string Type { get; }
+        public int Size { get; }
+        public List<Tuple<int, int>> Pos { get; }
+
+        public ObjectData(string _Type, int _Size, List<Tuple<int, int>> _Pos)
+        {
+            Type = _Type;
+            Size = _Size;
+            Pos = new List<Tuple<int, int>>(_Pos);
+        }
+
+        public ObjectData()
+        {
+            Type = "";
+            Size = -1;
+            Pos = new List<Tuple<int, int>>();
         }
     }
 
