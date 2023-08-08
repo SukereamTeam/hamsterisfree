@@ -60,7 +60,7 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
         {
             Type = "";
             Size = -1;
-            Pos = new List<Tuple<int, int>>();
+            Pos = new List<Tuple<int, int>>(0);
         }
     }
 
