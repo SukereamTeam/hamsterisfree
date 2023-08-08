@@ -23,8 +23,11 @@ public class SceneController : MonoBehaviour
     {
         // Data Load ?
 
+        loadingTask.Add(UniTask.Defer(() => DataContainer.LoadResources(0)));
         loadingTask.Add(UniTask.Defer(TestCode1));
         loadingTask.Add(UniTask.Defer(TestCode2));
+        //loadingTask.Add(UniTask.Defer((DataContainer.LoadResources(0))));
+        
         loadingTask.Add(UniTask.Defer(LoadScene));
 
         //

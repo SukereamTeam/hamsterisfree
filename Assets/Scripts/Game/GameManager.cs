@@ -26,14 +26,6 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-    private void Awake()
-    {
-        
-
-        // TODO : DELETE (테스트용)
-        CommonManager.Instance.Initialize();
-    }
-
     private void Start()
     {
 
