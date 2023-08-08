@@ -27,9 +27,9 @@ public static class DataContainer
     // Timer, Star(반드시 먹어야 하는 해씨의 갯수), Heart(기회 횟수)
 
 
-    static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-    static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
-    static char[] TRIM_CHARS = { '\"' };
+    static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
+    static readonly string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
+    static readonly char[] TRIM_CHARS = { '\"' };
 
     public static StageTable StageTable { get; private set; }
     public static SeedTable SeedTable { get; private set; }
@@ -45,15 +45,11 @@ public static class DataContainer
     }
 
 
-    public static List<Dictionary<string, T>> ReadCSV<T, S>(TableBase<T, S> _TableBase, string _FileName)
+    public static void ReadCSV<T, S>(TableBase<T, S> _TableBase, string _FileName)
     {
-        var list = new List<Dictionary<string, T>>();
         var table = Resources.Load<TextAsset>($"Data/csv/{_FileName}");
 
         var lines = Regex.Split(table.text, LINE_SPLIT_RE);
-
-        if (lines.Length <= 1)
-            return list;
 
 
         var headers = Regex.Split(lines[1], SPLIT_RE);  //csv의 둘째줄부터 header로 판정
@@ -65,8 +61,6 @@ public static class DataContainer
                 continue;
             }
 
-            var tableData = new Dictionary<string, T>();
-
             for (var j = 0; j < headers.Length && j < values.Length; j++)
             {
                 string value = values[j];
@@ -75,11 +69,7 @@ public static class DataContainer
 
                 _TableBase.SetTable(values[0], headers[j], value);
             }
-
-            list.Add(tableData);
         }
-
-        return list;
     }
 
     // TODO
