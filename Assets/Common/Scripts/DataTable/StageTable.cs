@@ -127,9 +127,9 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
 
     private List<ObjectData> GetListData(string _Value)
     {
-        List<ObjectData> list = new List<ObjectData>(0);
-
         var splitList = _Value.Split('+');
+
+        List<ObjectData> list = new List<ObjectData>(splitList.Length);
 
         (string type, int size, List<Tuple<int, int>> pos) value = ("", -1, new List<Tuple<int, int>>(0));
 
