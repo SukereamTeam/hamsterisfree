@@ -6,17 +6,42 @@ using UnityEngine;
 using System.Text;
 
 
-public struct StageData
-{
-    public int Index;
-    public string StageType;
-    public string MapName;
-    public List<TableBase.ObjectData> SeedList;
-    public List<TableBase.ObjectData> MonsterList;
-}
-
 public class StageTable : TableBase
 {
+    private int index;
+    private string stageType;
+    private string mapName;
+    private List<ObjectData> seedList = new List<ObjectData>(0);
+    private List<ObjectData> monsterList = new List<ObjectData>(0);
+
+
+    public record StageData
+    {
+        public int Index { get; }
+        public string StageType { get; }
+        public string MapName { get; }
+        public List<ObjectData> SeedList { get; }
+        public List<ObjectData> MonsterList { get; }
+
+        public StageData()
+        {
+            Index = -1;
+            StageType = "";
+            MapName = "";
+            SeedList = new List<ObjectData>(0);
+            MonsterList = new List<ObjectData>(0);
+        }
+
+        public StageData(int _Index, string _StageType, string _MapName, List<TableBase.ObjectData> _SeedList, List<TableBase.ObjectData> _MonsterList)
+        {
+            Index = _Index;
+            StageType = _StageType;
+            MapName = _MapName;
+            SeedList = new List<ObjectData>(_SeedList);
+            MonsterList = new List<ObjectData>(_MonsterList);
+        }
+    }
+
     public override void SetTable(string _Key, string _Name, string _Value)
     {
         StageData data;
@@ -28,37 +53,35 @@ public class StageTable : TableBase
             mDicData.Add(_Key, data);
         }
 
-        data = (StageData)mDicData[_Key];
-
-
+        
         switch (_Name)
         {
             case "Index":
-                data.Index = Int32.Parse(_Value);
+                this.index = Int32.Parse(_Value);
                 break;
             case "StageType":
-                data.StageType = _Value;
+                this.stageType = _Value;
                 break;
             case "MapName":
-                data.MapName = _Value;
+                this.mapName = _Value;
                 break;
             case "SeedData":
                 {
-                    data.SeedList = new List<ObjectData>();
+                    this.seedList = new List<ObjectData>(0);
 
                     if (_Value.Equals("NULL") == false)
                     {
-                        data.SeedList = GetListData(_Value);
+                        this.seedList = new List<ObjectData>(GetListData(_Value));
                     }
                 }
                 break;
             case "MonsterData":
                 {
-                    data.MonsterList = new List<ObjectData>();
+                    this.monsterList = new List<ObjectData>(0);
 
                     if (_Value.Equals("NULL") == false)
                     {
-                        data.MonsterList = GetListData(_Value);
+                        this.monsterList = new List<ObjectData>(GetListData(_Value));
                     }
                 }
                 break;
@@ -66,7 +89,15 @@ public class StageTable : TableBase
             default: break;
         }
 
-        mDicData[_Key] = data;
+        if (_Name.Equals("MonsterData"))
+        {
+            // 한 줄의 마지막을 읽어올 때 데이터 넣어주기
+            data = new StageData(this.index, this.stageType, this.mapName, this.seedList, this.monsterList);
+
+            mDicData[_Key] = data;
+
+            Reset();
+        }
     }
 
 
@@ -74,11 +105,11 @@ public class StageTable : TableBase
 
     public List<ObjectData> GetListData(string _Value)
     {
-        List<ObjectData> list = new List<ObjectData>();
+        List<ObjectData> list = new List<ObjectData>(0);
 
         var splitList = _Value.Split('+');
 
-        (string, int, List<Tuple<int, int>>) value = ("", -1, new List<Tuple<int, int>>());
+        (string type, int size, List<Tuple<int, int>> pos) value = ("", -1, new List<Tuple<int, int>>(0));
 
         for (int i = 0; i < splitList.Length; i++)
         {
@@ -89,19 +120,19 @@ public class StageTable : TableBase
             {
                 if (j == 0)
                 {
-                    value.Item1 = splitData[j];
+                    value.type = splitData[j];
                 }
                 else if (j == 1)
                 {
-                    value.Item2 = Int32.Parse(splitData[j]);
+                    value.size = Int32.Parse(splitData[j]);
                 }
                 else
                 {
-                    value.Item3 = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
+                    value.pos = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
                 }
             }
 
-            ObjectData data = new ObjectData(value.Item1, value.Item2, value.Item3);
+            ObjectData data = new ObjectData(value.type, value.size, value.pos);
 
             list.Add(data);
         }
@@ -113,7 +144,7 @@ public class StageTable : TableBase
 
     private List<Tuple<int, int>> ParsingPosition(string _Value)
     {
-        List<Tuple<int, int>> tuplePos = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> tuplePos = new List<Tuple<int, int>>(0);
 
         // "((0, 0), (3, 0))"
 
@@ -129,5 +160,14 @@ public class StageTable : TableBase
         }
 
         return tuplePos;
+    }
+
+    private void Reset()
+    {
+        this.index = -1;
+        this.stageType = "";
+        this.mapName = "";
+        this.seedList.Clear();
+        this.monsterList.Clear();
     }
 }

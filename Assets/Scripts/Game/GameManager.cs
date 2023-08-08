@@ -5,8 +5,6 @@ using UnityEngine;
 using UniRx;
 
 
-
-
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField]

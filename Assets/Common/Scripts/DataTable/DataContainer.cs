@@ -35,9 +35,6 @@ public class DataContainer : MonoBehaviour
     public SeedTable SeedTable { get; private set; }
 
 
-
-
-
     public void Initialize()
     {
         StageTable = new StageTable();

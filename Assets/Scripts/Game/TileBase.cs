@@ -4,9 +4,6 @@ using UnityEngine;
 
 
 
-
-
-
 public abstract class TileBase : MonoBehaviour
 {
     protected string tileName;
