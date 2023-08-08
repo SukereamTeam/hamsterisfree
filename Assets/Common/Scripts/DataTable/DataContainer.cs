@@ -45,7 +45,7 @@ public static class DataContainer
     }
 
 
-    public static void ReadCSV<T, S>(TableBase<T, S> _TableBase, string _FileName)
+    public static void ReadCSV<T>(TableBase<T> _TableBase, string _FileName)
     {
         var table = Resources.Load<TextAsset>($"Data/csv/{_FileName}");
 

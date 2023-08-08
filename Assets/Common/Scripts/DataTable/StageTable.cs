@@ -6,7 +6,7 @@ using UnityEngine;
 using System.Text;
 
 
-public class StageTable : TableBase<StageTable, StageTable.StageData>
+public class StageTable : TableBase<StageTable.StageData>
 {
     private int index;
     private string stageType;
