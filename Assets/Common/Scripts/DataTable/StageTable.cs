@@ -68,11 +68,11 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
     {
         StageData data;
 
-        if (mDicData.ContainsKey(_Key) == false)
+        if (dicData.ContainsKey(_Key) == false)
         {
             data = new StageData();
 
-            mDicData.Add(_Key, data);
+            dicData.Add(_Key, data);
         }
 
         
@@ -116,7 +116,7 @@ public class StageTable : TableBase<StageTable, StageTable.StageData>
             // 한 줄의 마지막을 읽어올 때 데이터 넣어주기
             data = new StageData(this.index, this.stageType, this.mapName, this.seedList, this.monsterList);
 
-            mDicData[_Key] = data;
+            dicData[_Key] = data;
 
             Reset();
         }
