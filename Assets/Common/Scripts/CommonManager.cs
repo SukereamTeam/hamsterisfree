@@ -5,6 +5,9 @@ using UnityEngine;
 public class CommonManager : MonoSingleton<CommonManager>
 {
 
+    //TODO : DELETE (Test용)
+    public int CurStageIndex { get; private set; }
+
     private bool isInit = false;
     public void Initialize()
     {
@@ -13,6 +16,7 @@ public class CommonManager : MonoSingleton<CommonManager>
 
         this.isInit = true;
 
+        CurStageIndex = 0;
 
         // Table Load
         DataContainer.Initialize();

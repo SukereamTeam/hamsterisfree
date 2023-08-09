@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using TMPro;
 
 public static class DataContainer
 {
@@ -78,4 +80,22 @@ public static class DataContainer
     // 탈출문 좌표
     // 게임 시작할 때 여기 저장된 스테이지 넘버로 스테이지 데이터테이블 참조하여 불러옴
 
+    public static async UniTask LoadResources(int stage)
+    {
+        var obj = GameObject.Find("Current");
+        if (obj != null)
+        {
+            var text = obj.GetComponent<TextMeshProUGUI>();
+
+            if (text != null)
+            {
+                text.text = "Data Load ~~~~~~";
+            }
+        }
+
+        var dicData = StageTable.DicData[CommonManager.Instance.CurStageIndex.ToString()];
+
+
+        await UniTask.Delay(3000);
+    }
 }

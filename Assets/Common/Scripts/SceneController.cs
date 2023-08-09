@@ -19,6 +19,12 @@ public class SceneController : MonoBehaviour
     List<UniTask> loadingTask = new List<UniTask>();
 
 
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
     private async void Start()
     {
         // Data Load ?
@@ -26,7 +32,6 @@ public class SceneController : MonoBehaviour
         loadingTask.Add(UniTask.Defer(() => DataContainer.LoadResources(0)));
         loadingTask.Add(UniTask.Defer(TestCode1));
         loadingTask.Add(UniTask.Defer(TestCode2));
-        //loadingTask.Add(UniTask.Defer((DataContainer.LoadResources(0))));
         
         loadingTask.Add(UniTask.Defer(LoadScene));
 
@@ -36,6 +41,19 @@ public class SceneController : MonoBehaviour
 
         // ----------- 밑에 있는게 되는 코드(쓰려면 위에 다 주석)
         //await LoadScene();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == nextScene)
+        {
+            Scene_Base baseScene = FindObjectOfType<Scene_Base>();
+            if (baseScene != null)
+            {
+                // FunctionToCallInNextScene 함수 호출
+                baseScene.Test();
+            }
+        }
     }
 
 
@@ -52,6 +70,8 @@ public class SceneController : MonoBehaviour
             loadingText.text = $"{percent} %";
         }
     }
+
+
 
     private async UniTask TestCode1()
     {
@@ -81,20 +101,21 @@ public class SceneController : MonoBehaviour
     private async UniTask LoadScene()
     {
         AsyncOperation op = SceneManager.LoadSceneAsync(nextScene);
-        op.allowSceneActivation = false;
+        //op.allowSceneActivation = false;
 
-        while (!op.isDone)
-        {
-            float progress = Mathf.Clamp01(op.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
-            //loadingText.text = $"Loading... {Mathf.RoundToInt(progress * 100)}%";
+        //while (!op.isDone)
+        //{
+        //    float progress = Mathf.Clamp01(op.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
+        //    //loadingText.text = $"Loading... {Mathf.RoundToInt(progress * 100)}%";
 
-            if (progress >= 1.0f)
-            {
-                op.allowSceneActivation = true;
-            }
+        //    if (progress >= 0.9f)
+        //    {
+        //        op.allowSceneActivation = true;
+        //    }
 
-            await UniTask.Yield(); // 다음 프레임까지 대기
-        }
+        //    await UniTask.Yield(); // 다음 프레임까지 대기
+        //}
+        await op;
     }
 
 }
