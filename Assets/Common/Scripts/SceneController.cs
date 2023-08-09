@@ -43,17 +43,15 @@ public class SceneController : MonoBehaviour
 
     private async UniTask OnSceneLoaded()
     {
+        this.operation.allowSceneActivation = true;
+
+        await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == nextScene);
+
         Scene_Base baseScene = FindObjectOfType<Scene_Base>();
         if (baseScene != null)
         {
             Debug.Log($"await baseScene.LoadDatas(); 호출 ~~~");
             await baseScene.LoadDatas();
-
-            this.operation.allowSceneActivation = true;
-        }
-        else
-        {
-            Debug.Log($"ㅡㅡ");
         }
     }
 
@@ -94,7 +92,6 @@ public class SceneController : MonoBehaviour
         while (!operation.isDone)
         {
             float progress = Mathf.Clamp01(operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
-            //loadingText.text = $"Loading... {Mathf.RoundToInt(progress * 100)}%";
 
             if (progress >= 0.9f)
             {
@@ -106,6 +103,7 @@ public class SceneController : MonoBehaviour
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
         //await op;
+
         await UniTask.CompletedTask;
     }
 
