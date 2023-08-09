@@ -5,9 +5,9 @@ using Cysharp.Threading.Tasks;
 
 public class Scene_Base : MonoBehaviour
 {
-    public virtual async UniTask Test()
+    public virtual async UniTask LoadDatas()
     {
-        Debug.Log("BaseScene's FunctionToCallInNextScene");
+        Debug.Log("### Scene_Base LoadDatas ###");
 
         await UniTask.CompletedTask;
     }

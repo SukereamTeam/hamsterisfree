@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UniRx;
-
+using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+    [SerializeField]
+    private Scene_Game sceneGameScript = null;
+
     [SerializeField]
     private MapManager mapManager = null;
     public MapManager MapManager => this.mapManager;
@@ -42,8 +46,16 @@ public class GameManager : MonoSingleton<GameManager>
 
 
         
+    }
 
-        this.mapManager.SetStage(curStageIndex);
+    public async UniTask GameStart()
+    {
+        if (this.sceneGameScript != null)
+        {
+            await this.mapManager.SetStage(this.sceneGameScript.TileSpriteList);
+        }
+        
+        //await UniTask.CompletedTask;
     }
 
     private void GameEndFlow()

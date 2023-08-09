@@ -27,5 +27,18 @@ public class Define
         Monster
     }
 
+    public enum TileSpriteName
+    {
+        Center = 0,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Mask
+    }
 
 }

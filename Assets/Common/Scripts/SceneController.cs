@@ -16,8 +16,9 @@ public class SceneController : MonoBehaviour
     private static string nextScene;
     private float progress;
 
-    List<UniTask> loadingTask = new List<UniTask>();
+    private List<UniTask> loadingTask = new List<UniTask>();
 
+    private AsyncOperation operation;
 
 
     //private void OnEnable()
@@ -29,64 +30,51 @@ public class SceneController : MonoBehaviour
     {
         // Data Load ?
 
-        loadingTask.Add(UniTask.Defer(() => DataContainer.LoadResources(0)));
-        loadingTask.Add(UniTask.Defer(TestCode1));
-        loadingTask.Add(UniTask.Defer(TestCode2));
-        
+        loadingTask.Add(UniTask.Defer(TestCode));
+
         loadingTask.Add(UniTask.Defer(LoadScene));
 
-        //
+        loadingTask.Add(UniTask.Defer(() => OnSceneLoaded()));
 
-        await Test();
+        await RunTasks();
 
-        // ----------- 밑에 있는게 되는 코드(쓰려면 위에 다 주석)
-        //await LoadScene();
-
-        await OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+        //await OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
     }
 
-    private async UniTask OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private async UniTask OnSceneLoaded()
     {
-        if (scene.name == nextScene)
+        Scene_Base baseScene = FindObjectOfType<Scene_Base>();
+        if (baseScene != null)
         {
-            Scene_Base baseScene = FindObjectOfType<Scene_Base>();
-            if (baseScene != null)
-            {
-                // FunctionToCallInNextScene 함수 호출
-                await baseScene.Test();
-            }
+            Debug.Log($"await baseScene.LoadDatas(); 호출 ~~~");
+            await baseScene.LoadDatas();
+
+            this.operation.allowSceneActivation = true;
+        }
+        else
+        {
+            Debug.Log($"ㅡㅡ");
         }
     }
 
-
-    private async UniTask Test()
+    private async UniTask RunTasks()
     {
         int i = 0;
         foreach (var task in loadingTask)
         {
+            Debug.Log($"{i + 1} 번째 호출");
+
             await task;
 
             i++;
-
-            var percent = (loadingTask.Count / i) * 100;
-            loadingText.text = $"{percent} %";
         }
     }
 
-
-
-    private async UniTask TestCode1()
+    private async UniTask TestCode()
     {
         await UniTask.Delay(3000);      //3초 대기
 
-        currentText.text = "TestCode111";
-    }
-
-    private async UniTask TestCode2()
-    {
-        await UniTask.Delay(3000);      //3초 대기
-
-        currentText.text = "TestCode222";
+        currentText.text = "TestCode";
     }
 
 
@@ -97,27 +85,28 @@ public class SceneController : MonoBehaviour
         SceneManager.LoadScene("Loading");
     }
 
-    
-
 
     private async UniTask LoadScene()
     {
-        AsyncOperation op = SceneManager.LoadSceneAsync(nextScene);
-        //op.allowSceneActivation = false;
+        operation = SceneManager.LoadSceneAsync(nextScene);
+        operation.allowSceneActivation = false;
 
-        //while (!op.isDone)
-        //{
-        //    float progress = Mathf.Clamp01(op.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
-        //    //loadingText.text = $"Loading... {Mathf.RoundToInt(progress * 100)}%";
+        while (!operation.isDone)
+        {
+            float progress = Mathf.Clamp01(operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
+            //loadingText.text = $"Loading... {Mathf.RoundToInt(progress * 100)}%";
 
-        //    if (progress >= 0.9f)
-        //    {
-        //        op.allowSceneActivation = true;
-        //    }
+            if (progress >= 0.9f)
+            {
+                Debug.Log("다 됐는디요 행님");
 
-        //    await UniTask.Yield(); // 다음 프레임까지 대기
-        //}
-        await op;
+                break;
+            }
+
+            await UniTask.Yield(); // 다음 프레임까지 대기
+        }
+        //await op;
+        await UniTask.CompletedTask;
     }
 
 }

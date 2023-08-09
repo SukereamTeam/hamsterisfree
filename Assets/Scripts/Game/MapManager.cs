@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using UniRx;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class MapManager : MonoBehaviour
 {
@@ -117,11 +118,31 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public async UniTask SetStage(List<Sprite> tileSpriteList)
+    {
+        if (tileSpriteList.Count > 0)
+        {
+            SetBackground(tileSpriteList);
+            SetOutlineTiles(tileSpriteList);
+            SetMask(tileSpriteList);
+        }
+
+        CreateExitTile();
+    }
+
+
     private void SetBackground(string _MapName)
     {
         var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Center");
 
         this.background.sprite = sprite;
+    }
+
+    private void SetBackground(List<Sprite> tileSpriteList)
+    {
+        var index = (int)Define.TileSpriteName.Center;
+
+        this.background.sprite = tileSpriteList[index];
     }
 
     private void SetOutlineTiles(string _MapName)
@@ -173,11 +194,72 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    private void SetOutlineTiles(List<Sprite> tileSpriteList)
+    {
+        var index = (int)Define.TileSpriteName.Center;
+
+        for (int i = 0; i < outlineTiles.Length; i++)
+        {
+            if (i < 9)
+            {
+                index = (int)Define.TileSpriteName.Left;
+                var sprite = tileSpriteList[index];
+
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+            }
+            else if (i < 15)
+            {
+                //bottom
+                index = (int)Define.TileSpriteName.Bottom;
+                var sprite = tileSpriteList[index];
+
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+            }
+            else if (i < 24)
+            {
+                //right
+                index = (int)Define.TileSpriteName.Right;
+                var sprite = tileSpriteList[index];
+
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+            }
+            else
+            {
+                //top
+                index = (int)Define.TileSpriteName.Top;
+                var sprite = tileSpriteList[index];
+
+                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+            }
+        }
+
+
+        var edgeSpritePath = string.Empty;
+
+        for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
+        {
+            var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
+            this.edgeTiles[tileIndex].sprite = tileSpriteList[index];
+        }
+    }
+
     private void SetMask(string _MapName)
     {
         var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Mask");
         mask.sprite = sprite;
     }
+
+    private void SetMask(List<Sprite> tileSpriteList)
+    {
+        var sprite = tileSpriteList[(int)Define.TileSpriteName.Mask];
+        
+        this.mask.sprite = sprite;
+    }
+
 
     private void CreateExitTile()
     {
