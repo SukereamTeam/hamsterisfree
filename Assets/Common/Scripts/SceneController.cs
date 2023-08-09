@@ -2,29 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using TMPro;
+using DG.Tweening;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
+
 
 public class SceneController : MonoBehaviour
 {
-    [SerializeField]
-    private TextMeshProUGUI loadingText = null;
 
     [SerializeField]
     private TextMeshProUGUI currentText = null;
 
+    [SerializeField]
+    private Slider progressBar = null;
+
+    [SerializeField]
+    private Image fadeImage = null;
+
+    [SerializeField]
+    private float fadeDuration = 0f;
+
+
     private static string nextScene;
-    private float progress;
 
     private List<UniTask> loadingTask = new List<UniTask>();
 
-    private AsyncOperation operation;
 
-
-    //private void OnEnable()
-    //{
-    //    SceneManager.sceneLoaded += OnSceneLoaded;
-    //}
 
     private async void Start()
     {
@@ -34,26 +38,24 @@ public class SceneController : MonoBehaviour
 
         loadingTask.Add(UniTask.Defer(LoadScene));
 
-        loadingTask.Add(UniTask.Defer(() => OnSceneLoaded()));
+        //loadingTask.Add(UniTask.Defer(() => OnSceneLoaded()));
 
         await RunTasks();
 
         //await OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
     }
 
-    private async UniTask OnSceneLoaded()
-    {
-        this.operation.allowSceneActivation = true;
+    //private async UniTask OnSceneLoaded()
+    //{
+    //    await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == nextScene);
 
-        await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == nextScene);
-
-        Scene_Base baseScene = FindObjectOfType<Scene_Base>();
-        if (baseScene != null)
-        {
-            Debug.Log($"await baseScene.LoadDatas(); 호출 ~~~");
-            await baseScene.LoadDatas();
-        }
-    }
+    //    Scene_Base baseScene = FindObjectOfType<Scene_Base>();
+    //    if (baseScene != null)
+    //    {
+    //        Debug.Log($"await baseScene.LoadDatas(); 호출 ~~~");
+    //        await baseScene.LoadDatas();
+    //    }
+    //}
 
     private async UniTask RunTasks()
     {
@@ -75,6 +77,11 @@ public class SceneController : MonoBehaviour
         currentText.text = "TestCode";
     }
 
+    private async UniTask FadeIn()
+    {
+        
+    }
+
 
     public static void LoadScene(string sceneName)
     {
@@ -86,12 +93,12 @@ public class SceneController : MonoBehaviour
 
     private async UniTask LoadScene()
     {
-        operation = SceneManager.LoadSceneAsync(nextScene);
-        operation.allowSceneActivation = false;
+        AsyncOperation op = SceneManager.LoadSceneAsync(nextScene);
+        //op.allowSceneActivation = false;
 
-        while (!operation.isDone)
+        while (!op.isDone)
         {
-            float progress = Mathf.Clamp01(operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
+            float progress = Mathf.Clamp01(op.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
 
             if (progress >= 0.9f)
             {
