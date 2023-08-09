@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 
-public class MonsterTable : TableBase<MonsterTable, MonsterTable.MonsterData>
+public class MonsterTable : TableBase<MonsterTable.MonsterData>
 {
     public record MonsterData
     {

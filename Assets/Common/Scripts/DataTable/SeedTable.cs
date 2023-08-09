@@ -7,7 +7,7 @@ using System;
 
 
 
-public class SeedTable : TableBase<SeedTable, SeedTable.SeedData>
+public class SeedTable : TableBase<SeedTable.SeedData>
 {
     public record SeedData
     {
