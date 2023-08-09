@@ -20,10 +20,10 @@ public class SceneController : MonoBehaviour
 
 
 
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
+    //private void OnEnable()
+    //{
+    //    SceneManager.sceneLoaded += OnSceneLoaded;
+    //}
 
     private async void Start()
     {
@@ -41,9 +41,11 @@ public class SceneController : MonoBehaviour
 
         // ----------- 밑에 있는게 되는 코드(쓰려면 위에 다 주석)
         //await LoadScene();
+
+        await OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private async UniTask OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == nextScene)
         {
@@ -51,7 +53,7 @@ public class SceneController : MonoBehaviour
             if (baseScene != null)
             {
                 // FunctionToCallInNextScene 함수 호출
-                baseScene.Test();
+                await baseScene.Test();
             }
         }
     }

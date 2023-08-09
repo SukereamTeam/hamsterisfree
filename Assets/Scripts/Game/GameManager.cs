@@ -28,7 +28,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Start()
     {
-        Debug.Log("Game Start 진입");
+        Debug.Log("GameManagere에서 Start 진입");
 
         this.isGame.Value = true;
 
