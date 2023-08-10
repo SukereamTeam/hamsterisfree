@@ -41,4 +41,10 @@ public class Define
         Mask
     }
 
+    public enum ObjectDataField
+    {
+        Type = 0,
+        Size,
+        Pos
+    }
 }
