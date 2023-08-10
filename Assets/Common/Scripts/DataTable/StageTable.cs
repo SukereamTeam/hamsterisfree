@@ -140,15 +140,15 @@ public class StageTable : TableBase<StageTable.StageData>
             
             for (int j = 0; j < splitData.Length; j++)
             {
-                if (j == 0)
+                if (j == (int)Define.ObjectDataField.Type)
                 {
                     value.type = splitData[j];
                 }
-                else if (j == 1)
+                else if (j == (int)Define.ObjectDataField.Size)
                 {
                     value.size = Int32.Parse(splitData[j]);
                 }
-                else
+                else if (j == (int)Define.ObjectDataField.Pos)
                 {
                     value.pos = new List<Tuple<int, int>>(ParsingPosition(splitData[j]));
                 }

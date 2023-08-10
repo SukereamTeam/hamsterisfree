@@ -27,5 +27,10 @@ public class Define
         Monster
     }
 
-
+    public enum ObjectDataField
+    {
+        Type = 0,
+        Size,
+        Pos
+    }
 }
