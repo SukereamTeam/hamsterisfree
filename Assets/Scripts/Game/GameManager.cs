@@ -55,4 +55,6 @@ public class GameManager : MonoSingleton<GameManager>
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
         MapManager.IsFade.Value = false;
     }
+
+    
 }

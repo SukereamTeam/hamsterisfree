@@ -81,10 +81,11 @@ public class MapManager : MonoBehaviour
 
         DataContainer.StageTileSprites.Clear();
 
-        await this.fadeImage.DOFade(0f, 0.5f).OnComplete(() =>
-        {
-            this.fadeImage.raycastTarget = false;
-        }).ToUniTask();
+        //await this.fadeImage.DOFade(0f, 0.5f).OnComplete(() =>
+        //{
+        //    this.fadeImage.raycastTarget = false;
+        //}).ToUniTask();
+
     }
 
 

@@ -1,18 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LoadingScene : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private Slider progressBar = null;
 
-    // Update is called once per frame
-    void Update()
+    private float progress = 0f;
+
+
+    private void Update()
     {
-        
+        if (progress <= 0.9f)
+        {
+            if (SceneController.Operation != null)
+            {
+                progress = Mathf.Clamp01(SceneController.Operation.progress);
+            }
+        }
+        else
+        {
+            progress = 1f;
+        }
+
+        progressBar.value = progress;
     }
+    
+
 }

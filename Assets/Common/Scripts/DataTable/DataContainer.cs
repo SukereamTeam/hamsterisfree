@@ -110,9 +110,9 @@ public static class DataContainer
         {
             for (spriteName = 0; (int)spriteName < tileSpriteCount; spriteName++)
             {
-                path = $"{rootPath}{spriteName}";
+                var spritePath = $"{path}{spriteName}";
 
-                var resource = await Resources.LoadAsync<Sprite>(path);
+                var resource = await Resources.LoadAsync<Sprite>(spritePath);
                 var sprite = resource as Sprite;
 
                 if (sprite != null)

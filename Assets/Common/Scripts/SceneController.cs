@@ -9,38 +9,16 @@ using UnityEngine.UI;
 using TMPro;
 
 
-public class SceneController : MonoBehaviour
+public class SceneController
 {
-
-    [SerializeField]
-    private TextMeshProUGUI currentText = null;
-
-    [SerializeField]
-    private Slider progressBar = null;
-
-    [SerializeField]
-    private CanvasGroup canvasGroup = null;
-
-    [SerializeField]
-    private float fadeDuration = 0.5f;
-
 
     private static string nextScene;
 
     public static List<UniTask> LoadingTask = new List<UniTask>();
-    private static AsyncOperation operation;
+    public static AsyncOperation Operation;
 
 
 
-
-    private async void Start()
-    {
-        LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
-
-        await UniTask.WhenAll(LoadingTask.ToArray());
-
-        LoadingTask.Clear();
-    }
 
     public static async UniTaskVoid LoadScene(Define.Scene _SceneName)
     {
@@ -50,40 +28,55 @@ public class SceneController : MonoBehaviour
 
         LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
 
-        await UniTask.WhenAll(LoadingTask.ToArray());
+        //await UniTask.WhenAll(LoadingTask.ToArray());
+
+        foreach(var task in LoadingTask)
+        {
+            await task;
+        }
 
         LoadingTask.Clear();
     }
 
-    public static void LoadSceneWithLoading(Define.Scene _SceneName)
+    public static async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
     {
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
         nextScene = sceneString;
 
-        SceneManager.LoadScene("Loading");
+        await SceneManager.LoadSceneAsync("Loading");
+
+        LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
+
+        await UniTask.WhenAll(LoadingTask.ToArray());
+
+        LoadingTask.Clear();
     }
 
 
     private static async UniTask LoadSceneAsync()
     {
-        operation = SceneManager.LoadSceneAsync(nextScene);
-        operation.allowSceneActivation = false;
-
-        while (!operation.isDone)
+        if (Operation != null)
         {
-            float progress = Mathf.Clamp01(operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
+            Operation = null;
+        }
+
+        Operation = SceneManager.LoadSceneAsync(nextScene);
+
+        while (true)
+        {
+            float progress = Mathf.Clamp01(Operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
 
             if (progress >= 0.9f)
             {
-                Debug.Log("다 됐는디요 행님");
-
+                
                 break;
             }
 
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
 
+        //Operation.allowSceneActivation = true;
         await UniTask.CompletedTask;
     }
 
@@ -117,7 +110,15 @@ public class SceneController : MonoBehaviour
             await UniTask.WhenAll(
                 _CanvasGroup.DOFade(0f, _Duration)
                 .SetEase(Ease.OutQuint)
-                //.OnComplete(() => _CanvasGroup.interactable = false)
+                //.OnComplete(() => { _CanvasGroup.interactable = false;
+                //    if (_OnComplete != null)
+                //    {
+                //        Action.Add(async () =>
+                //        {
+                //            await _OnComplete();
+                //        });
+                //    }
+                //})
                 .ToUniTask()
             );
         }

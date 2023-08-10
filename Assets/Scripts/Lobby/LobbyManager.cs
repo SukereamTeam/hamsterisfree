@@ -13,9 +13,14 @@ public class LobbyManager : MonoBehaviour
 
     public async void OnClick_Next()
     {
-        await SceneController.CanvasFadeIn(this.canvasGroup, this.fadeDuration);
+        await SceneController.CanvasFadeOut(this.canvasGroup, this.fadeDuration);
 
         SceneController.LoadingTask.Add(UniTask.Defer(DataContainer.LoadStageDatas));
-        SceneController.LoadScene(Define.Scene.Game).Forget();
+        SceneController.LoadScene(Define.Scene.Game).Forget();//, async () =>
+        //{
+        //    SceneController.Operation.allowSceneActivation = true;
+
+        //    await UniTask.CompletedTask;
+        //}).Forget();
     }
 }

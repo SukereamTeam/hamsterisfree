@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System;
+using DG.Tweening;
 
 public class IntroManager : MonoBehaviour
 {
@@ -15,14 +17,21 @@ public class IntroManager : MonoBehaviour
     {
         CommonManager.Instance.Initialize();
 
+        DOTween.Init();
+
+        // DOTween 디버그 모드 활성화
+        DOTween.SetTweensCapacity(500, 50);
+
+
         await SceneController.CanvasFadeIn(this.canvasGroup, fadeDuration);
 
-        await UniTask.Delay(3000);
+        await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
         await SceneController.CanvasFadeOut(this.canvasGroup, fadeDuration);
 
         // TODO : 유저 데이터 로드 ?
         //SceneController.LoadingTask.Add();
-        SceneController.LoadSceneWithLoading(Define.Scene.Lobby);
+        
+        SceneController.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
     }
 }
