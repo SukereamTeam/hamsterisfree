@@ -17,10 +17,6 @@ public class IntroManager : MonoBehaviour
     {
         CommonManager.Instance.Initialize();
 
-        DOTween.Init();
-
-        // DOTween 디버그 모드 활성화
-        DOTween.SetTweensCapacity(500, 50);
 
 
         await SceneController.CanvasFadeIn(this.canvasGroup, fadeDuration);

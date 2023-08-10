@@ -22,8 +22,6 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
 
-    private int curStageIndex = 0;
-
 
 
 

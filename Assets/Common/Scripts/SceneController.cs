@@ -63,13 +63,12 @@ public class SceneController
 
         Operation = SceneManager.LoadSceneAsync(nextScene);
 
-        while (true)
+        while (!Operation.isDone)
         {
             float progress = Mathf.Clamp01(Operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
 
             if (progress >= 0.9f)
             {
-                
                 break;
             }
 
