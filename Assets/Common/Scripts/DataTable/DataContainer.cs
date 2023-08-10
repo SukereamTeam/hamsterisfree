@@ -38,6 +38,8 @@ public static class DataContainer
 
     public static List<Sprite> StageTileSprites { get; private set; }
 
+    public static bool isLoaded = false;
+
     private static int tileSpriteCount = 0;
 
 
@@ -133,5 +135,7 @@ public static class DataContainer
         }
 
         await UniTask.WaitUntil(() => isDone == true);
+
+        isLoaded = true;
     }
 }

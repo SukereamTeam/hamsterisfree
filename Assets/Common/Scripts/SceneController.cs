@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Threading;
 
 public class SceneController
 {
@@ -26,23 +26,48 @@ public class SceneController
 
         nextScene = sceneString;
 
+        await UniTask.DelayFrame(1);
+
         LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
 
-        //await UniTask.WhenAll(LoadingTask.ToArray());
+        //await UniTask.WhenAll(LoadingTask.ToArray()).ContinueWith(async () =>
+        //{
+        //    LoadingTask.Clear();
 
-        foreach(var task in LoadingTask)
+        //    Operation.allowSceneActivation = true;
+
+        //    await UniTask.Yield();
+
+        //    await UniTask.DelayFrame(1);
+        //});
+
+        foreach (var task in LoadingTask)
         {
             await task;
         }
 
+        await UniTask.Yield();
+
         LoadingTask.Clear();
+
+
+        Operation.allowSceneActivation = true;
+
+
     }
 
     public static async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
     {
+        //if (Operation != null)
+        //{
+        //    Operation = null;
+        //}
+
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
         nextScene = sceneString;
+
+        await UniTask.DelayFrame(1);
 
         await SceneManager.LoadSceneAsync("Loading");
 
@@ -50,18 +75,26 @@ public class SceneController
 
         await UniTask.WhenAll(LoadingTask.ToArray());
 
+        await UniTask.Yield();
+
         LoadingTask.Clear();
+
+        Operation.allowSceneActivation = true;
+
+        
     }
 
 
     private static async UniTask LoadSceneAsync()
     {
-        if (Operation != null)
-        {
-            Operation = null;
-        }
+        //if (Operation != null)
+        //{
+        //    Operation = null;
+        //}
 
         Operation = SceneManager.LoadSceneAsync(nextScene);
+
+        Operation.allowSceneActivation = false;
 
         while (!Operation.isDone)
         {
@@ -76,22 +109,41 @@ public class SceneController
         }
 
         //Operation.allowSceneActivation = true;
-        await UniTask.CompletedTask;
+        //await UniTask.CompletedTask;
     }
 
-    public static async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration)
+    public static async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
     {
+        _CanvasGroup.alpha = 0f;
+        _CanvasGroup.interactable = false;
+
         try
         {
-            _CanvasGroup.alpha = 0f;
-            _CanvasGroup.interactable = false;
+            var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 1f, _Duration)
+                .SetEase(Ease.OutQuint);
 
-            await UniTask.WhenAll(
-                _CanvasGroup.DOFade(1f, _Duration)
-                .SetEase(Ease.OutQuint)
-                //.OnComplete(() => _CanvasGroup.interactable = false)
-                .ToUniTask()
-            );
+            Action myAction = () =>
+            {
+                Debug.Log("아!!! 취소라고!!!");
+                tweener.Kill();
+
+                _CanvasGroup.alpha = 1f;
+            };
+
+            using (cancellationToken.Token.Register(() => myAction()))
+            {
+                await tweener
+                    .OnKill(() =>
+                    {
+                        Debug.Log("FadeIn was OnKill.");
+                    })
+                    .OnComplete(() =>
+                    {
+                        // Cleanup or do something when the fade-in is complete
+                        Debug.Log("FadeIn was OnComplete.");
+                    })
+                    .ToUniTask();
+            }
         }
         catch (Exception ex)
         {
@@ -99,31 +151,46 @@ public class SceneController
         }
     }
 
-    public static async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration)
+    public static async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
     {
+        _CanvasGroup.alpha = 1f;
+        _CanvasGroup.interactable = false;
+
         try
         {
-            _CanvasGroup.alpha = 1f;
-            _CanvasGroup.interactable = false;
+            var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 0f, _Duration)
+                .SetEase(Ease.OutQuint);
 
-            await UniTask.WhenAll(
-                _CanvasGroup.DOFade(0f, _Duration)
-                .SetEase(Ease.OutQuint)
-                //.OnComplete(() => { _CanvasGroup.interactable = false;
-                //    if (_OnComplete != null)
-                //    {
-                //        Action.Add(async () =>
-                //        {
-                //            await _OnComplete();
-                //        });
-                //    }
-                //})
-                .ToUniTask()
-            );
+            Action myAction = () =>
+            {
+                Debug.Log("아!!! 취소라고!!!~~~~~~~~~~~");
+                tweener.Kill();
+
+                _CanvasGroup.alpha = 1f;
+            };
+
+            using (cancellationToken.Token.Register(() => myAction()))
+            {
+                await tweener
+                    .OnKill(() =>
+                    {
+                        Debug.Log("FadeOut was OnKill.");
+                    })
+                    .OnComplete(() =>
+                    {
+                        Debug.Log("FadeOut was OnComplete.");
+                    })
+                    .ToUniTask();
+            };
         }
         catch (Exception ex)
         {
             Debug.LogError($"### exception occurred: {ex}");
         }
     }
+
+    // TODO
+    // CanvasFadeIn/Out 부르는 애들마다
+    // Cancel에서 원하는 행동이 있을 텐데
+    // 이걸 Action? 으로 넣어주기?
 }
