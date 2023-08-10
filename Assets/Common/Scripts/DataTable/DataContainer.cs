@@ -36,6 +36,10 @@ public static class DataContainer
     public static StageTable StageTable { get; private set; }
     public static SeedTable SeedTable { get; private set; }
 
+    public static List<Sprite> StageTileSprites { get; private set; }
+
+    private static int tileSpriteCount = 0;
+
 
 
 
@@ -44,6 +48,9 @@ public static class DataContainer
     {
         StageTable = new StageTable();
         ReadCSV(StageTable, "StageTable");
+
+        tileSpriteCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
+        StageTileSprites = new List<Sprite>(tileSpriteCount);
     }
 
 
@@ -78,5 +85,53 @@ public static class DataContainer
     // Json 으로 진행상황 저장하는 함수 만들기
     // 진행해야하는 스테이지 넘버 (첫 시작이면 0이란 소리)
     // 탈출문 좌표
-    // 게임 시작할 때 여기 저장된 스테이지 넘버로 스테이지 데이터테이블 참조하여 불러옴
+    // 스테이지 선택해서 게임 시작할 때 여기 저장된 스테이지 넘버로 스테이지 데이터테이블 참조하여 불러옴
+
+
+
+    public static async UniTask LoadStageDatas()
+    {
+        var dicData = StageTable.DicData[CommonManager.Instance.CurStageIndex.ToString()];
+
+        await LoadTileSprites(dicData.MapName);
+    }
+
+    public static async UniTask LoadTileSprites(string _MapName)
+    {
+        bool isDone = false;
+
+        var rootPath = "Images/Map";
+
+        var path = $"{rootPath}/{_MapName}/{_MapName}_";
+
+        Define.TileSpriteName spriteName = Define.TileSpriteName.Center;
+
+        try
+        {
+            for (spriteName = 0; (int)spriteName < tileSpriteCount; spriteName++)
+            {
+                path = $"{rootPath}{spriteName}";
+
+                var resource = await Resources.LoadAsync<Sprite>(path);
+                var sprite = resource as Sprite;
+
+                if (sprite != null)
+                {
+                    StageTileSprites.Add(sprite);
+                }
+                else
+                {
+                    Debug.Log("### Fail <Sprite> Type Casting ###");
+                }
+            }
+
+            isDone = true;
+        }
+        catch (Exception ex) when (!(ex is OperationCanceledException))
+        {
+            Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
+        }
+
+        await UniTask.WaitUntil(() => isDone == true);
+    }
 }

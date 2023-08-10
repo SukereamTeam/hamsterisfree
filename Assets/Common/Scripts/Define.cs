@@ -7,8 +7,8 @@ public class Define
     public enum Scene
     {
         Intro,
+        Lobby,
         Game,
-        Lobby
     }
 
     public enum Direction

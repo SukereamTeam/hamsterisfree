@@ -8,8 +8,6 @@ using Cysharp.Threading.Tasks;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-    [SerializeField]
-    private Scene_Game sceneGameScript = null;
 
     [SerializeField]
     private MapManager mapManager = null;
@@ -45,18 +43,9 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        
+        MapManager.SetStage().Forget();
     }
 
-    public async UniTask GameStart()
-    {
-        if (this.sceneGameScript != null)
-        {
-            await this.mapManager.SetStage(this.sceneGameScript.TileSpriteList);
-        }
-        
-        //await UniTask.CompletedTask;
-    }
 
     private void GameEndFlow()
     {
@@ -64,6 +53,6 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-        GameManager.Instance.MapManager.IsFade.Value = false;
+        MapManager.IsFade.Value = false;
     }
 }

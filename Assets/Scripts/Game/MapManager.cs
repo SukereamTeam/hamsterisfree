@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 using UniRx;
 using DG.Tweening;
@@ -34,6 +35,9 @@ public class MapManager : MonoBehaviour
     [SerializeField]
     private GameObject exitPrefab = null;
 
+    [SerializeField]
+    private Image fadeImage = null;
+
 
 
 
@@ -55,26 +59,35 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        //SetBackground();
-
-        //this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform && x.name.Contains("Tile_")).ToArray();
-
-        //SetOutlineTiles();
-
-        //CreateExitTile();
-
-        //SetMask();
-
-
         this.isFade
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Subscribe(_ =>
             {
                 FadeMap();
             }).AddTo(this);
+
+
+        
     }
 
-    
+    public async UniTask SetStage()
+    {
+        if (DataContainer.StageTileSprites.Count > 0)
+        {
+            await UniTask.WhenAll(SetBackground(), SetOutlineTiles(), SetMask());
+        }
+
+        CreateExitTile();
+
+        DataContainer.StageTileSprites.Clear();
+
+        await this.fadeImage.DOFade(0f, 0.5f).OnComplete(() =>
+        {
+            this.fadeImage.raycastTarget = false;
+        }).ToUniTask();
+    }
+
+
 
     private void ChangeNameOutlineTiles()
     {
@@ -104,97 +117,16 @@ public class MapManager : MonoBehaviour
 
     //------------ Setting Stage Data
 
-    public void SetStage(int stageIndex)
-    {
-        if (DataContainer.StageTable.DicData.ContainsKey(stageIndex.ToString()))
-        {
-            var data = DataContainer.StageTable.DicData[stageIndex.ToString()];
-
-            SetBackground(data.MapName);
-            SetOutlineTiles(data.MapName);
-            SetMask(data.MapName);
-
-            CreateExitTile();
-        }
-    }
-
-    public async UniTask SetStage(List<Sprite> tileSpriteList)
-    {
-        if (tileSpriteList.Count > 0)
-        {
-            SetBackground(tileSpriteList);
-            SetOutlineTiles(tileSpriteList);
-            SetMask(tileSpriteList);
-        }
-
-        CreateExitTile();
-    }
-
-
-    private void SetBackground(string _MapName)
-    {
-        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Center");
-
-        this.background.sprite = sprite;
-    }
-
-    private void SetBackground(List<Sprite> tileSpriteList)
+    private async UniTask SetBackground()
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        this.background.sprite = tileSpriteList[index];
+        this.background.sprite = DataContainer.StageTileSprites[index];
+
+        await UniTask.CompletedTask;
     }
 
-    private void SetOutlineTiles(string _MapName)
-    {
-        for (int i = 0; i < outlineTiles.Length; i++)
-        {
-            if (i < 9)
-            {
-                var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Left");
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
-            }
-            else if (i < 15)
-            {
-                //bottom
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Bottom");
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
-            }
-            else if (i < 24)
-            {
-                //right
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Right");
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
-            }
-            else
-            {
-                //top
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Top");
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
-            }
-        }
-
-
-        var edgeSpritePath = string.Empty;
-
-        for (int i = 0; i < Enum.GetValues(typeof(Define.Direction)).Length; i++)
-        {
-            var horizontal = i < 2 ? string.Format("Top") : string.Format("Bottom");
-            var vertical = i < 2 ? i : i - 2;
-
-            edgeSpritePath = $"Images/Map/Forest/Forest_{horizontal}{Enum.GetName(typeof(Define.Direction), vertical)}";
-
-            var sprite = Resources.Load<Sprite>(edgeSpritePath);
-
-            this.edgeTiles[i].sprite = sprite;
-        }
-    }
-
-    private void SetOutlineTiles(List<Sprite> tileSpriteList)
+    private async UniTask SetOutlineTiles()
     {
         var index = (int)Define.TileSpriteName.Center;
 
@@ -203,7 +135,7 @@ public class MapManager : MonoBehaviour
             if (i < 9)
             {
                 index = (int)Define.TileSpriteName.Left;
-                var sprite = tileSpriteList[index];
+                var sprite = DataContainer.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -212,7 +144,7 @@ public class MapManager : MonoBehaviour
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
-                var sprite = tileSpriteList[index];
+                var sprite = DataContainer.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -221,7 +153,7 @@ public class MapManager : MonoBehaviour
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
-                var sprite = tileSpriteList[index];
+                var sprite = DataContainer.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -230,7 +162,7 @@ public class MapManager : MonoBehaviour
             {
                 //top
                 index = (int)Define.TileSpriteName.Top;
-                var sprite = tileSpriteList[index];
+                var sprite = DataContainer.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -243,21 +175,20 @@ public class MapManager : MonoBehaviour
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
-            this.edgeTiles[tileIndex].sprite = tileSpriteList[index];
+            this.edgeTiles[tileIndex].sprite = DataContainer.StageTileSprites[index];
         }
+
+        await UniTask.CompletedTask;
     }
 
-    private void SetMask(string _MapName)
-    {
-        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Mask");
-        mask.sprite = sprite;
-    }
 
-    private void SetMask(List<Sprite> tileSpriteList)
+    private async UniTask SetMask()
     {
-        var sprite = tileSpriteList[(int)Define.TileSpriteName.Mask];
+        var sprite = DataContainer.StageTileSprites[(int)Define.TileSpriteName.Mask];
         
         this.mask.sprite = sprite;
+
+        await UniTask.CompletedTask;
     }
 
 
