@@ -66,14 +66,7 @@ public class StageTable : TableBase<StageTable.StageData>
 
     public override void SetTable(string _Key, string _Name, string _Value)
     {
-        StageData data;
-
-        if (dicData.ContainsKey(_Key) == false)
-        {
-            data = new StageData();
-
-            dicData.Add(_Key, data);
-        }
+        
 
         
         switch (_Name)
@@ -105,20 +98,21 @@ public class StageTable : TableBase<StageTable.StageData>
                     {
                         this.monsterList = new List<ObjectData>(GetListData(_Value));
                     }
+
+                    
+                    if (dicData.ContainsKey(_Key) == false)
+                    {
+                        // 한 줄의 마지막을 읽어올 때 데이터 넣어주기
+                        StageData data = new StageData(this.index, this.stageType, this.mapName, this.seedList, this.monsterList);
+
+                        dicData[_Key] = data;
+
+                        Reset();
+                    }
                 }
                 break;
 
             default: break;
-        }
-
-        if (_Name.Equals("MonsterData"))
-        {
-            // 한 줄의 마지막을 읽어올 때 데이터 넣어주기
-            data = new StageData(this.index, this.stageType, this.mapName, this.seedList, this.monsterList);
-
-            dicData[_Key] = data;
-
-            Reset();
         }
     }
 
