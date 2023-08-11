@@ -30,7 +30,11 @@ public class IntroManager : MonoBehaviour
 
         // TODO : 유저 데이터 로드 ?
         //SceneController.LoadingTask.Add();
-        
+
+        UniTask emptyUniTask = UniTask.CompletedTask; // 빈 UniTask 생성
+
+        // 빈 UniTask를 사용하여 SceneActivation 함수 호출
+        await SceneController.SceneActivation(emptyUniTask);
         SceneController.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
     }
 
