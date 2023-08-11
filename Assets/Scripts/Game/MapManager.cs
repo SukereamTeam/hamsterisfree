@@ -74,7 +74,9 @@ public class MapManager : MonoBehaviour
     {
         if (DataContainer.StageTileSprites.Count > 0)
         {
-            await UniTask.WhenAll(SetBackground(), SetOutlineTiles(), SetMask());
+            SetBackground();
+            SetOutlineTiles();
+            SetMask();
         }
 
         CreateExitTile();
@@ -82,10 +84,6 @@ public class MapManager : MonoBehaviour
         DataContainer.StageTileSprites.Clear();
 
         await UniTask.CompletedTask;
-        //await this.fadeImage.DOFade(0f, 0.5f).OnComplete(() =>
-        //{
-        //    this.fadeImage.raycastTarget = false;
-        //}).ToUniTask();
 
     }
 
@@ -119,16 +117,16 @@ public class MapManager : MonoBehaviour
 
     //------------ Setting Stage Data
 
-    private async UniTask SetBackground()
+    private void SetBackground()
     {
         var index = (int)Define.TileSpriteName.Center;
 
         this.background.sprite = DataContainer.StageTileSprites[index];
 
-        await UniTask.CompletedTask;
+        
     }
 
-    private async UniTask SetOutlineTiles()
+    private void SetOutlineTiles()
     {
         var index = (int)Define.TileSpriteName.Center;
 
@@ -172,25 +170,21 @@ public class MapManager : MonoBehaviour
         }
 
 
-        var edgeSpritePath = string.Empty;
-
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
             this.edgeTiles[tileIndex].sprite = DataContainer.StageTileSprites[index];
         }
-
-        await UniTask.CompletedTask;
     }
 
 
-    private async UniTask SetMask()
+    private void SetMask()
     {
+        Debug.Log("SetMask 시작");
         var sprite = DataContainer.StageTileSprites[(int)Define.TileSpriteName.Mask];
         
         this.mask.sprite = sprite;
-
-        await UniTask.CompletedTask;
+        Debug.Log("SetMask 끝");
     }
 
 
