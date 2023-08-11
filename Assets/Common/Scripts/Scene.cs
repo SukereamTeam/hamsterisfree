@@ -12,19 +12,18 @@ public class SceneL : MonoBehaviour
     private async void Start()
     {
         // 데이터 로드 비동기 작업 시작
-        await LoadData();
+        var test = LoadData().ContinueWith(() =>
+        {
+            op.allowSceneActivation = true;
+        });
+
+
+        var scene = LoadSceneAsync("Lobby");
 
         // 씬 로드 비동기 작업 시작
-        op = SceneManager.LoadSceneAsync("Lobby");
-        op.allowSceneActivation = false; // 씬 전환을 막음
 
-        // 데이터 로드가 완료될 때까지 대기
-        while (!isDataLoaded)
-        {
-            await UniTask.Yield();
-        }
+        await UniTask.WhenAll(test, scene);
 
-        // 데이터 로드 완료 후 씬 전환
         await Test();
     }
 
@@ -32,10 +31,12 @@ public class SceneL : MonoBehaviour
 
     private async UniTask Test()
     {
-        op.allowSceneActivation = true;
+        Debug.Log("Test 진입");
 
         await UniTask.CompletedTask;
     }
+
+    
 
     private async UniTask LoadData()
     {
@@ -44,5 +45,21 @@ public class SceneL : MonoBehaviour
 
         // 데이터 로드 완료 처리
         isDataLoaded = true;
+
+        Debug.Log("LoadData 끝");
+    }
+
+    private async UniTask LoadSceneAsync(string sceneName)
+    {
+        op = SceneManager.LoadSceneAsync(sceneName);
+        op.allowSceneActivation = false; // 씬 전환을 막음
+
+        // 씬 로드 작업이 완료될 때까지 대기
+        while (!op.isDone)
+        {
+            await UniTask.Yield();
+        }
+
+        Debug.Log("LoadSceneAsync 로딩 끝");
     }
 }

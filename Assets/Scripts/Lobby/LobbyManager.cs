@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
+using System;
+using UniRx;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -26,14 +28,26 @@ public class LobbyManager : MonoBehaviour
     {
         await SceneController.CanvasFadeOut(this.canvasGroup, this.fadeDuration, cancellationToken);
 
-        await UniTask.Yield();
+        var task = DataContainer.LoadStageDatas();
 
-        SceneController.LoadingTask.Add(UniTask.Defer(DataContainer.LoadStageDatas));
-        SceneController.LoadScene(Define.Scene.Game).Forget();//, async () =>
-        //{
-        //    SceneController.Operation.allowSceneActivation = true;
+        await task.ToObservable().Do(async x =>
+        {
+            Debug.Log("Subscribe !!!");
 
-        //    await UniTask.CompletedTask;
-        //}).Forget();
+            await UniTask.WaitUntil(() => SceneController.Operation != null);
+
+            if (SceneController.Operation != null)
+            {
+                Debug.Log("Operation !!!");
+                SceneController.Operation.allowSceneActivation = true;
+            }
+            
+            await UniTask.CompletedTask;
+        }).Last();
+
+
+        SceneController.LoadingTask.Add(UniTask.Defer(() => UniTask.FromResult(task)));
+
+        SceneController.LoadScene(Define.Scene.Game).Forget();
     }
 }

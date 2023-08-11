@@ -20,48 +20,44 @@ public class SceneController
 
 
 
+
+
     public static async UniTaskVoid LoadScene(Define.Scene _SceneName)
     {
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
         nextScene = sceneString;
 
-        await UniTask.DelayFrame(1);
-
         LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
 
-        //await UniTask.WhenAll(LoadingTask.ToArray()).ContinueWith(async () =>
+
+
+        await UniTask.WhenAll(LoadingTask.ToArray());//.ContinueWith(async () =>
         //{
         //    LoadingTask.Clear();
-
-        //    Operation.allowSceneActivation = true;
-
-        //    await UniTask.Yield();
-
-        //    await UniTask.DelayFrame(1);
         //});
 
-        foreach (var task in LoadingTask)
-        {
-            await task;
-        }
+        //foreach (var task in LoadingTask)
+        //{
+        //    await task;
+        //}
 
-        await UniTask.Yield();
+        //await UniTask.Yield();
 
         LoadingTask.Clear();
-
-
-        Operation.allowSceneActivation = true;
-
+        if (Operation != null)
+        {
+            Operation = null;
+        }
 
     }
 
     public static async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
     {
-        //if (Operation != null)
-        //{
-        //    Operation = null;
-        //}
+        ////if (Operation != null)
+        ////{
+        ////    Operation = null;
+        ////}
 
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
@@ -78,19 +74,19 @@ public class SceneController
         await UniTask.Yield();
 
         LoadingTask.Clear();
-
-        Operation.allowSceneActivation = true;
-
-        
+        if (Operation != null)
+        {
+            Operation = null;
+        }
     }
 
 
     private static async UniTask LoadSceneAsync()
     {
-        //if (Operation != null)
-        //{
-        //    Operation = null;
-        //}
+        if (Operation != null)
+        {
+            Operation = null;
+        }
 
         Operation = SceneManager.LoadSceneAsync(nextScene);
 
@@ -98,18 +94,8 @@ public class SceneController
 
         while (!Operation.isDone)
         {
-            float progress = Mathf.Clamp01(Operation.progress / 0.9f); // allowSceneActivation이 false일 때까지 진행률을 0.9까지 제한합니다.
-
-            if (progress >= 0.9f)
-            {
-                break;
-            }
-
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
-
-        //Operation.allowSceneActivation = true;
-        //await UniTask.CompletedTask;
     }
 
     public static async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
@@ -124,7 +110,7 @@ public class SceneController
 
             Action myAction = () =>
             {
-                Debug.Log("아!!! 취소라고!!!");
+                Debug.Log("Cancel CanvasFadeIn");
                 tweener.Kill();
 
                 _CanvasGroup.alpha = 1f;
