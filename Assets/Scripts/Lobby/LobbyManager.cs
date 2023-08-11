@@ -31,7 +31,7 @@ public class LobbyManager : MonoBehaviour
         var task = DataContainer.LoadStageDatas();
         await SceneController.Instance.SceneActivation(task);
 
-        SceneController.LoadingTask.Add(UniTask.Defer(() => UniTask.FromResult(task)));
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => UniTask.FromResult(task)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game).Forget();
     }

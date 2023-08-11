@@ -15,9 +15,9 @@ public class LoadingScene : MonoBehaviour
     {
         if (progress <= 0.9f)
         {
-            if (SceneController.Operation != null)
+            if (SceneController.Instance.Operation != null)
             {
-                progress = Mathf.Clamp01(SceneController.Operation.progress);
+                progress = Mathf.Clamp01(SceneController.Instance.Operation.progress);
             }
         }
         else

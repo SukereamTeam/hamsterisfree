@@ -10,10 +10,18 @@ using UniRx;
 
 public class SceneController : Singleton<SceneController>
 {
-    private static string nextScene;
+    private string nextScene;
+    public string NextScene => this.nextScene;
 
-    public static List<UniTask> LoadingTask = new List<UniTask>();
-    public static AsyncOperation Operation;
+    private List<UniTask> loadingTask = new List<UniTask>();
+    public List<UniTask> LoadingTask
+    {
+        get => this.loadingTask;
+        private set => this.loadingTask = value;
+    }
+
+    private AsyncOperation operation;
+    public AsyncOperation Operation => this.operation;
 
 
 
@@ -23,12 +31,12 @@ public class SceneController : Singleton<SceneController>
         {
             Debug.Log("Subscribe !!!");
 
-            await UniTask.WaitUntil(() => SceneController.Operation != null);
+            await UniTask.WaitUntil(() => this.operation != null);
 
-            if (SceneController.Operation != null)
+            if (this.operation != null)
             {
                 Debug.Log("Operation !!!");
-                SceneController.Operation.allowSceneActivation = true;
+                this.operation.allowSceneActivation = true;
             }
 
             await UniTask.CompletedTask;
@@ -48,9 +56,10 @@ public class SceneController : Singleton<SceneController>
         await UniTask.WhenAll(LoadingTask.ToArray());
 
         LoadingTask.Clear();
-        if (Operation != null)
+
+        if (this.operation != null)
         {
-            Operation = null;
+            this.operation = null;
         }
 
     }
@@ -73,25 +82,20 @@ public class SceneController : Singleton<SceneController>
 
         LoadingTask.Clear();
 
-        if (Operation != null)
+        if (this.operation != null)
         {
-            Operation = null;
+            this.operation = null;
         }
     }
 
 
     private async UniTask LoadSceneAsync()
     {
-        if (Operation != null)
-        {
-            Operation = null;
-        }
+        this.operation = SceneManager.LoadSceneAsync(nextScene);
 
-        Operation = SceneManager.LoadSceneAsync(nextScene);
+        this.operation.allowSceneActivation = false;
 
-        Operation.allowSceneActivation = false;
-
-        while (!Operation.isDone)
+        while (!this.operation.isDone)
         {
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
@@ -177,4 +181,9 @@ public class SceneController : Singleton<SceneController>
     // CanvasFadeIn/Out 부르는 애들마다
     // Cancel에서 원하는 행동이 있을 텐데
     // 이걸 Action? 으로 넣어주기?
+
+    public void AddLoadingTask(UniTask task)
+    {
+        this.loadingTask.Add(task);
+    }
 }
