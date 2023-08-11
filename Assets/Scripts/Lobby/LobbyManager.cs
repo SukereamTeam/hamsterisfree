@@ -29,22 +29,7 @@ public class LobbyManager : MonoBehaviour
         await SceneController.CanvasFadeOut(this.canvasGroup, this.fadeDuration, cancellationToken);
 
         var task = DataContainer.LoadStageDatas();
-
-        await task.ToObservable().Do(async x =>
-        {
-            Debug.Log("Subscribe !!!");
-
-            await UniTask.WaitUntil(() => SceneController.Operation != null);
-
-            if (SceneController.Operation != null)
-            {
-                Debug.Log("Operation !!!");
-                SceneController.Operation.allowSceneActivation = true;
-            }
-            
-            await UniTask.CompletedTask;
-        }).Last();
-
+        await SceneController.SceneActivation(task);
 
         SceneController.LoadingTask.Add(UniTask.Defer(() => UniTask.FromResult(task)));
 

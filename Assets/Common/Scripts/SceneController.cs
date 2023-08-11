@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Threading;
+using UniRx;
 
 public class SceneController
 {
@@ -19,7 +20,24 @@ public class SceneController
 
 
 
+    public static async UniTask SceneActivation(UniTask task)
+    {
+        await task.ToObservable().Do(async x =>
+        {
+            Debug.Log("Subscribe !!!");
 
+            await UniTask.WaitUntil(() => SceneController.Operation != null);
+
+            if (SceneController.Operation != null)
+            {
+                Debug.Log("Operation !!!");
+                SceneController.Operation.allowSceneActivation = true;
+            }
+
+            await UniTask.CompletedTask;
+
+        }).Last();
+    }
 
 
     public static async UniTaskVoid LoadScene(Define.Scene _SceneName)
