@@ -5,6 +5,8 @@ using UnityEngine;
 using UniRx;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System.Threading;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -12,6 +14,10 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField]
     private MapManager mapManager = null;
     public MapManager MapManager => this.mapManager;
+
+    [SerializeField]
+    private Image fadeImage = null;
+
 
 
     private IReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
@@ -41,8 +47,12 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        MapManager.SetStage().Forget();
+        MapManager.SetStage()
+            .ToObservable()
+            .Subscribe(_ => this.fadeImage.DOFade(0f, 1f));
     }
+
+
 
 
     private void GameEndFlow()

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,5 +21,10 @@ public class CommonManager : MonoSingleton<CommonManager>
 
         // Table Load
         DataContainer.Initialize();
+    }
+
+    public void OnDisable()
+    {
+        DOTween.KillAll(true);
     }
 }
