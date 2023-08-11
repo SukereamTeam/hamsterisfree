@@ -15,27 +15,37 @@ public class IntroManager : MonoBehaviour
 
     private CancellationTokenSource cancellationToken;
 
-    private async void Start()
+    private void Start()
     {
         CommonManager.Instance.Initialize();
 
         this.cancellationToken = new CancellationTokenSource();
 
+        InitializeAsync().Forget();
+    }
 
-        await SceneController.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken);
+    private async UniTask InitializeAsync()
+    {
+        try
+        {
+            await SceneController.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(3f));
+            await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
-        await SceneController.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken);
+            await SceneController.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken);
 
-        // TODO : 유저 데이터 로드 ?
-        //SceneController.LoadingTask.Add();
+            // TODO : 유저 데이터 로드 ?
+            //SceneController.LoadingTask.Add();
 
-        UniTask emptyUniTask = UniTask.CompletedTask; // 빈 UniTask 생성
+            // 빈 UniTask 을 넘겨줘서 바로 실행되게
+            await SceneController.SceneActivation(UniTask.CompletedTask);
 
-        // 빈 UniTask를 사용하여 SceneActivation 함수 호출
-        await SceneController.SceneActivation(emptyUniTask);
-        SceneController.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
+            SceneController.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"### exception occurred: {ex}");
+        }
     }
 
 
