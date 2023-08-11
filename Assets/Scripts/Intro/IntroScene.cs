@@ -28,19 +28,19 @@ public class IntroManager : MonoBehaviour
     {
         try
         {
-            await SceneController.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken);
+            await SceneController.Instance.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken);
 
             await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
-            await SceneController.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken);
+            await SceneController.Instance.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken);
 
             // TODO : 유저 데이터 로드 ?
             //SceneController.LoadingTask.Add();
 
             // 빈 UniTask 을 넘겨줘서 바로 실행되게
-            await SceneController.SceneActivation(UniTask.CompletedTask);
+            await SceneController.Instance.SceneActivation(UniTask.CompletedTask);
 
-            SceneController.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
+            SceneController.Instance.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
         }
         catch (Exception ex)
         {

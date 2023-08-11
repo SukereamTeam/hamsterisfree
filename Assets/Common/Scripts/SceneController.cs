@@ -5,14 +5,11 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Threading;
 using UniRx;
 
-public class SceneController
+public class SceneController : Singleton<SceneController>
 {
-
     private static string nextScene;
 
     public static List<UniTask> LoadingTask = new List<UniTask>();
@@ -20,7 +17,7 @@ public class SceneController
 
 
 
-    public static async UniTask SceneActivation(UniTask task)
+    public async UniTask SceneActivation(UniTask task)
     {
         await task.ToObservable().Do(async x =>
         {
@@ -40,7 +37,7 @@ public class SceneController
     }
 
 
-    public static async UniTaskVoid LoadScene(Define.Scene _SceneName)
+    public async UniTaskVoid LoadScene(Define.Scene _SceneName)
     {
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
@@ -48,19 +45,7 @@ public class SceneController
 
         LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
 
-
-
-        await UniTask.WhenAll(LoadingTask.ToArray());//.ContinueWith(async () =>
-        //{
-        //    LoadingTask.Clear();
-        //});
-
-        //foreach (var task in LoadingTask)
-        //{
-        //    await task;
-        //}
-
-        //await UniTask.Yield();
+        await UniTask.WhenAll(LoadingTask.ToArray());
 
         LoadingTask.Clear();
         if (Operation != null)
@@ -70,18 +55,13 @@ public class SceneController
 
     }
 
-    public static async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
+    public async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
     {
-        ////if (Operation != null)
-        ////{
-        ////    Operation = null;
-        ////}
-
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
         nextScene = sceneString;
 
-        await UniTask.DelayFrame(1);
+        await UniTask.Yield();
 
         await SceneManager.LoadSceneAsync("Loading");
 
@@ -92,6 +72,7 @@ public class SceneController
         await UniTask.Yield();
 
         LoadingTask.Clear();
+
         if (Operation != null)
         {
             Operation = null;
@@ -99,7 +80,7 @@ public class SceneController
     }
 
 
-    private static async UniTask LoadSceneAsync()
+    private async UniTask LoadSceneAsync()
     {
         if (Operation != null)
         {
@@ -116,7 +97,7 @@ public class SceneController
         }
     }
 
-    public static async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
+    public async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
     {
         _CanvasGroup.alpha = 0f;
         _CanvasGroup.interactable = false;
@@ -143,7 +124,6 @@ public class SceneController
                     })
                     .OnComplete(() =>
                     {
-                        // Cleanup or do something when the fade-in is complete
                         Debug.Log("FadeIn was OnComplete.");
                     })
                     .ToUniTask();
@@ -155,7 +135,7 @@ public class SceneController
         }
     }
 
-    public static async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
+    public async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
     {
         _CanvasGroup.alpha = 1f;
         _CanvasGroup.interactable = false;
@@ -167,7 +147,7 @@ public class SceneController
 
             Action myAction = () =>
             {
-                Debug.Log("아!!! 취소라고!!!~~~~~~~~~~~");
+                Debug.Log("Cancel CanvasFadeOut");
                 tweener.Kill();
 
                 _CanvasGroup.alpha = 1f;
