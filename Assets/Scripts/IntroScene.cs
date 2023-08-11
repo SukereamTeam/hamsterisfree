@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
-public class IntroManager : MonoBehaviour
+public class IntroScene : MonoBehaviour
 {
     [SerializeField]
     private CanvasGroup canvasGroup = null;
@@ -28,11 +28,17 @@ public class IntroManager : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken);
+            await SceneController.Instance.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken, () =>
+            {
+                this.canvasGroup.alpha = 1f;
+            });
 
             await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
-            await SceneController.Instance.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken);
+            await SceneController.Instance.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken, () =>
+            {
+                this.canvasGroup.alpha = 1f;
+            });
 
             // TODO : 유저 데이터 로드 ?
             //SceneController.LoadingTask.Add();

@@ -101,7 +101,15 @@ public class SceneController : Singleton<SceneController>
         }
     }
 
-    public async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
+
+    public void AddLoadingTask(UniTask task)
+    {
+        this.loadingTask.Add(task);
+    }
+
+
+    // Canvas Fade In/Out -------------------------
+    public async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken, Action _CancelAction = null)
     {
         _CanvasGroup.alpha = 0f;
         _CanvasGroup.interactable = false;
@@ -111,15 +119,15 @@ public class SceneController : Singleton<SceneController>
             var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 1f, _Duration)
                 .SetEase(Ease.OutQuint);
 
-            Action myAction = () =>
+            Action cancelAction = () =>
             {
                 Debug.Log("Cancel CanvasFadeIn");
                 tweener.Kill();
 
-                _CanvasGroup.alpha = 1f;
+                _CancelAction();
             };
 
-            using (cancellationToken.Token.Register(() => myAction()))
+            using (cancellationToken.Token.Register(() => cancelAction()))
             {
                 await tweener
                     .OnKill(() =>
@@ -139,7 +147,7 @@ public class SceneController : Singleton<SceneController>
         }
     }
 
-    public async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken)
+    public async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource _CancellationToken, Action _CancelAction = null)
     {
         _CanvasGroup.alpha = 1f;
         _CanvasGroup.interactable = false;
@@ -149,15 +157,15 @@ public class SceneController : Singleton<SceneController>
             var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 0f, _Duration)
                 .SetEase(Ease.OutQuint);
 
-            Action myAction = () =>
+            Action cancelAction = () =>
             {
                 Debug.Log("Cancel CanvasFadeOut");
                 tweener.Kill();
 
-                _CanvasGroup.alpha = 1f;
+                _CancelAction();
             };
 
-            using (cancellationToken.Token.Register(() => myAction()))
+            using (_CancellationToken.Token.Register(() => cancelAction()))
             {
                 await tweener
                     .OnKill(() =>
@@ -177,13 +185,5 @@ public class SceneController : Singleton<SceneController>
         }
     }
 
-    // TODO
-    // CanvasFadeIn/Out 부르는 애들마다
-    // Cancel에서 원하는 행동이 있을 텐데
-    // 이걸 Action? 으로 넣어주기?
-
-    public void AddLoadingTask(UniTask task)
-    {
-        this.loadingTask.Add(task);
-    }
+    
 }

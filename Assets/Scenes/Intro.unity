@@ -317,7 +317,7 @@ GameObject:
   - component: {fileID: 621071328}
   - component: {fileID: 621071329}
   m_Layer: 0
-  m_Name: IntroManager
+  m_Name: Intro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -351,7 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 154342442}
-  fadeDuration: 3
+  fadeDuration: 1.5
 --- !u!1 &993456147
 GameObject:
   m_ObjectHideFlags: 0
