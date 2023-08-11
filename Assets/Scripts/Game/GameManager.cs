@@ -5,14 +5,6 @@ using UnityEngine;
 using UniRx;
 
 
-public enum Direction
-{
-    Left = 0,
-    Right,
-    Top,
-    Bottom
-}
-
 public class GameManager : MonoSingleton<GameManager>
 {
     [SerializeField]
@@ -28,10 +20,24 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
 
+    private int curStageIndex = 0;
 
+
+
+
+
+    private void Awake()
+    {
+        
+
+        // TODO : DELETE (테스트용)
+        CommonManager.Instance.Initialize();
+    }
 
     private void Start()
     {
+
+
         this.isGame.Value = true;
 
         this.isGame
@@ -41,6 +47,11 @@ public class GameManager : MonoSingleton<GameManager>
             {
                 GameEndFlow();
             }).AddTo(this);
+
+
+        
+
+        this.mapManager.SetStage(curStageIndex);
     }
 
     private void GameEndFlow()

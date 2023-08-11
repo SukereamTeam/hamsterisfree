@@ -7,7 +7,7 @@ public class ExitTile : TileBase
     [SerializeField]
     private Sprite sprite;
 
-    public override void Initialize(TileType _Type, string _SpritePath, Vector2 _Pos)
+    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
     {
         base.Initialize(_Type, _SpritePath, _Pos);
 

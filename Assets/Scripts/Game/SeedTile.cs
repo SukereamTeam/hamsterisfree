@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+
+public enum SeedType
+{
+    Normal = 0,
+    Heart
+}
+
+
 public class SeedTile : TileBase
 {
     [SerializeField]
@@ -19,7 +27,7 @@ public class SeedTile : TileBase
 
     }
 
-    public override void Initialize(TileType _Type, string _SpritePath, Vector2 _Pos)
+    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
     {
         base.Initialize(_Type, _SpritePath, _Pos);
 
