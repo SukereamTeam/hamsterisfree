@@ -15,10 +15,17 @@ public class IntroScene : MonoBehaviour
 
     private CancellationTokenSource cancellationToken;
 
+
+
+    private void Awake()
+    {
+        // 싱글톤 객체 생성 및 초기화
+        CommonManager.Instance.Initialize();
+        SceneController.Instance.Initialize();
+    }
+
     private void Start()
     {
-        CommonManager.Instance.Initialize();
-
         this.cancellationToken = new CancellationTokenSource();
 
         InitializeAsync().Forget();
@@ -28,17 +35,11 @@ public class IntroScene : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.CanvasFadeIn(this.canvasGroup, fadeDuration, cancellationToken, () =>
-            {
-                this.canvasGroup.alpha = 1f;
-            });
+            await SceneController.Instance.Fade(true, fadeDuration, true, cancellationToken);
 
             await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
-            await SceneController.Instance.CanvasFadeOut(this.canvasGroup, fadeDuration, cancellationToken, () =>
-            {
-                this.canvasGroup.alpha = 1f;
-            });
+            await SceneController.Instance.Fade(false, fadeDuration, true, cancellationToken);
 
             // TODO : 유저 데이터 로드 ?
             //SceneController.LoadingTask.Add();

@@ -18,6 +18,9 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField]
     private Image fadeImage = null;
 
+    [SerializeField]
+    private float fadeDuration = 0f;
+
 
 
     private IReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
@@ -31,12 +34,9 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-
     private void Start()
     {
         Debug.Log("GameManagere에서 Start 진입");
-
-        this.isGame.Value = true;
 
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
@@ -49,7 +49,11 @@ public class GameManager : MonoSingleton<GameManager>
 
         MapManager.SetStage()
             .ToObservable()
-            .Subscribe(_ => this.fadeImage.DOFade(0f, 1f));
+            .Subscribe(_ =>
+            {
+                this.fadeImage.DOFade(0f, fadeDuration);
+                GameManager.Instance.IsGame.Value = true;
+            });
     }
 
 

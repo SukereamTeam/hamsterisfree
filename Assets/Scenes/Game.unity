@@ -5630,6 +5630,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapManager: {fileID: 1975502251}
+  fadeImage: {fileID: 1859425092}
+  fadeDuration: 0.5
 --- !u!1 &1055597776
 GameObject:
   m_ObjectHideFlags: 0
@@ -8895,12 +8897,12 @@ GameObject:
   - component: {fileID: 1859425093}
   - component: {fileID: 1859425092}
   m_Layer: 5
-  m_Name: Image
+  m_Name: StartFadeImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1859425091
 RectTransform:
   m_ObjectHideFlags: 0

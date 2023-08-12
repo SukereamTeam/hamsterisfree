@@ -26,7 +26,7 @@ public class LobbyManager : MonoBehaviour
 
     public async void OnClick_Next()
     {
-        await SceneController.Instance.CanvasFadeOut(this.canvasGroup, this.fadeDuration, cancellationToken);
+        await SceneController.Instance.Fade(false, this.fadeDuration, false, cancellationToken);
 
         var task = DataContainer.LoadStageDatas();
         await SceneController.Instance.SceneActivation(task);

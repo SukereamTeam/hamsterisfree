@@ -7,8 +7,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using System.Threading;
 using UniRx;
+using UnityEngine.UI;
 
-public class SceneController : Singleton<SceneController>
+public class SceneController : MonoSingleton<SceneController>
 {
     private string nextScene;
     public string NextScene => this.nextScene;
@@ -22,6 +23,18 @@ public class SceneController : Singleton<SceneController>
 
     private AsyncOperation operation;
     public AsyncOperation Operation => this.operation;
+
+    private Image fade = null;
+
+    
+
+    public void Initialize()
+    {
+        var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
+        var canvas = Instantiate<GameObject>(prefab, this.transform);
+
+        this.fade = canvas.GetComponentInChildren<Image>();
+    }
 
 
 
@@ -62,6 +75,7 @@ public class SceneController : Singleton<SceneController>
             this.operation = null;
         }
 
+        this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
     }
 
     public async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
@@ -86,6 +100,8 @@ public class SceneController : Singleton<SceneController>
         {
             this.operation = null;
         }
+
+        this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
     }
 
 
@@ -109,22 +125,34 @@ public class SceneController : Singleton<SceneController>
 
 
     // Canvas Fade In/Out -------------------------
-    public async UniTask CanvasFadeIn(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource cancellationToken, Action _CancelAction = null)
+    public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource cancellationToken, Action _Action = null)
     {
-        _CanvasGroup.alpha = 0f;
-        _CanvasGroup.interactable = false;
+        //if (this.fade.gameObject.activeSelf == false)
+        //    this.fade.gameObject.SetActive(true);
+
+        var fadeInt = _FadeIn ? 1 : 0;  // fade in : 검은 화면에서 서서히 밝아지는 것!
+        this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, fadeInt);
+        this.fade.raycastTarget = !_Skip;
 
         try
         {
-            var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 1f, _Duration)
-                .SetEase(Ease.OutQuint);
+            var negBool = !_FadeIn;
+            var resultInt = negBool ? 1 : 0;
+
+            var tweener = DOTween.To(() => this.fade.color.a, x =>
+            {
+                this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, x);
+            }, resultInt, _Duration).SetEase(Ease.OutQuint);
 
             Action cancelAction = () =>
             {
-                Debug.Log("Cancel CanvasFadeIn");
+                Debug.Log("Cancel CanvasFade");
                 tweener.Kill();
 
-                _CancelAction();
+                this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
+
+                if (_Action != null)
+                    _Action();
             };
 
             using (cancellationToken.Token.Register(() => cancelAction()))
@@ -132,11 +160,11 @@ public class SceneController : Singleton<SceneController>
                 await tweener
                     .OnKill(() =>
                     {
-                        Debug.Log("FadeIn was OnKill.");
+                        Debug.Log("Fade was OnKill.");
                     })
                     .OnComplete(() =>
                     {
-                        Debug.Log("FadeIn was OnComplete.");
+                        Debug.Log("Fade was OnComplete.");
                     })
                     .ToUniTask();
             }
@@ -147,43 +175,4 @@ public class SceneController : Singleton<SceneController>
         }
     }
 
-    public async UniTask CanvasFadeOut(CanvasGroup _CanvasGroup, float _Duration, CancellationTokenSource _CancellationToken, Action _CancelAction = null)
-    {
-        _CanvasGroup.alpha = 1f;
-        _CanvasGroup.interactable = false;
-
-        try
-        {
-            var tweener = DOTween.To(() => _CanvasGroup.alpha, x => _CanvasGroup.alpha = x, 0f, _Duration)
-                .SetEase(Ease.OutQuint);
-
-            Action cancelAction = () =>
-            {
-                Debug.Log("Cancel CanvasFadeOut");
-                tweener.Kill();
-
-                _CancelAction();
-            };
-
-            using (_CancellationToken.Token.Register(() => cancelAction()))
-            {
-                await tweener
-                    .OnKill(() =>
-                    {
-                        Debug.Log("FadeOut was OnKill.");
-                    })
-                    .OnComplete(() =>
-                    {
-                        Debug.Log("FadeOut was OnComplete.");
-                    })
-                    .ToUniTask();
-            };
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"### exception occurred: {ex}");
-        }
-    }
-
-    
 }
