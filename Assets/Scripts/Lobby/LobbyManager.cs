@@ -33,6 +33,6 @@ public class LobbyManager : MonoBehaviour
 
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => UniTask.FromResult(task)));
 
-        SceneController.Instance.LoadScene(Define.Scene.Game).Forget();
+        SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }
 }

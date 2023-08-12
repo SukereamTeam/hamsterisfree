@@ -58,27 +58,7 @@ public class SceneController : MonoSingleton<SceneController>
     }
 
 
-    public async UniTaskVoid LoadScene(Define.Scene _SceneName)
-    {
-        var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
-
-        nextScene = sceneString;
-
-        LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
-
-        await UniTask.WhenAll(LoadingTask.ToArray());
-
-        LoadingTask.Clear();
-
-        if (this.operation != null)
-        {
-            this.operation = null;
-        }
-
-        this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
-    }
-
-    public async UniTask LoadSceneWithLoading(Define.Scene _SceneName)
+    public async UniTaskVoid LoadScene(Define.Scene _SceneName, bool withLoading)
     {
         var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
@@ -86,9 +66,14 @@ public class SceneController : MonoSingleton<SceneController>
 
         await UniTask.Yield();
 
-        await SceneManager.LoadSceneAsync("Loading");
+        if (withLoading == true)
+        {
+            await SceneManager.LoadSceneAsync("Loading");
+        }
 
         LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
+
+        await UniTask.Yield();
 
         await UniTask.WhenAll(LoadingTask.ToArray());
 
@@ -127,9 +112,6 @@ public class SceneController : MonoSingleton<SceneController>
     // Canvas Fade In/Out -------------------------
     public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource cancellationToken, Action _Action = null)
     {
-        //if (this.fade.gameObject.activeSelf == false)
-        //    this.fade.gameObject.SetActive(true);
-
         var fadeInt = _FadeIn ? 1 : 0;  // fade in : 검은 화면에서 서서히 밝아지는 것!
         this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, fadeInt);
         this.fade.raycastTarget = !_Skip;

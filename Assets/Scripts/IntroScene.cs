@@ -47,7 +47,8 @@ public class IntroScene : MonoBehaviour
             // 빈 UniTask 을 넘겨줘서 바로 실행되게
             await SceneController.Instance.SceneActivation(UniTask.CompletedTask);
 
-            SceneController.Instance.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
+            SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
+            //SceneController.Instance.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
         }
         catch (Exception ex)
         {
