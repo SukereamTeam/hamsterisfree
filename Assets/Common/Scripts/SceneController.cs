@@ -12,9 +12,6 @@ using System.Linq;
 
 public class SceneController : MonoSingleton<SceneController>
 {
-    private string nextScene;
-    public string NextScene => this.nextScene;
-
     private List<UniTask> loadingTask;
     public List<UniTask> LoadingTask
     {
@@ -28,8 +25,6 @@ public class SceneController : MonoSingleton<SceneController>
     private bool loadingDone = false;
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
-    private AsyncOperation operation;
-    public AsyncOperation Operation => this.operation;
 
     private Image fade = null;
 
@@ -51,8 +46,6 @@ public class SceneController : MonoSingleton<SceneController>
         try
         {
             var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
-
-            nextScene = sceneString;
 
             await UniTask.Yield();
 
@@ -79,18 +72,13 @@ public class SceneController : MonoSingleton<SceneController>
                 await UniTask.WaitUntil(() => this.loadingDone == true);
             }
 
-            await LoadSceneAsync();
+            await LoadSceneAsync(sceneString);
 
             await UniTask.Yield();
 
             LoadingTask.Clear();
             CompleteCount = 0;
             this.loadingDone = false;
-
-            if (this.operation != null)
-            {
-                this.operation = null;
-            }
 
             this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
         }
@@ -101,11 +89,11 @@ public class SceneController : MonoSingleton<SceneController>
     }
 
 
-    private async UniTask LoadSceneAsync()
+    private async UniTask LoadSceneAsync(string _SceneName)
     {
-        this.operation = SceneManager.LoadSceneAsync(nextScene);
+        var operation = SceneManager.LoadSceneAsync(_SceneName);
 
-        while (!this.operation.isDone)
+        while (!operation.isDone)
         {
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
