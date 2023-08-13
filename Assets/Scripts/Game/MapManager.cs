@@ -132,7 +132,7 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        int LeftEnd = 8;
+        int LeftEnd = 9;
         int BottomEnd = 15;
         int RightEnd = 24;
 
