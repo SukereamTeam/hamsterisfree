@@ -3,13 +3,22 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UniRx;
-
+using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System.Threading;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+
     [SerializeField]
     private MapManager mapManager = null;
     public MapManager MapManager => this.mapManager;
+
+
+    [SerializeField]
+    private float fadeDuration = 0f;
+
 
 
     private IReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
@@ -20,25 +29,12 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
 
-    private int curStageIndex = 0;
 
 
 
-
-
-    private void Awake()
+    private async void Start()
     {
-        
-
-        // TODO : DELETE (테스트용)
-        CommonManager.Instance.Initialize();
-    }
-
-    private void Start()
-    {
-
-
-        this.isGame.Value = true;
+        Debug.Log("GameManagere에서 Start 진입");
 
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
@@ -49,10 +45,15 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        
+        MapManager.SetStage();
 
-        this.mapManager.SetStage(curStageIndex);
+        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+
+        this.isGame.Value = true;
     }
+
+
+
 
     private void GameEndFlow()
     {
@@ -60,6 +61,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-        GameManager.Instance.MapManager.IsFade.Value = false;
+        MapManager.IsFade.Value = false;
     }
+
+    
 }

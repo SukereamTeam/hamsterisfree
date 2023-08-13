@@ -5446,7 +5446,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1009608640
 RectTransform:
@@ -5629,6 +5629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapManager: {fileID: 1975502251}
+  fadeDuration: 0.5
 --- !u!1 &1055597776
 GameObject:
   m_ObjectHideFlags: 0
@@ -9254,6 +9255,7 @@ MonoBehaviour:
   mask: {fileID: 1162894044}
   fadeTime: 1.5
   exitPrefab: {fileID: 1242813034118986203, guid: 5b4701f9c0486f44e9edae527c15c5be, type: 3}
+  fadeImage: {fileID: 0}
 --- !u!1 &1980264063
 GameObject:
   m_ObjectHideFlags: 0

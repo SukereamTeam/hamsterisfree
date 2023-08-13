@@ -7,8 +7,8 @@ public class Define
     public enum Scene
     {
         Intro,
+        Lobby,
         Game,
-        Lobby
     }
 
     public enum Direction
@@ -25,6 +25,20 @@ public class Define
         Exit,
         Seed,
         Monster
+    }
+
+    public enum TileSpriteName
+    {
+        Center = 0,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Mask
     }
 
     public enum ObjectDataField

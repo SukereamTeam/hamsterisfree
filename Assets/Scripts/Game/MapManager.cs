@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 using UniRx;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class MapManager : MonoBehaviour
 {
@@ -33,7 +35,13 @@ public class MapManager : MonoBehaviour
     [SerializeField]
     private GameObject exitPrefab = null;
 
+    [SerializeField]
+    private Image fadeImage = null;
 
+
+    private const int Left_End = 9;
+    private const int Bottom_End = 15;
+    private const int Right_End = 24;
 
 
     private IReactiveProperty<bool> isFade = new ReactiveProperty<bool>(false);
@@ -54,26 +62,35 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        //SetBackground();
-
-        //this.backTiles = this.background.transform.parent.GetComponentsInChildren<Transform>().Where(x => x != this.background.transform && x.name.Contains("Tile_")).ToArray();
-
-        //SetOutlineTiles();
-
-        //CreateExitTile();
-
-        //SetMask();
-
-
         this.isFade
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Subscribe(_ =>
             {
                 FadeMap();
             }).AddTo(this);
+
+
+        
     }
 
-    
+    public void SetStage()
+    {
+        if (DataContainer.StageTileSprites.Count == 0)
+        {
+            Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
+            return;
+        }
+
+        SetBackground();
+        SetOutlineTiles();
+        SetMask();
+
+        CreateExitTile();
+
+        DataContainer.StageTileSprites.Clear();
+    }
+
+
 
     private void ChangeNameOutlineTiles()
     {
@@ -103,81 +120,79 @@ public class MapManager : MonoBehaviour
 
     //------------ Setting Stage Data
 
-    public void SetStage(int stageIndex)
+    private void SetBackground()
     {
-        if (DataContainer.StageTable.DicData.ContainsKey(stageIndex.ToString()))
-        {
-            var data = DataContainer.StageTable.DicData[stageIndex.ToString()];
+        var index = (int)Define.TileSpriteName.Center;
 
-            SetBackground(data.MapName);
-            SetOutlineTiles(data.MapName);
-            SetMask(data.MapName);
+        this.background.sprite = DataContainer.StageTileSprites[index];
 
-            CreateExitTile();
-        }
+        
     }
 
-    private void SetBackground(string _MapName)
+    private void SetOutlineTiles()
     {
-        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Center");
+        var index = (int)Define.TileSpriteName.Center;
 
-        this.background.sprite = sprite;
-    }
+        
 
-    private void SetOutlineTiles(string _MapName)
-    {
+
         for (int i = 0; i < outlineTiles.Length; i++)
         {
-            if (i < 9)
+            if (i < Left_End)
             {
-                var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Left");
+                index = (int)Define.TileSpriteName.Left;
+                var sprite = DataContainer.StageTileSprites[index];
+
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < 15)
+            else if (i < Bottom_End)
             {
                 //bottom
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Bottom");
+                index = (int)Define.TileSpriteName.Bottom;
+                var sprite = DataContainer.StageTileSprites[index];
+
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < 24)
+            else if (i < Right_End)
             {
                 //right
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Right");
+                index = (int)Define.TileSpriteName.Right;
+                var sprite = DataContainer.StageTileSprites[index];
+
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
             else
             {
                 //top
-                var sprite = Resources.Load<Sprite>("Images/Map/Forest/Forest_Top");
+                index = (int)Define.TileSpriteName.Top;
+                var sprite = DataContainer.StageTileSprites[index];
+
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
         }
 
 
-        var edgeSpritePath = string.Empty;
-
-        for (int i = 0; i < Enum.GetValues(typeof(Define.Direction)).Length; i++)
+        for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
-            var horizontal = i < 2 ? string.Format("Top") : string.Format("Bottom");
-            var vertical = i < 2 ? i : i - 2;
-
-            edgeSpritePath = $"Images/Map/Forest/Forest_{horizontal}{Enum.GetName(typeof(Define.Direction), vertical)}";
-
-            var sprite = Resources.Load<Sprite>(edgeSpritePath);
-
-            this.edgeTiles[i].sprite = sprite;
+            var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
+            this.edgeTiles[tileIndex].sprite = DataContainer.StageTileSprites[index];
         }
     }
 
-    private void SetMask(string _MapName)
+
+    private void SetMask()
     {
-        var sprite = Resources.Load<Sprite>($"Images/Map/{_MapName}/{_MapName}_Mask");
-        mask.sprite = sprite;
+        Debug.Log("SetMask 시작");
+        var sprite = DataContainer.StageTileSprites[(int)Define.TileSpriteName.Mask];
+        
+        this.mask.sprite = sprite;
+        Debug.Log("SetMask 끝");
     }
+
 
     private void CreateExitTile()
     {
