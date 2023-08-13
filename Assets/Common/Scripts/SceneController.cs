@@ -25,16 +25,14 @@ public class SceneController : MonoSingleton<SceneController>
     private bool loadingDone = false;
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
-    [SerializeField]
-    private GameObject fadeCanvas = null;
-
-    private Image fade = null;
+    private Image fade;
 
     
 
     public void Initialize()
     {
-        var canvas = Instantiate<GameObject>(fadeCanvas, this.transform);
+        var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
+        var canvas = Instantiate<GameObject>(prefab, this.transform);
 
         this.fade = canvas.GetComponentInChildren<Image>();
 

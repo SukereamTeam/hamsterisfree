@@ -1,3 +1,3 @@
-스테이지 번호(index),스테이지 유형,맵,"Seed Data(pos(empty = 0), Size)","Monster Data (Type, Size, pos(or empty = random fixed))"
+스테이지 번호(index),스테이지 유형 / 시간값or기회값 (Default / LimitTime / LimitChallnge) int Value(TimeSpan.FromSeconds),맵,SeedData Type (Default / Disappear / Fake / Moving) int (갯수),MonsterData Type  Size int (갯수)
 Index,StageType,MapName,SeedData,MonsterData
-0,Heart,Forest,"(NORMAL_1_(0, 0), (3, 0))",NULL
+0,"LimitTime, 60",Forest,"(Default, 3)",0

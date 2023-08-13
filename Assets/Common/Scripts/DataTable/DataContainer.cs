@@ -77,6 +77,7 @@ public static class DataContainer
 
                 value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
 
+                //0 / LimitTime,60 / Forest / Default,3 / 0
                 _TableBase.SetTable(values[0], headers[j], value);
             }
         }

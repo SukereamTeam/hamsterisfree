@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
+using System.Threading.Tasks;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -31,9 +32,18 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-
-    private void Start()
+    private void Awake()
     {
+        CommonManager.Instance.Initialize();
+        SceneController.Instance.Initialize();
+    }
+
+    private async void Start()
+    {
+        
+
+        await DataContainer.LoadStageDatas();
+
         Debug.Log("GameManagere에서 Start 진입");
 
         this.isGame

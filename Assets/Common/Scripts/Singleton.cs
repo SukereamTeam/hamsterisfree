@@ -52,11 +52,10 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
                     {
                         string name = String.Concat("Singleton.", typeof(T).ToString());
                         _instance = new GameObject(name, typeof(T)).GetComponent<T>();
-                    }
-
-                    if (Application.isPlaying)
-                    {
-                        DontDestroyOnLoad(_instance);
+                        if (Application.isPlaying)
+                        {
+                            DontDestroyOnLoad(_instance);
+                        }
                     }
                 }
 
