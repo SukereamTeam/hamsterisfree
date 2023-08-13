@@ -8,9 +8,6 @@ using System.Threading;
 public class IntroScene : MonoBehaviour
 {
     [SerializeField]
-    private CanvasGroup canvasGroup = null;
-
-    [SerializeField]
     private float fadeDuration = 0f;
 
     private CancellationTokenSource cancellationToken;
@@ -44,11 +41,28 @@ public class IntroScene : MonoBehaviour
             // TODO : 유저 데이터 로드 ?
             //SceneController.LoadingTask.Add();
 
-            // 빈 UniTask 을 넘겨줘서 바로 실행되게
-            await SceneController.Instance.SceneActivation(UniTask.CompletedTask);
+            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
+            {
+                Debug.Log("1차 태스크");
+                await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+                Debug.Log("1차 태스크 끝");
+            }));
+
+            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
+            {
+                Debug.Log("2차 태스크");
+                await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
+                Debug.Log("2차 태스크 끝");
+            }));
+
+            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
+            {
+                Debug.Log("3차 태스크");
+                await UniTask.Delay(TimeSpan.FromMilliseconds(10000));
+                Debug.Log("3차 태스크 끝");
+            }));
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
-            //SceneController.Instance.LoadSceneWithLoading(Define.Scene.Lobby).Forget();
         }
         catch (Exception ex)
         {

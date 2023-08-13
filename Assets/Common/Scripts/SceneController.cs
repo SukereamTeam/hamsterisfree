@@ -8,18 +8,25 @@ using UnityEngine;
 using System.Threading;
 using UniRx;
 using UnityEngine.UI;
+using System.Linq;
 
 public class SceneController : MonoSingleton<SceneController>
 {
     private string nextScene;
     public string NextScene => this.nextScene;
 
-    private List<UniTask> loadingTask = new List<UniTask>();
+    private List<UniTask> loadingTask;
     public List<UniTask> LoadingTask
     {
         get => this.loadingTask;
         private set => this.loadingTask = value;
     }
+    public int TaskCount => this.loadingTask.Count;
+
+    public int CompleteCount { get; set; }
+
+    private bool loadingDone = false;
+    public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
     private AsyncOperation operation;
     public AsyncOperation Operation => this.operation;
@@ -34,67 +41,69 @@ public class SceneController : MonoSingleton<SceneController>
         var canvas = Instantiate<GameObject>(prefab, this.transform);
 
         this.fade = canvas.GetComponentInChildren<Image>();
+
+        this.loadingTask = new List<UniTask>();
     }
 
 
-
-    public async UniTask SceneActivation(UniTask task)
+    public async UniTaskVoid LoadScene(Define.Scene _SceneName, bool _WithLoading)
     {
-        await task.ToObservable().Do(async x =>
+        try
         {
-            Debug.Log("Subscribe !!!");
+            var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
-            await UniTask.WaitUntil(() => this.operation != null);
+            nextScene = sceneString;
+
+            await UniTask.Yield();
+
+            if (_WithLoading == true)
+            {
+                await SceneManager.LoadSceneAsync("Loading");
+            }
+
+            await UniTask.Yield();
+
+            await UniTask.WhenAll(LoadingTask.ToArray().Select(async task =>
+            {
+                await task;
+
+                Debug.Log("태스크 끝");
+
+                CompleteCount++;
+            }));
+
+            await UniTask.Yield();
+
+            if (_WithLoading == true)
+            {
+                await UniTask.WaitUntil(() => this.loadingDone == true);
+            }
+
+            await LoadSceneAsync();
+
+            await UniTask.Yield();
+
+            LoadingTask.Clear();
+            CompleteCount = 0;
+            this.loadingDone = false;
 
             if (this.operation != null)
             {
-                Debug.Log("Operation !!!");
-                this.operation.allowSceneActivation = true;
+                this.operation = null;
             }
 
-            await UniTask.CompletedTask;
-
-        }).Last();
-    }
-
-
-    public async UniTaskVoid LoadScene(Define.Scene _SceneName, bool withLoading)
-    {
-        var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
-
-        nextScene = sceneString;
-
-        await UniTask.Yield();
-
-        if (withLoading == true)
-        {
-            await SceneManager.LoadSceneAsync("Loading");
+            this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
         }
-
-        LoadingTask.Add(UniTask.Defer(LoadSceneAsync));
-
-        await UniTask.Yield();
-
-        await UniTask.WhenAll(LoadingTask.ToArray());
-
-        await UniTask.Yield();
-
-        LoadingTask.Clear();
-
-        if (this.operation != null)
+        catch (Exception ex)
         {
-            this.operation = null;
+            Debug.LogError($"### exception occurred: {ex}");
         }
-
-        this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
     }
 
 
     private async UniTask LoadSceneAsync()
     {
         this.operation = SceneManager.LoadSceneAsync(nextScene);
-
-        this.operation.allowSceneActivation = false;
 
         while (!this.operation.isDone)
         {

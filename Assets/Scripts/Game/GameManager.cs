@@ -52,7 +52,7 @@ public class GameManager : MonoSingleton<GameManager>
             .Subscribe(_ =>
             {
                 this.fadeImage.DOFade(0f, fadeDuration);
-                GameManager.Instance.IsGame.Value = true;
+                IsGame.Value = true;
             });
     }
 
