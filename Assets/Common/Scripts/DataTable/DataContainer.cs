@@ -99,7 +99,7 @@ public static class DataContainer
         await LoadTileSprites(dicData.MapName);
     }
 
-    public static async UniTask LoadTileSprites(string _MapName)
+    private static async UniTask LoadTileSprites(string _MapName)
     {
         bool isDone = false;
 
