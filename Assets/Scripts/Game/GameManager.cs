@@ -15,8 +15,6 @@ public class GameManager : MonoSingleton<GameManager>
     private MapManager mapManager = null;
     public MapManager MapManager => this.mapManager;
 
-    [SerializeField]
-    private Image fadeImage = null;
 
     [SerializeField]
     private float fadeDuration = 0f;
@@ -49,12 +47,11 @@ public class GameManager : MonoSingleton<GameManager>
 
         MapManager.SetStage()
             .ToObservable()
-            .Subscribe(_ =>
+            .Subscribe(async _ =>
             {
-                this.fadeImage.DOFade(0f, fadeDuration).OnComplete(() =>
-                {
-                    IsGame.Value = true;
-                });
+                await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+
+                this.isGame.Value = true;
             });
     }
 

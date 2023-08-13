@@ -94,15 +94,30 @@ public static class DataContainer
     {
         Debug.Log("LoadStageDatas 시작");
 
-        var dicData = StageTable.DicData[CommonManager.Instance.CurStageIndex.ToString()];
+        try
+        {
+            if (StageTable.DicData.ContainsKey(CommonManager.Instance.CurStageIndex.ToString()))
+            {
+                var dicData = StageTable.DicData[CommonManager.Instance.CurStageIndex.ToString()];
 
-        await LoadTileSprites(dicData.MapName);
+
+                await LoadTileSprites(dicData.MapName);
+            }
+            else
+            {
+                Debug.Log($"### Error ---> {CommonManager.Instance.CurStageIndex} is Not ContainsKey ###");
+            }
+        }
+        catch (Exception ex) when (!(ex is OperationCanceledException))
+        {
+            Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
+        }
+
+        Debug.Log("LoadStageDatas 끝!");
     }
 
     private static async UniTask LoadTileSprites(string _MapName)
     {
-        bool isDone = false;
-
         var rootPath = "Images/Map";
 
         var path = $"{rootPath}/{_MapName}/{_MapName}_";
@@ -127,14 +142,10 @@ public static class DataContainer
                     Debug.Log("### Fail <Sprite> Type Casting ###");
                 }
             }
-
-            isDone = true;
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
             Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
         }
-
-        await UniTask.WaitUntil(() => isDone == true);
     }
 }

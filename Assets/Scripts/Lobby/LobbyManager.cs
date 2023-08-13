@@ -9,9 +9,6 @@ using UniRx;
 public class LobbyManager : MonoBehaviour
 {
     [SerializeField]
-    private CanvasGroup canvasGroup = null;
-
-    [SerializeField]
     private float fadeDuration = 0f;
 
 

@@ -52,6 +52,8 @@ public class SceneController : MonoSingleton<SceneController>
             if (_WithLoading == true)
             {
                 await SceneManager.LoadSceneAsync("Loading");
+
+                this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
             }
 
             await UniTask.Yield();
@@ -60,7 +62,7 @@ public class SceneController : MonoSingleton<SceneController>
             {
                 await task;
 
-                Debug.Log("태스크 끝");
+                Debug.Log("태스크 하나 끝");
 
                 CompleteCount++;
             }));
@@ -144,8 +146,7 @@ public class SceneController : MonoSingleton<SceneController>
                     .OnComplete(() =>
                     {
                         Debug.Log("Fade was OnComplete.");
-                    })
-                    .ToUniTask();
+                    }).ToUniTask();
             }
         }
         catch (Exception ex)

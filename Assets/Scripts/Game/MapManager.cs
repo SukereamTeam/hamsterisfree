@@ -72,19 +72,21 @@ public class MapManager : MonoBehaviour
 
     public async UniTask SetStage()
     {
-        if (DataContainer.StageTileSprites.Count > 0)
+        if (DataContainer.StageTileSprites.Count == 0)
         {
-            SetBackground();
-            SetOutlineTiles();
-            SetMask();
+            Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
+            return;
         }
+
+        SetBackground();
+        SetOutlineTiles();
+        SetMask();
 
         CreateExitTile();
 
         DataContainer.StageTileSprites.Clear();
 
         await UniTask.CompletedTask;
-
     }
 
 
@@ -130,9 +132,14 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
+        int LeftEnd = 8;
+        int BottomEnd = 15;
+        int RightEnd = 24;
+
+
         for (int i = 0; i < outlineTiles.Length; i++)
         {
-            if (i < 9)
+            if (i < LeftEnd)
             {
                 index = (int)Define.TileSpriteName.Left;
                 var sprite = DataContainer.StageTileSprites[index];
@@ -140,7 +147,7 @@ public class MapManager : MonoBehaviour
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < 15)
+            else if (i < BottomEnd)
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
@@ -149,7 +156,7 @@ public class MapManager : MonoBehaviour
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < 24)
+            else if (i < RightEnd)
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;

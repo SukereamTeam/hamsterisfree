@@ -55,13 +55,6 @@ public class IntroScene : MonoBehaviour
                 Debug.Log("2차 태스크 끝");
             }));
 
-            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
-            {
-                Debug.Log("3차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(10000));
-                Debug.Log("3차 태스크 끝");
-            }));
-
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
         }
         catch (Exception ex)
