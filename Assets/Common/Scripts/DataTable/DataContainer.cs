@@ -94,18 +94,20 @@ public static class DataContainer
     {
         Debug.Log("LoadStageDatas 시작");
 
+        var curIndex = CommonManager.Instance.CurStageIndex;
+
         try
         {
-            if (StageTable.DicData.ContainsKey(CommonManager.Instance.CurStageIndex.ToString()))
+            if (StageTable.DicData.ContainsKey(curIndex.ToString()))
             {
-                var dicData = StageTable.DicData[CommonManager.Instance.CurStageIndex.ToString()];
+                var dicData = StageTable.DicData[curIndex.ToString()];
 
 
                 await LoadTileSprites(dicData.MapName);
             }
             else
             {
-                Debug.Log($"### Error ---> {CommonManager.Instance.CurStageIndex} is Not ContainsKey ###");
+                Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");
             }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))

@@ -32,7 +32,7 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-    private void Start()
+    private async void Start()
     {
         Debug.Log("GameManagere에서 Start 진입");
 
@@ -45,14 +45,11 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        MapManager.SetStage()
-            .ToObservable()
-            .Subscribe(async _ =>
-            {
-                await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+        MapManager.SetStage();
 
-                this.isGame.Value = true;
-            });
+        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+
+        this.isGame.Value = true;
     }
 
 
