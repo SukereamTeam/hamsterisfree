@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
-using System.Threading.Tasks;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -32,18 +31,9 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-    private void Awake()
-    {
-        CommonManager.Instance.Initialize();
-        SceneController.Instance.Initialize();
-    }
 
     private async void Start()
     {
-        
-
-        await DataContainer.LoadStageDatas();
-
         Debug.Log("GameManagere에서 Start 진입");
 
         this.isGame
@@ -55,14 +45,11 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        MapManager.SetStage()
-            .ToObservable()
-            .Subscribe(async _ =>
-            {
-                await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+        MapManager.SetStage();
 
-                this.isGame.Value = true;
-            });
+        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+
+        this.isGame.Value = true;
     }
 
 

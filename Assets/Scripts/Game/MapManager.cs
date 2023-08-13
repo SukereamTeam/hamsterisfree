@@ -39,6 +39,9 @@ public class MapManager : MonoBehaviour
     private Image fadeImage = null;
 
 
+    private const int Left_End = 9;
+    private const int Bottom_End = 15;
+    private const int Right_End = 24;
 
 
     private IReactiveProperty<bool> isFade = new ReactiveProperty<bool>(false);
@@ -70,7 +73,7 @@ public class MapManager : MonoBehaviour
         
     }
 
-    public async UniTask SetStage()
+    public void SetStage()
     {
         if (DataContainer.StageTileSprites.Count == 0)
         {
@@ -85,8 +88,6 @@ public class MapManager : MonoBehaviour
         CreateExitTile();
 
         DataContainer.StageTileSprites.Clear();
-
-        await UniTask.CompletedTask;
     }
 
 
@@ -132,14 +133,12 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        int LeftEnd = 9;
-        int BottomEnd = 15;
-        int RightEnd = 24;
+        
 
 
         for (int i = 0; i < outlineTiles.Length; i++)
         {
-            if (i < LeftEnd)
+            if (i < Left_End)
             {
                 index = (int)Define.TileSpriteName.Left;
                 var sprite = DataContainer.StageTileSprites[index];
@@ -147,7 +146,7 @@ public class MapManager : MonoBehaviour
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < BottomEnd)
+            else if (i < Bottom_End)
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
@@ -156,7 +155,7 @@ public class MapManager : MonoBehaviour
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
             }
-            else if (i < RightEnd)
+            else if (i < Right_End)
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
