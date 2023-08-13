@@ -49,10 +49,11 @@ public class SceneController : MonoSingleton<SceneController>
 
             await UniTask.Yield();
 
+            LoadingScene loadingScene = null;
             if (_WithLoading == true)
             {
                 await SceneManager.LoadSceneAsync("Loading");
-
+                loadingScene = FindObjectOfType<LoadingScene>();
                 this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
             }
 
@@ -62,16 +63,22 @@ public class SceneController : MonoSingleton<SceneController>
             {
                 await task;
 
-                Debug.Log("태스크 하나 끝");
-
-                CompleteCount++;
+                if(loadingScene)
+                {
+                    CompleteCount++;
+                    var amount = ((float)CompleteCount / (float)TaskCount);
+                    var progress = Mathf.Round(amount * 100) / 100;    // 소수점 둘째자리까지 반올림
+                    loadingScene.UpdateProgress(progress);
+                }
             }));
 
             await UniTask.Yield();
 
-            if (_WithLoading == true)
+            if (loadingScene)
             {
-                await UniTask.WaitUntil(() => this.loadingDone == true);
+                // 로딩바 1f까지 다 채운 후 0.5초 쉬고 씬 이동
+                loadingScene.UpdateProgress(1f);
+                await UniTask.Delay(TimeSpan.FromMilliseconds(500));
             }
 
             await LoadSceneAsync(sceneString);
