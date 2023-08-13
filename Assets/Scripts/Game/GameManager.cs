@@ -51,8 +51,10 @@ public class GameManager : MonoSingleton<GameManager>
             .ToObservable()
             .Subscribe(_ =>
             {
-                this.fadeImage.DOFade(0f, fadeDuration);
-                IsGame.Value = true;
+                this.fadeImage.DOFade(0f, fadeDuration).OnComplete(() =>
+                {
+                    IsGame.Value = true;
+                });
             });
     }
 
