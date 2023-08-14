@@ -133,9 +133,6 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        
-
-
         for (int i = 0; i < outlineTiles.Length; i++)
         {
             if (i < Left_End)

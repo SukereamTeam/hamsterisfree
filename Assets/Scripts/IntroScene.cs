@@ -34,7 +34,7 @@ public class IntroScene : MonoBehaviour
         {
             await SceneController.Instance.Fade(true, fadeDuration, true, cancellationToken);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(3f));
+            await UniTask.Delay(TimeSpan.FromSeconds(1f));
 
             await SceneController.Instance.Fade(false, fadeDuration, true, cancellationToken);
 

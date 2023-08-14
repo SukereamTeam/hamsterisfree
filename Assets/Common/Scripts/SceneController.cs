@@ -25,16 +25,17 @@ public class SceneController : MonoSingleton<SceneController>
     private bool loadingDone = false;
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
+    [SerializeField]
     private Image fade;
 
     
 
     public void Initialize()
     {
-        var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
-        var canvas = Instantiate<GameObject>(prefab, this.transform);
+        //var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
+        //var canvas = Instantiate<GameObject>(prefab, this.transform);
 
-        this.fade = canvas.GetComponentInChildren<Image>();
+        //this.fade = canvas.GetComponentInChildren<Image>();
 
         this.loadingTask = new List<UniTask>();
     }
@@ -148,6 +149,8 @@ public class SceneController : MonoSingleton<SceneController>
                     .OnKill(() =>
                     {
                         Debug.Log("Fade was OnKill.");
+
+                        this.fade.raycastTarget = false;
                     })
                     .OnComplete(() =>
                     {
