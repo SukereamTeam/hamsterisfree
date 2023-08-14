@@ -9,7 +9,6 @@ using UnityEngine;
 public class Stage_Importer : AssetPostprocessor
 {
     private static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-    private static readonly string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
     private static readonly char[] TRIM_CHARS = { '\"' };
 
     private static readonly string filePath = "Assets/Resources/Data/csv/StageTable.csv";
