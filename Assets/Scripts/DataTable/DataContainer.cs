@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using TMPro;
+
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
@@ -17,6 +19,10 @@ public class DataContainer : MonoSingleton<DataContainer>
 
     public static List<Sprite> StageTileSprites { get; private set; }
 
+    [SerializeField]
+    private Stage_Entity stageList;
+
+    public Stage_Entity StageList => this.stageList;
 
     private static int tileSpriteCount = 0;
 
@@ -24,7 +30,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
 
 
-    public static void Initialize()
+    public void Initialize()
     {
         StageTable = new StageTable();
         ReadCSV(StageTable, "StageTable");
@@ -70,7 +76,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
 
 
-    public static async UniTask LoadStageDatas()
+    public async UniTask LoadStageDatas()
     {
         Debug.Log("LoadStageDatas 시작");
 
@@ -78,13 +84,17 @@ public class DataContainer : MonoSingleton<DataContainer>
 
         try
         {
-            if (StageTable.DicData.ContainsKey(curIndex.ToString()))
+            var item = stageList.list.Where(x => x.Index == curIndex).FirstOrDefault();
+
+            if (item != null)
             {
-                var dicData = StageTable.DicData[curIndex.ToString()];
-
-
-                await LoadTileSprites(dicData.MapName);
+                await LoadTileSprites(item.MapName);
             }
+            //if (StageTable.DicData.ContainsKey(curIndex.ToString()))
+            //{
+            //    var dicData = StageTable.DicData[curIndex.ToString()];
+            //    await LoadTileSprites(dicData.MapName);
+            //}
             else
             {
                 Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");

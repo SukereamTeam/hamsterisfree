@@ -105,7 +105,7 @@ public class SceneController : MonoSingleton<SceneController>
         while (!operation.isDone)
         {
             await UniTask.Yield(); // 다음 프레임까지 대기
-        }
+       }
     }
 
 

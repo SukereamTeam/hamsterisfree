@@ -34,7 +34,7 @@ public class LobbyManager : MonoBehaviour
 
         //SceneController.Instance.AddLoadingTask(UniTask.Defer(() => UniTask.FromResult(task)));
 
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.LoadStageDatas()));
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas()));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }

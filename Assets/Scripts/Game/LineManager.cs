@@ -45,15 +45,15 @@ public class LineManager : MonoBehaviour
     {
         if (CurrentLine != null)
         {
-            var ob = Observable.Timer(TimeSpan.FromSeconds(0.5f))
-                .Subscribe(_ => 
-                {
-                    Debug.Log("Done");
+            //var ob = Observable.Timer(TimeSpan.FromSeconds(0.5f))
+            //    .Subscribe(_ => 
+            //    {
+            //        Debug.Log("Done");
 
-                    CurrentLine.Clear();
-                    Destroy(CurrentLine.gameObject);
-                    CurrentLine = null;
-                }).AddTo(this);
+            //        CurrentLine.Clear();
+            //        Destroy(CurrentLine.gameObject);
+            //        CurrentLine = null;
+            //    }).AddTo(this);
 
 
             /*

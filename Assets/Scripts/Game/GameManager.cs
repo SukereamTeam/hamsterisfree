@@ -32,6 +32,7 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
+
     private async void Start()
     {
         Debug.Log("GameManagere에서 Start 진입");
@@ -51,7 +52,10 @@ public class GameManager : MonoSingleton<GameManager>
 
         this.isGame.Value = true;
 
-        Debug.Log("## Start 끝 ##");
+        if (GameManager.IsInstance == false)
+        {
+            var obj = GameManager.Instance;
+        }
     }
 
 
@@ -72,6 +76,6 @@ public class GameManager : MonoSingleton<GameManager>
 
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
 
-        GameManager.Clear();
+        Clear();
     }
 }

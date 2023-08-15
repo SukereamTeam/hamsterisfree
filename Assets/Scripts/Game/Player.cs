@@ -32,7 +32,9 @@ public class Player : MonoBehaviour
     private void Update()
     {
         if (GameManager.IsInstance == false)
+        {
             return;
+        }
 
         if (GameManager.Instance.IsGame.Value == false)
         {
@@ -43,7 +45,7 @@ public class Player : MonoBehaviour
         {
             var result = RaycastGameScreen(Input.mousePosition);
 
-            if (result.Item1.collider.IsNull())
+            if (result.hit2D.collider.IsNull())
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
