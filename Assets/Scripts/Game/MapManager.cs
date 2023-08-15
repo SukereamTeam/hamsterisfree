@@ -75,7 +75,7 @@ public class MapManager : MonoBehaviour
 
     public void SetStage()
     {
-        if (DataContainer.StageTileSprites.Count == 0)
+        if (DataContainer.Instance.StageTileSprites.Count == 0)
         {
             Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
             return;
@@ -87,7 +87,7 @@ public class MapManager : MonoBehaviour
 
         CreateExitTile();
 
-        DataContainer.StageTileSprites.Clear();
+        DataContainer.Instance.StageTileSprites.Clear();
     }
 
 
@@ -124,7 +124,7 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        this.background.sprite = DataContainer.StageTileSprites[index];
+        this.background.sprite = DataContainer.Instance.StageTileSprites[index];
 
         
     }
@@ -138,7 +138,7 @@ public class MapManager : MonoBehaviour
             if (i < Left_End)
             {
                 index = (int)Define.TileSpriteName.Left;
-                var sprite = DataContainer.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -147,7 +147,7 @@ public class MapManager : MonoBehaviour
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
-                var sprite = DataContainer.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -156,7 +156,7 @@ public class MapManager : MonoBehaviour
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
-                var sprite = DataContainer.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -165,7 +165,7 @@ public class MapManager : MonoBehaviour
             {
                 //top
                 index = (int)Define.TileSpriteName.Top;
-                var sprite = DataContainer.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageTileSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -176,7 +176,7 @@ public class MapManager : MonoBehaviour
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
-            this.edgeTiles[tileIndex].sprite = DataContainer.StageTileSprites[index];
+            this.edgeTiles[tileIndex].sprite = DataContainer.Instance.StageTileSprites[index];
         }
     }
 
@@ -184,7 +184,7 @@ public class MapManager : MonoBehaviour
     private void SetMask()
     {
         Debug.Log("SetMask 시작");
-        var sprite = DataContainer.StageTileSprites[(int)Define.TileSpriteName.Mask];
+        var sprite = DataContainer.Instance.StageTileSprites[(int)Define.TileSpriteName.Mask];
         
         this.mask.sprite = sprite;
         Debug.Log("SetMask 끝");

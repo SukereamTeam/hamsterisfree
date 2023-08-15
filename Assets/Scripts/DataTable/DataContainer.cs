@@ -10,63 +10,28 @@ using TMPro;
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
-    static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-    static readonly string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
-    static readonly char[] TRIM_CHARS = { '\"' };
-
-    public static StageTable StageTable { get; private set; }
-    public static SeedTable SeedTable { get; private set; }
-
-    public static List<Sprite> StageTileSprites { get; private set; }
-
     [SerializeField]
     private Stage_Entity stageList;
 
     public Stage_Entity StageList => this.stageList;
 
-    private static int tileSpriteCount = 0;
 
+    private List<Sprite> stageTileSprites;
+    public List<Sprite> StageTileSprites => this.stageTileSprites;
+
+    private int tileSpritesCount = 0;
 
 
 
 
     public void Initialize()
     {
-        StageTable = new StageTable();
-        ReadCSV(StageTable, "StageTable");
-
-        tileSpriteCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        StageTileSprites = new List<Sprite>(tileSpriteCount);
+        this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
+        this.stageTileSprites = new List<Sprite>(this.tileSpritesCount);
     }
 
 
-    public static void ReadCSV<T>(TableBase<T> _TableBase, string _FileName)
-    {
-        var table = Resources.Load<TextAsset>($"Data/csv/{_FileName}");
-
-        var lines = Regex.Split(table.text, LINE_SPLIT_RE);
-
-
-        var headers = Regex.Split(lines[1], SPLIT_RE);  //csv의 둘째줄부터 header로 판정
-        for (var i = 2; i < lines.Length; i++)
-        {
-            var values = Regex.Split(lines[i], SPLIT_RE);
-            if (values.Length == 0 || values[0] == "")
-            {
-                continue;
-            }
-
-            for (var j = 0; j < headers.Length && j < values.Length; j++)
-            {
-                string value = values[j];
-
-                value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
-
-                //0 / LimitTime,60 / Forest / Default,3 / 0
-                _TableBase.SetTable(values[0], headers[j], value);
-            }
-        }
-    }
+    
 
     // TODO
     // Json 으로 진행상황 저장하는 함수 만들기
@@ -90,11 +55,6 @@ public class DataContainer : MonoSingleton<DataContainer>
             {
                 await LoadTileSprites(item.MapName);
             }
-            //if (StageTable.DicData.ContainsKey(curIndex.ToString()))
-            //{
-            //    var dicData = StageTable.DicData[curIndex.ToString()];
-            //    await LoadTileSprites(dicData.MapName);
-            //}
             else
             {
                 Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");
@@ -108,7 +68,7 @@ public class DataContainer : MonoSingleton<DataContainer>
         Debug.Log("LoadStageDatas 끝!");
     }
 
-    private static async UniTask LoadTileSprites(string _MapName)
+    private async UniTask LoadTileSprites(string _MapName)
     {
         var rootPath = "Images/Map";
 
@@ -118,7 +78,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
         try
         {
-            for (spriteName = 0; (int)spriteName < tileSpriteCount; spriteName++)
+            for (spriteName = 0; (int)spriteName < this.tileSpritesCount; spriteName++)
             {
                 var spritePath = $"{path}{spriteName}";
 
