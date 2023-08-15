@@ -16,7 +16,12 @@ public class SheetDownloaderEditor : Editor
 
         if (GUILayout.Button("Download All CSV"))
         {
-            sheetDownloader.DownloadAll().Forget();
+            sheetDownloader.DownloadAll(() =>
+            {
+                AssetDatabase.Refresh();
+            }).Forget();
+
+            
         }
 
         if (GUILayout.Button("Download CSV"))

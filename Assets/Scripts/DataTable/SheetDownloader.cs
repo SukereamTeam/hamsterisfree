@@ -46,55 +46,19 @@ public class SheetDownloader : MonoBehaviour
         {
             await Download(sheet, FILE_FORMAT);
         }
+
+        if (_Oncomplete != null)
+        {
+            _Oncomplete();
+        }
+
+        await UniTask.Yield();
+
+        foreach(var sheet in sheetDatas)
+        {
+            await CreateScriptableObject(sheet);
+        }
     }
-
-    //public async UniTaskVoid DownloadCSV(Action _OnComplete = null)
-    //{
-    //    await Download(_SHEET_ID, "csv");
-
-    //    if (_OnComplete != null)
-    //        _OnComplete();
-    //}
-
-
-
-    //private async UniTask Download(string sheetID, string format)
-    //{
-    //    var url = $"https://docs.google.com/spreadsheets/d/{sheetID}/export?format={format}&sheet={_SHEET_NAME}";
-
-
-    //    using (var www = UnityWebRequest.Get(url))
-    //    {
-    //        Debug.Log("### Start DataTable CSV Downloading ###");
-
-    //        try
-    //        {
-    //            await www.SendWebRequest();
-    //        }
-    //        catch(Exception ex)
-    //        {
-    //            Debug.LogError($"### exception occurred: {ex}");
-    //        }
-
-    //        if (www.result != UnityWebRequest.Result.Success)
-    //        {
-    //            return;
-    //        }
-
-    //        var fileUrl = $"{_SHEET_PATH}/{_SHEET_NAME}.{format}";
-
-    //        await UniTask.SwitchToMainThread();
-    //        // 비동기 작업을 메인 스레드에서 실행되도록 전환해주는 함수
-    //        // UnityWebRequest 는 백그라운드 스레드에서 실행될 수 있으나
-    //        // UI 업뎃이나 파일 작업은 메인 스레드에서 수행할 수 있음
-    //        // 그래서 백그라운드 스레드에서 작업을 마치고 결과를 메인 스레드로 전환하여 이후 작업을 수행하도록 함
-
-
-    //        await File.WriteAllTextAsync(fileUrl, www.downloadHandler.text + "\n", new CancellationToken());
-
-    //        Debug.Log("Download Complete.");
-    //    }
-    //}
 
     private async UniTask Download(SheetData _SheetData, string _Format)
     {
@@ -102,7 +66,7 @@ public class SheetDownloader : MonoBehaviour
 
         using (var www = UnityWebRequest.Get(url))
         {
-            Debug.Log("### Start DataTable CSV Downloading ###");
+            Debug.Log("Start DataTable CSV Downloading");
 
             try
             {
@@ -115,7 +79,7 @@ public class SheetDownloader : MonoBehaviour
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log($"Failed Download CSV {_SheetData.SheetName}");
+                Debug.Log($"### Failed Download CSV {_SheetData.SheetName} ###");
                 return;
             }
 
@@ -132,5 +96,10 @@ public class SheetDownloader : MonoBehaviour
 
             Debug.Log("Download Complete.");
         }
+    }
+
+    private async UniTask CreateScriptableObject(SheetData _SheetData)
+    {
+        
     }
 }
