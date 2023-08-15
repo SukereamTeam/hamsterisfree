@@ -156,6 +156,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.DefaultCompany.sd
     Standalone: com.DefaultCompany.sd
+    iPhone: com.DefaultCompany.sd
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -750,6 +751,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     Android: UNITASK_DOTWEEN_SUPPORT;DOTween
     Standalone: DOTween;UNITASK_DOTWEEN_SUPPORT
+    iPhone: DOTween;UNITASK_DOTWEEN_SUPPORT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
