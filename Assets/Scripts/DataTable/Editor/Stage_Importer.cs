@@ -21,11 +21,11 @@ public class Stage_Importer : AssetPostprocessor
             if (filePath.Equals(asset) == false)
                 continue;
 
-            Stage_Entity data = (Stage_Entity)AssetDatabase.LoadAssetAtPath(exportPath, typeof(Stage_Entity));
+            Table_Stage data = (Table_Stage)AssetDatabase.LoadAssetAtPath(exportPath, typeof(Table_Stage));
 
             if (data == null)
             {
-                data = ScriptableObject.CreateInstance<Stage_Entity>();
+                data = ScriptableObject.CreateInstance<Table_Stage>();
                 AssetDatabase.CreateAsset((ScriptableObject)data, exportPath);
             }
 
@@ -47,7 +47,7 @@ public class Stage_Importer : AssetPostprocessor
                             continue;
                         }
 
-                        Stage_Entity.Param csvData = new Stage_Entity.Param();
+                        Table_Stage.Param csvData = new Table_Stage.Param();
 
                         for (int j = 0; j < headers.Length; j++)
                         {
@@ -82,9 +82,9 @@ public class Stage_Importer : AssetPostprocessor
         }
     }
 
-    private static Stage_Entity.SerializableTuple<string, int> ParseStageType(string input)
+    private static Table_Base.SerializableTuple<string, int> ParseStageType(string input)
     {
-        Stage_Entity.SerializableTuple<string, int> result = new("", 0);
+        Table_Base.SerializableTuple<string, int> result = new("", 0);
 
         string[] parts = input.Trim('(', ')').Split(',');
 
@@ -94,7 +94,7 @@ public class Stage_Importer : AssetPostprocessor
 
             if (Int32.TryParse(parts[1].Trim(), out int value))
             {
-                result = new Stage_Entity.SerializableTuple<string, int>(type, value);
+                result = new Table_Base.SerializableTuple<string, int>(type, value);
             }
             else
             {
@@ -105,14 +105,14 @@ public class Stage_Importer : AssetPostprocessor
         return result;
     }
 
-    private static List<Stage_Entity.SerializableTuple<string, int>> ParseObjectData(string input)
+    private static List<Table_Base.SerializableTuple<string, int>> ParseObjectData(string input)
     {
         // "((0, 0), (3, 0))"
         string[] pairs = input.Replace("(", "").Replace(")", "").Split(new[] { "), (" }, StringSplitOptions.RemoveEmptyEntries);
 
         // "0030"
 
-        List<Stage_Entity.SerializableTuple<string, int>> resultList = new List<Stage_Entity.SerializableTuple<string, int>>(pairs.Length);
+        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>(pairs.Length);
 
 
         foreach (string pair in pairs)
@@ -123,7 +123,7 @@ public class Stage_Importer : AssetPostprocessor
             {
                 if (int.TryParse(keyValue[1].Trim(), out int value))
                 {
-                    resultList.Add(new Stage_Entity.SerializableTuple<string, int>(keyValue[0], value));
+                    resultList.Add(new Table_Base.SerializableTuple<string, int>(keyValue[0], value));
                 }
                 else
                 {

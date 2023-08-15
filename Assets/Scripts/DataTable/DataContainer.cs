@@ -11,9 +11,9 @@ using TMPro;
 public class DataContainer : MonoSingleton<DataContainer>
 {
     [SerializeField]
-    private Stage_Entity stageList;
+    private Table_Stage stageList;
 
-    public Stage_Entity StageList => this.stageList;
+    public Table_Stage StageList => this.stageList;
 
 
     private List<Sprite> stageTileSprites;
@@ -87,7 +87,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
                 if (sprite != null)
                 {
-                    StageTileSprites.Add(sprite);
+                    this.stageTileSprites.Add(sprite);
                 }
                 else
                 {

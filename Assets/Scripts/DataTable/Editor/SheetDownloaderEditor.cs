@@ -12,11 +12,7 @@ public class SheetDownloaderEditor : Editor
 
         if (GUILayout.Button("Download CSV"))
         {
-            (target as SheetDownloader).DownloadCSV(() =>
-            {
-                Debug.Log("Asset Import Refresh");
-                AssetDatabase.Refresh();
-            }).Forget();
+            (target as SheetDownloader).DownloadCSV().Forget();
         }
     }
 }
