@@ -10,9 +10,20 @@ public class SheetDownloaderEditor : Editor
     {
         base.OnInspectorGUI();
 
+        var sheetDownloader = (SheetDownloader)target;
+
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("Download All CSV"))
+        {
+            sheetDownloader.DownloadAll().Forget();
+        }
+
         if (GUILayout.Button("Download CSV"))
         {
-            (target as SheetDownloader).DownloadCSV().Forget();
+            //sheetDownloader.DownloadCSV().Forget();
         }
+
+        
     }
 }

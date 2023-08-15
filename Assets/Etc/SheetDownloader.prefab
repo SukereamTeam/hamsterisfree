@@ -44,3 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061ab9c4461a7324fa159b14c0aa0f93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sheetDatas:
+  - SheetName: StageTable
+    SheetId: 1fvU3xywFyNZkfHUn1L4PFeJu_uEJMswXxMU7Dl_PcmM
+  - SheetName: SeedTable
+    SheetId: 1XQzv1rDJRQuhQSIVnKqaRR9VWxeGaA4s_O1puRWS2Lw
