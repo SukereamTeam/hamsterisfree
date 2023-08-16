@@ -195,6 +195,7 @@ public class SheetDownloader : MonoBehaviour
                         if (csvDataField != null)
                         {
                             // StageType 필드인 경우 파싱 필요해서
+                            // 시트 string 값 : "(LimitTime, 60)" -> Type: LimitTime, Count: 60(60초) 로 파싱이 필요함
                             Type stageTypeField = typeof(Table_Base.SerializableTuple<string, int>);
                             if (csvDataField.FieldType.Equals(stageTypeField))
                             {
@@ -203,6 +204,7 @@ public class SheetDownloader : MonoBehaviour
                             }
 
                             // List<ObjectData> 필드인 경우 파싱 필요
+                            // 시트 string 값 : "((Default, 3), (Boss, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
                             Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
                             if (csvDataField.FieldType.Equals(objectDataTypeField))
                             {
