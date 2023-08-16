@@ -11,14 +11,9 @@ using DataTable;
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
-    [SerializeField]
-    private Table_Stage stageTable;
-    public Table_Stage StageTable => this.stageTable;
+    public Table_Stage StageTable;
 
-    [SerializeField]
-    private Table_Seed seedTable;
-    public Table_Seed SeedTable => this.seedTable;
-
+    public Table_Seed SeedTable;
 
     private List<Sprite> stageTileSprites;
     public List<Sprite> StageTileSprites => this.stageTileSprites;
@@ -53,7 +48,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
         try
         {
-            var item = this.stageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();
+            var item = StageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();//this.stageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();
 
             if (item != null)
             {

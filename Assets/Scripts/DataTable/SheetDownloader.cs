@@ -42,6 +42,9 @@ public class SheetDownloader : MonoBehaviour
 
     private const string FILE_FORMAT = "csv";
 
+    [SerializeField]
+    private GameObject dataContainer;
+
     [ReadOnlyCustom]
     [SerializeField]
     private SheetData[] sheetDatas;
@@ -67,6 +70,10 @@ public class SheetDownloader : MonoBehaviour
         {
             CreateScriptableObject(sheet);
         }
+
+        var script = this.dataContainer.GetComponent<DataContainer>();
+        EditorUtility.SetDirty(script);
+        AssetDatabase.SaveAssets();
     }
 
     private async UniTask Download(SheetData _SheetData, string _Format)
@@ -232,9 +239,26 @@ public class SheetDownloader : MonoBehaviour
 
         EditorUtility.SetDirty(data);
         AssetDatabase.SaveAssets();
+
+        SetDataContainer(foundType, data);
     }
 
-    static bool IsListType(MemberInfo member)
+
+    private void SetDataContainer(Type _Type, ScriptableObject _Data)
+    {
+        var script = this.dataContainer.GetComponent<DataContainer>();
+
+        foreach (var field in script.GetType().GetFields())
+        {
+            if (field.FieldType.Equals(_Type))
+            {
+                field.SetValue(script, _Data);
+                break;
+            }
+        }
+    }
+
+    private static bool IsListType(MemberInfo member)
     {
         if (member is FieldInfo fieldInfo && typeof(List<>).IsAssignableFrom(fieldInfo.FieldType.GetGenericTypeDefinition()))
         {
@@ -249,7 +273,7 @@ public class SheetDownloader : MonoBehaviour
         return false;
     }
 
-    static Type GetListElementType(MemberInfo member)
+    private static Type GetListElementType(MemberInfo member)
     {
         if (member is FieldInfo fieldInfo)
         {
@@ -264,7 +288,7 @@ public class SheetDownloader : MonoBehaviour
         throw new ArgumentException($"### {member.Name} 는 Field가 아니다 ###");
     }
 
-    static Type FindClassWithPartialString(string partialString, Assembly assembly)
+    private static Type FindClassWithPartialString(string partialString, Assembly assembly)
     {
         Type[] types = assembly.GetTypes(); // 어셈블리 내의 모든 타입 가져오기
 
