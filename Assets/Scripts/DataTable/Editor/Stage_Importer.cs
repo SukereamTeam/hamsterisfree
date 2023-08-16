@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using DataTable;
 
 public class Stage_Importer : AssetPostprocessor
 {
@@ -14,73 +15,77 @@ public class Stage_Importer : AssetPostprocessor
     private static readonly string filePath = "Assets/Resources/Data/csv/StageTable.csv";
     private static readonly string exportPath = "Assets/Resources/Data/so/StageTable.asset";
 
-    private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
-    {
-        foreach (var asset in importedAssets)
-        {
-            if (filePath.Equals(asset) == false)
-                continue;
+    //private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+    //{
+    //    foreach (var asset in importedAssets)
+    //    {
+    //        if (filePath.Equals(asset) == false)
+    //            continue;
 
-            Table_Stage data = (Table_Stage)AssetDatabase.LoadAssetAtPath(exportPath, typeof(Table_Stage));
+    //        Table_Stage data = (Table_Stage)AssetDatabase.LoadAssetAtPath(exportPath, typeof(Table_Stage));
 
-            if (data == null)
-            {
-                data = ScriptableObject.CreateInstance<Table_Stage>();
-                AssetDatabase.CreateAsset((ScriptableObject)data, exportPath);
-            }
+    //        if (data == null)
+    //        {
+    //            data = ScriptableObject.CreateInstance<Table_Stage>();
+    //            AssetDatabase.CreateAsset((ScriptableObject)data, exportPath);
+    //        }
 
-            data.hideFlags = HideFlags.NotEditable;
-            data.list.Clear();
+    //        data.hideFlags = HideFlags.NotEditable;
+    //        data.list.Clear();
 
-            using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    var headers = Regex.Split(reader.ReadLine(), SPLIT_RE);
+    //        using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+    //        {
+    //            using (StreamReader reader = new StreamReader(stream))
+    //            {
+    //                var headers = Regex.Split(reader.ReadLine(), SPLIT_RE);
 
-                    while (!reader.EndOfStream)
-                    {
-                        string dataLine = reader.ReadLine();
-                        var values = Regex.Split(dataLine, SPLIT_RE);
-                        if (values.Length == 0 || values[0] == "")
-                        {
-                            continue;
-                        }
+    //                while (!reader.EndOfStream)
+    //                {
+    //                    string dataLine = reader.ReadLine();
+    //                    var values = Regex.Split(dataLine, SPLIT_RE);
+    //                    if (values.Length == 0 || values[0] == "")
+    //                    {
+    //                        continue;
+    //                    }
 
-                        Table_Stage.Param csvData = new Table_Stage.Param();
+    //                    Table_Stage.Param csvData = new Table_Stage.Param();
 
-                        for (int j = 0; j < headers.Length; j++)
-                        {
-                            var value = values[j];
-                            value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
+    //                    for (int j = 0; j < headers.Length; j++)
+    //                    {
+    //                        var value = values[j];
+    //                        value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
 
-                            // 헤더와 일치하는 속성에 값을 할당
-                            switch (headers[j])
-                            {
-                                case "Index":
-                                    csvData.Index = Int32.Parse(value);
-                                    break;
-                                case "StageType":
-                                    csvData.StageType = ParseStageType(value);
-                                    break;
-                                case "MapName":
-                                    csvData.MapName = value;
-                                    break;
-                                case "SeedData":
-                                    csvData.SeedData = ParseObjectData(value);
-                                    break;
-                                case "MonsterData":
-                                    csvData.MonsterData = ParseObjectData(value);
-                                    break;
-                            }
-                        }
+    //                        // 헤더와 일치하는 속성에 값을 할당
+    //                        switch (headers[j])
+    //                        {
+    //                            case "Index":
+    //                                csvData.Index = Int32.Parse(value);
+    //                                break;
+    //                            case "StageType":
+    //                                csvData.StageType = ParseStageType(value);
+    //                                break;
+    //                            case "MapName":
+    //                                csvData.MapName = value;
+    //                                break;
+    //                            case "SeedData":
+    //                                csvData.SeedData = ParseObjectData(value);
+    //                                break;
+    //                            case "MonsterData":
+    //                                csvData.MonsterData = ParseObjectData(value);
+    //                                break;
+    //                        }
+    //                    }
 
-                        data.list.Add(csvData);
-                    }
-                }
-            }
-        }
-    }
+    //                    data.list.Add(csvData);
+                        
+    //                }
+    //            }
+    //        }
+
+    //        EditorUtility.SetDirty(data);
+    //        AssetDatabase.SaveAssets();
+    //    }
+    //}
 
     private static Table_Base.SerializableTuple<string, int> ParseStageType(string input)
     {

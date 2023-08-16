@@ -6,7 +6,12 @@ using UnityEngine.Networking;
 using System.Threading;
 using System.IO;
 using System;
+using System.Reflection;
 using Unity.Collections;
+using DataTable;
+using UnityEditor;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 public class SheetDownloader : MonoBehaviour
 {
@@ -29,8 +34,12 @@ public class SheetDownloader : MonoBehaviour
         }
     }
 
+    private static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
+    private static readonly char[] TRIM_CHARS = { '\"' };
 
     private const string CSV_PATH = "Assets/Resources/Data/csv";
+    private const string SO_PATH = "Assets/Resources/Data/so/";
+
     private const string FILE_FORMAT = "csv";
 
     [ReadOnlyCustom]
@@ -54,9 +63,9 @@ public class SheetDownloader : MonoBehaviour
 
         await UniTask.Yield();
 
-        foreach(var sheet in sheetDatas)
+        foreach (var sheet in sheetDatas)
         {
-            await CreateScriptableObject(sheet);
+            CreateScriptableObject(sheet);
         }
     }
 
@@ -98,8 +107,228 @@ public class SheetDownloader : MonoBehaviour
         }
     }
 
-    private async UniTask CreateScriptableObject(SheetData _SheetData)
+    private void CreateScriptableObject(SheetData _SheetData)
     {
-        
+        // eg) 1. StageTable 에서 Table 떼기
+        var tableName = _SheetData.SheetName.Split("Table")[0];
+
+        // eg) 2. 'Stage' 문자열이 들어간 클래스 찾기
+        Type foundType = FindClassWithPartialString(tableName, typeof(Table_Base).Assembly);
+
+        if (foundType == null)
+        {
+            Debug.Log($"Not Found DataTable Type Class ---> {_SheetData.SheetName}");
+            return;
+        }
+
+        // 데이터테이블 기반의 ScriptableObject 에셋 경로
+        string assetPath = $"{SO_PATH}{_SheetData.SheetName}.asset";
+
+        // 위에서 찾은 클래스의 타입(foundType)을 기반으로 하는 ScriptableObject 로드
+        var data = (ScriptableObject)AssetDatabase.LoadAssetAtPath(assetPath, foundType);
+
+        if (data == null)
+        {
+            // foundType 기반의 ScriptableObject 인스턴스 생성
+            data = ScriptableObject.CreateInstance(foundType);
+
+            // 위에서 생성한 인스턴스로 에셋 생성
+            AssetDatabase.CreateAsset(data, assetPath);
+        }
+
+        // 인스펙터에서 수정 못하게
+        data.hideFlags = HideFlags.NotEditable;
+
+
+
+        // foundType 이 가지고 있는 필드 긁어오기
+        FieldInfo[] fields = foundType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        //PropertyInfo[] properties = foundType.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+
+        IEnumerable<MemberInfo> allMembers = fields.Cast<MemberInfo>();//fields.Cast<MemberInfo>().Concat(properties.Cast<MemberInfo>());
+
+        // List 타입인 것 가지고 오기 (eg. Table_Stage -> List<Param> list)
+        MemberInfo listMember = allMembers.Where(member => IsListType(member)).FirstOrDefault();
+
+        // 정확히 어떤 List 타입인지 타입 가져오기
+        Type listType = GetListElementType(listMember);
+
+        // 위에서 찾았던 List 타입인 필드 끌어오기
+        var fieldValue = ((listMember as FieldInfo)?.GetValue(data)) as IList;
+
+        // 끌어와서 일단 list 초기화 해주기
+        fieldValue.Clear();
+
+
+        // CSV Path
+        var csvPath = $"{CSV_PATH}/{_SheetData.SheetName}.{FILE_FORMAT}";
+
+        using (FileStream stream = File.Open(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                // CSV 헤더 나누기
+                var headers = Regex.Split(reader.ReadLine(), SPLIT_RE);
+
+                while (!reader.EndOfStream)
+                {
+                    string dataLine = reader.ReadLine();
+                    var values = Regex.Split(dataLine, SPLIT_RE);
+                    if (values.Length == 0 || values[0] == "")
+                    {
+                        continue;
+                    }
+
+
+                    // 위에서 찾았던 List의 타입으로 인스턴스 생성 (값 넣어서 List 변수에 넣어줄 예정)
+                    object csvData = Activator.CreateInstance(listType);
+
+
+                    for (int j = 0; j < headers.Length; j++)
+                    {
+                        var value = values[j];
+                        value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
+
+                        // listType의 타입이 사용자 정의 클래스라서... 클래스에 header와 이름이 같은 필드가 있는지 체크
+                        FieldInfo csvDataField = listType.GetField(headers[j]);
+                        if (csvDataField != null)
+                        {
+                            // StageType 필드인 경우 파싱 필요해서
+                            Type stageTypeField = typeof(Table_Base.SerializableTuple<string, int>);
+                            if (csvDataField.FieldType.Equals(stageTypeField))
+                            {
+                                csvDataField.SetValue(csvData, ParseStageType(value));
+                                continue;
+                            }
+
+                            // List<ObjectData> 필드인 경우 파싱 필요
+                            Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
+                            if (csvDataField.FieldType.Equals(objectDataTypeField))
+                            {
+                                csvDataField.SetValue(csvData, ParseObjectData(value));
+                                continue;
+                            }
+
+                            // Int 타입인 경우 파싱 필요
+                            if (csvDataField.FieldType.Equals(typeof(Int32)))
+                            {
+                                csvDataField.SetValue(csvData, Int32.Parse(value));
+                                continue;
+                            }
+
+                            
+                            csvDataField.SetValue(csvData, value);
+                        }
+                    }
+
+                    // 위에서 value 넣어준 csvData를 삽입
+                    fieldValue.Add(csvData);
+                }
+            }
+        }
+
+        EditorUtility.SetDirty(data);
+        AssetDatabase.SaveAssets();
+    }
+
+    static bool IsListType(MemberInfo member)
+    {
+        if (member is FieldInfo fieldInfo && typeof(List<>).IsAssignableFrom(fieldInfo.FieldType.GetGenericTypeDefinition()))
+        {
+            return true;
+        }
+
+        //if (member is PropertyInfo propertyInfo && propertyInfo.PropertyType.IsGenericType && typeof(List<>) == propertyInfo.PropertyType.GetGenericTypeDefinition())
+        //{
+        //    return true;
+        //}
+
+        return false;
+    }
+
+    static Type GetListElementType(MemberInfo member)
+    {
+        if (member is FieldInfo fieldInfo)
+        {
+            return fieldInfo.FieldType.GetGenericArguments()[0];
+        }
+
+        //if (member is PropertyInfo propertyInfo)
+        //{
+        //    return propertyInfo.PropertyType.GetGenericArguments()[0];
+        //}
+
+        throw new ArgumentException($"### {member.Name} 는 Field가 아니다 ###");
+    }
+
+    static Type FindClassWithPartialString(string partialString, Assembly assembly)
+    {
+        Type[] types = assembly.GetTypes(); // 어셈블리 내의 모든 타입 가져오기
+
+        foreach (Type type in types)
+        {
+            // Namespace 일치 확인, 상속 받은 클래스인지 확인, 이름 포함하는지 확인
+            if (type.Namespace == "DataTable" && typeof(Table_Base).IsAssignableFrom(type) && type.Name.Contains(partialString))
+            {
+                return type; // 일치하는 클래스 타입 반환
+            }
+        }
+
+        Debug.Log($"### {partialString} 와 일치하는 클래스 타입이 없음 ###");
+        return null; // 일치하는 클래스 타입이 없을 경우 null 반환
+    }
+
+    private static Table_Base.SerializableTuple<string, int> ParseStageType(string input)
+    {
+        Table_Base.SerializableTuple<string, int> result = new("", 0);
+
+        string[] parts = input.Trim('(', ')').Split(',');
+
+        if (parts.Length == 2)
+        {
+            string type = parts[0].Trim();
+
+            if (Int32.TryParse(parts[1].Trim(), out int value))
+            {
+                result = new Table_Base.SerializableTuple<string, int>(type, value);
+            }
+            else
+            {
+                Debug.Log($"### Error ---> {parts[0]}, {parts[1]} <--- ParseStageType ");
+            }
+        }
+
+        return result;
+    }
+
+    private static List<Table_Base.SerializableTuple<string, int>> ParseObjectData(string input)
+    {
+        // "((0, 0), (3, 0))"
+        string[] pairs = input.Replace("(", "").Replace(")", "").Split(new[] { "), (" }, StringSplitOptions.RemoveEmptyEntries);
+
+        // "0030"
+
+        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>(pairs.Length);
+
+
+        foreach (string pair in pairs)
+        {
+            string[] keyValue = pair.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            if (keyValue.Length == 2)
+            {
+                if (int.TryParse(keyValue[1].Trim(), out int value))
+                {
+                    resultList.Add(new Table_Base.SerializableTuple<string, int>(keyValue[0], value));
+                }
+                else
+                {
+                    Debug.Log($"### Error ---> {keyValue[0]}, {keyValue[1]} <--- ParseSeedData ");
+                }
+            }
+        }
+
+        return resultList;
     }
 }

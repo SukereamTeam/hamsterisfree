@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using TMPro;
+using DataTable;
 
 
 public class DataContainer : MonoSingleton<DataContainer>

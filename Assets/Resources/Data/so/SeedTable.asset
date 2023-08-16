@@ -9,16 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27e2c417f66a12442920b356a88e9fa1, type: 3}
-  m_Name: StageTable
+  m_Script: {fileID: 11500000, guid: b125c40689211a3438670dc1f619411e, type: 3}
+  m_Name: SeedTable
   m_EditorClassIdentifier: 
   list:
   - Index: 0
-    StageType:
-      Type: LimitTime
-      Count: 60
-    MapName: Forest
-    SeedData:
-    - Type: Default
-      Count: 3
-    MonsterData: []
+    Type: Default
+    ActiveTime: 1

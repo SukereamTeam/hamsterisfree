@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using DataTable;
 
 [CustomEditor(typeof(SheetDownloader))]
 public class SheetDownloaderEditor : Editor
