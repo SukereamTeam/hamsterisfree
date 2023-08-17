@@ -85,7 +85,10 @@ public class MapManager : MonoBehaviour
         SetOutlineTiles();
         SetMask();
 
+        var curStage = CommonManager.Instance.CurStageIndex;
+
         CreateExitTile();
+        CreateSeedTile(curStage);
 
         DataContainer.Instance.StageTileSprites.Clear();
     }
@@ -209,8 +212,13 @@ public class MapManager : MonoBehaviour
 
     
 
-    private void CreateTile()
+    private void CreateSeedTile(int _CurStage)
     {
+        var table = DataContainer.Instance.StageTable.list[_CurStage];
 
+        foreach(var seed in table.SeedData)
+        {
+            
+        }
     }
 }

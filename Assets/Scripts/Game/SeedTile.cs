@@ -14,7 +14,10 @@ public enum SeedType
 public class SeedTile : TileBase
 {
     [SerializeField]
-    private Sprite sprite = null;
+    private Sprite sprite;
+
+    [SerializeField]
+    private string type;
 
     private bool isTouch = false;
     public bool IsTouch {
@@ -36,6 +39,7 @@ public class SeedTile : TileBase
         // Resources.load
         // 그리고 베이스 클래스로 옮겨줘야 함 SpritePath 써서 로드하는 걸로
         this.tileSprite = sprite;
+
         this.spriteRenderer.sprite = this.tileSprite;
 
         
@@ -44,6 +48,12 @@ public class SeedTile : TileBase
     public override void TileTriggerEvent()
     {
         // Check 타일 지나감
+
+        // TODO
+        // Seed Count 증가
+        this.tileCollider.enabled = false;
+        // Trigger Ani 재생
+        //
     }
 
 }
