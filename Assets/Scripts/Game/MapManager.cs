@@ -87,13 +87,34 @@ public class MapManager : MonoBehaviour
 
         var curStage = CommonManager.Instance.CurStageIndex;
 
-        CreateExitTile();
-        CreateSeedTile(curStage);
+        for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
+        {
+            if (i == (int)Define.TileType.Exit)
+            {
+                
+                CreateExitTile();
+            }
+            else if (i == (int)Define.TileType.Seed)
+            {
+                CreateSeedTile();
+            }
+        }
 
         DataContainer.Instance.StageTileSprites.Clear();
     }
 
-
+    private void CreateSeedTile()
+    {
+        var stageTable = DataContainer.Instance.StageTable.list[CommonManager.Instance.CurStageIndex];
+        
+        for (int i = 0; i < stageTable.SeedData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.SeedData[i].Count; j++)
+            {
+                //instantiate
+            }
+        }
+    }
 
     private void ChangeNameOutlineTiles()
     {
