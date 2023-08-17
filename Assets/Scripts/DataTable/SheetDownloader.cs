@@ -248,7 +248,7 @@ public class SheetDownloader : MonoBehaviour
     {
         var script = this.dataContainer.GetComponent<DataContainer>();
 
-        foreach (var field in script.GetType().GetFields())
+        foreach (var field in script.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
         {
             if (field.FieldType.Equals(_Type))
             {
