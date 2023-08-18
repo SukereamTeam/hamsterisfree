@@ -1,10 +1,6 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
-using System;
-using UniRx;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -34,7 +30,9 @@ public class LobbyManager : MonoBehaviour
 
         //SceneController.Instance.AddLoadingTask(UniTask.Defer(() => UniTask.FromResult(task)));
 
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas()));
+        var curIndex = 0;
+
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(curIndex)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }

@@ -7,7 +7,6 @@ using System.Threading;
 using System.IO;
 using System;
 using System.Reflection;
-using Unity.Collections;
 using DataTable;
 using UnityEditor;
 using System.Linq;
@@ -38,12 +37,12 @@ public class SheetDownloader : MonoBehaviour
     private static readonly char[] TRIM_CHARS = { '\"' };
 
     private const string CSV_PATH = "Assets/Resources/Data/csv";
-    private const string SO_PATH = "Assets/Resources/Data/so/";
+    private const string SO_PATH = "Assets/Resources/Data/so";
 
     private const string FILE_FORMAT = "csv";
 
     [SerializeField]
-    private GameObject dataContainer;
+    private DataContainer dataContainer;
 
     [ReadOnlyCustom]
     [SerializeField]
@@ -59,10 +58,7 @@ public class SheetDownloader : MonoBehaviour
             await Download(sheet, FILE_FORMAT);
         }
 
-        if (_Oncomplete != null)
-        {
-            _Oncomplete();
-        }
+        _Oncomplete?.Invoke();
 
         await UniTask.Yield();
 
@@ -71,8 +67,7 @@ public class SheetDownloader : MonoBehaviour
             CreateScriptableObject(sheet);
         }
 
-        var script = this.dataContainer.GetComponent<DataContainer>();
-        EditorUtility.SetDirty(script);
+        EditorUtility.SetDirty(this.dataContainer);
         AssetDatabase.SaveAssets();
     }
 
@@ -108,7 +103,7 @@ public class SheetDownloader : MonoBehaviour
             // 그래서 백그라운드 스레드에서 작업을 마치고 결과를 메인 스레드로 전환하여 이후 작업을 수행하도록 함
 
 
-            await File.WriteAllTextAsync(fileUrl, www.downloadHandler.text + "\n", new CancellationToken());
+            await File.WriteAllTextAsync(fileUrl, www.downloadHandler.text + "\n");
 
             Debug.Log("Download Complete.");
         }
@@ -120,7 +115,7 @@ public class SheetDownloader : MonoBehaviour
         var tableName = _SheetData.SheetName.Split("Table")[0];
 
         // eg) 2. 'Stage' 문자열이 들어간 클래스 찾기
-        Type foundType = FindClassWithPartialString(tableName, typeof(Table_Base).Assembly);
+        Type foundType = FindClassWithPartialString<Table_Base>(tableName);
 
         if (foundType == null)
         {
@@ -129,7 +124,7 @@ public class SheetDownloader : MonoBehaviour
         }
 
         // 데이터테이블 기반의 ScriptableObject 에셋 경로
-        string assetPath = $"{SO_PATH}{_SheetData.SheetName}.asset";
+        string assetPath = $"{SO_PATH}/{_SheetData.SheetName}.asset";
 
         // 위에서 찾은 클래스의 타입(foundType)을 기반으로 하는 ScriptableObject 로드
         var data = (ScriptableObject)AssetDatabase.LoadAssetAtPath(assetPath, foundType);
@@ -288,14 +283,16 @@ public class SheetDownloader : MonoBehaviour
         throw new ArgumentException($"### {member.Name} 는 Field가 아니다 ###");
     }
 
-    private static Type FindClassWithPartialString(string partialString, Assembly assembly)
+    private static Type FindClassWithPartialString<T>(string partialString)
     {
+        var classType = typeof(T);
+        var assembly = classType.Assembly;
         Type[] types = assembly.GetTypes(); // 어셈블리 내의 모든 타입 가져오기
 
         foreach (Type type in types)
         {
             // Namespace 일치 확인, 상속 받은 클래스인지 확인, 이름 포함하는지 확인
-            if (type.Namespace == "DataTable" && typeof(Table_Base).IsAssignableFrom(type) && type.Name.Contains(partialString))
+            if (type.Namespace == "DataTable" && classType.IsAssignableFrom(type) && type.Name.Contains(partialString))
             {
                 return type; // 일치하는 클래스 타입 반환
             }

@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
@@ -43,9 +40,9 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            var result = RaycastGameScreen(Input.mousePosition);
+            var (hit2D, _) = RaycastGameScreen(Input.mousePosition);
 
-            if (result.hit2D.collider.IsNull())
+            if (hit2D.collider.IsNull())
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
