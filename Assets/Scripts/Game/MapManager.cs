@@ -133,7 +133,6 @@ public class MapManager : MonoBehaviour
         {
             Type = _TileType,
             Pos = randomPos,
-            SpritePath = "Images/Map/Forest/Forest_Center",
             Root = random
         };
 
@@ -183,13 +182,12 @@ public class MapManager : MonoBehaviour
                 {
                     Type = _TileType,
                     Pos = randomPos,
-                    SpritePath = targetSeedData.SpritePath,
                     Root = random
                 };
 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(stageTable.SeedData[i].Type)
+                    .WithSubType(targetSeedData.Type)
                     .WithActiveTime(targetSeedData.ActiveTime)
                     .Build();
 

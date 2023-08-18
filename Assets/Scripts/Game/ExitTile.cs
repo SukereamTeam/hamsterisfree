@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class ExitTile : TileBase
 {
-    [SerializeField]
-    private Sprite sprite;
-
     public override void Initialize(TileInfo _Info)
     {
         base.Initialize(_Info);
+
+        var sprite = DataContainer.Instance.ExitSprite;
+        if (sprite != null)
+        {
+            this.spriteRenderer.sprite = sprite;
+        }
     }
 
     public override void TileTriggerEvent()

@@ -25,7 +25,12 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info);
 
-        
+        var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
+
+        if (sprite != null)
+        {
+            this.spriteRenderer.sprite = sprite;
+        }
     }
 
     public override void TileTriggerEvent()

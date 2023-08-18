@@ -39,6 +39,12 @@ public abstract class TileBase : MonoBehaviour
             return this;
         }
 
+
+        /// <summary>
+        /// 각 타일들이 맵에서 보여지는 시간 지정 
+        /// </summary>
+        /// <param name="_Time">eg. 1 : 쭉, 0.5 : 0.5초 간격으로 보였다가 사라지기</param>
+        /// <returns></returns>
         public TileBuilder WithActiveTime(float _Time)
         {
             _tileInfo.ActiveTime = _Time;
@@ -57,7 +63,7 @@ public abstract class TileBase : MonoBehaviour
     /// (SeedTile, MonsterTile은 MapManager의 backTiles 중 하나)
     /// </summary>
     [SerializeField]
-    private TileInfo info;
+    protected TileInfo info;
     public TileInfo Info => this.info;
 
     [SerializeField]
@@ -75,15 +81,15 @@ public abstract class TileBase : MonoBehaviour
 
         info = _Info;
 
-        var sprite = Resources.Load<Sprite>(_Info.SpritePath);
-        if (sprite != null)
-        {
-            this.spriteRenderer.sprite = sprite;
-        }
-        else
-        {
-            Debug.Log($"### ERROR ---> {_Info.SpritePath} ###");
-        }
+        //var sprite = Resources.Load<Sprite>(_Info.SpritePath);
+        //if (sprite != null)
+        //{
+        //    this.spriteRenderer.sprite = sprite;
+        //}
+        //else
+        //{
+        //    Debug.Log($"### ERROR ---> {_Info.SpritePath} ###");
+        //}
     }
 
     public abstract void TileTriggerEvent();

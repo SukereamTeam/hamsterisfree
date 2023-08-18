@@ -7,7 +7,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using DataTable;
-
+using System.Threading.Tasks;
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
@@ -25,6 +25,13 @@ public class DataContainer : MonoSingleton<DataContainer>
 
     private int tileSpritesCount = 0;
 
+    private Sprite exitSprite;
+    public Sprite ExitSprite => this.exitSprite;
+
+    private Dictionary<string, Sprite> seedSprites;
+    public Dictionary<string, Sprite> SeedSprites => this.seedSprites;
+
+
 
 
 
@@ -32,6 +39,7 @@ public class DataContainer : MonoSingleton<DataContainer>
     {
         this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
         this.stageSprites = new List<Sprite>(this.tileSpritesCount);
+        
     }
 
 
@@ -56,7 +64,16 @@ public class DataContainer : MonoSingleton<DataContainer>
             var item = stageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();
 
             if (item != null)
+            {
                 await LoadStageSprites(item.MapName);
+
+                // TODO : Modify
+                this.exitSprite = await Resources.LoadAsync<Sprite>("Images/Map/Forest/Forest_Center") as Sprite;
+                if (this.exitSprite == null)
+                    Debug.Log("### ERROR ---> ExitSprite is Null ###");
+
+                await LoadSeedSprites(item);
+            }
             else
                 Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");
         }
@@ -67,6 +84,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
         Debug.Log("LoadStageDatas 끝!");
     }
+
 
     private async UniTask LoadStageSprites(string _MapName)
     {
@@ -97,5 +115,24 @@ public class DataContainer : MonoSingleton<DataContainer>
         }
     }
 
+    private async UniTask LoadSeedSprites(Table_Stage.Param item)
+    {
+        var seedCount = item.SeedData.Count;
 
+        this.seedSprites = new Dictionary<string, Sprite>(seedCount);
+
+        for (int i = 0; i < seedCount; i++)
+        {
+            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Type);
+
+            var sprite = await Resources.LoadAsync<Sprite>(seedData.SpritePath) as Sprite;
+
+            if (sprite != null)
+            {
+                this.seedSprites.Add(item.SeedData[i].Type, sprite);
+            }
+            else
+                Debug.Log($"### ERROR LoadSeedSprites ---> {seedData.Type} ###");
+        }
+    }
 }
