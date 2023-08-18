@@ -33,11 +33,9 @@ public class SeedTile : TileBase
 
     }
 
-    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos, int _Root)
+    public override void Initialize(TileInfo _Info)
     {
-        base.Initialize(_Type, _SpritePath, _Pos, _Root);
-
-        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+        base.Initialize(_Info);
 
         // TODO
         // sprite 나중엔 데이터테이블 경로로 빼야함 지금은 serializeField이지만...
@@ -48,7 +46,6 @@ public class SeedTile : TileBase
 
         //this.spriteRenderer.sprite = this.tileSprite;
 
-        this.type = _Type.ToString();
     }
 
     public override void TileTriggerEvent()

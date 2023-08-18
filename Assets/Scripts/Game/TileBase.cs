@@ -6,14 +6,21 @@ using UnityEngine;
 
 public abstract class TileBase : MonoBehaviour
 {
+    public struct TileInfo
+    {
+        public Define.TileType Type;
+        public string SubType;
+        public Vector2 Pos;
+        public string SpritePath;
+        public int Root;
+    }
 
-    protected string tileName;
-    protected Vector2 position;
-
-    [SerializeField]
-    protected int rootTile;         // 각 타일이 생성되는 위치의 기반이 되는 타일이 어떤건지.
-                                    // (ExitTile은 MapManager의 outlineTiles 중 하나일 것)
-                                    // (SeedTile, MonsterTile은 MapManager의 backTiles 중 하나)
+    /// <summary>
+    /// 각 타일이 생성되는 위치의 기반이 되는 타일이 어떤건지.
+    /// (ExitTile은 MapManager의 outlineTiles 중 하나일 것)
+    /// (SeedTile, MonsterTile은 MapManager의 backTiles 중 하나)
+    /// </summary>
+    protected int rootTile;         
     public int RootTile => this.rootTile;
 
 
@@ -25,14 +32,13 @@ public abstract class TileBase : MonoBehaviour
     protected BoxCollider2D tileCollider;
     protected Animator animator;
 
-    public virtual void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos, int _Root)
+    public virtual void Initialize(TileInfo _Info)
     {
-        this.tileType = _Type;
+        this.tileType = _Info.Type;
 
-        this.position = _Pos;
-        this.transform.localPosition = this.position;
+        this.transform.localPosition = new Vector3(_Info.Pos.x, _Info.Pos.y, -0.7f);
 
-        this.rootTile = _Root;
+        this.rootTile = _Info.Root;
     }
 
     public abstract void TileTriggerEvent();

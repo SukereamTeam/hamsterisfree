@@ -121,12 +121,23 @@ public class MapManager : MonoBehaviour
     {
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
 
+        
+
         var random = UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
         var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
         var exitScript = exitTile.GetComponent<ExitTile>();
-        exitScript.Initialize(_TileType, "", randomPos, random);
+
+        TileBase.TileInfo info = new TileBase.TileInfo
+        {
+            Type = _TileType,
+            Pos = randomPos,
+            SpritePath = "",
+            Root = random
+        };
+
+        exitScript.Initialize(info);
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
@@ -161,7 +172,16 @@ public class MapManager : MonoBehaviour
 
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
-                seedScript.Initialize(_TileType, "", randomPos, random);
+
+                TileBase.TileInfo info = new TileBase.TileInfo
+                {
+                    Type = _TileType,
+                    Pos = randomPos,
+                    SpritePath = "",
+                    Root = random
+                };
+
+                seedScript.Initialize(info);
 
                 this.seedTiles.Add(seedScript);
             }
