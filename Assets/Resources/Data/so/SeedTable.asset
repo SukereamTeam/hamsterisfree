@@ -16,3 +16,4 @@ MonoBehaviour:
   - Index: 0
     Type: Default
     ActiveTime: 1
+    SpritePath: Images/Map/Forest/Forest_TopLeft

@@ -12,7 +12,7 @@ public class GameManager : MonoSingleton<GameManager>
 {
 
     [SerializeField]
-    private MapManager mapManager = null;
+    private MapManager mapManager;
     public MapManager MapManager => this.mapManager;
 
 
