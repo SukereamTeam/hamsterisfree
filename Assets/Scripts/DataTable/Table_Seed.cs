@@ -21,7 +21,7 @@ namespace DataTable
             public string SpritePath;
         }
 
-        public Param GetParam(string _Type)
+        public Param GetParamFromType(string _Type)
         {
             return list.FirstOrDefault(x => x.Type.Equals(_Type));
         }

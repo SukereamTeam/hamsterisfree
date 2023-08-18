@@ -88,7 +88,7 @@ public class MapManager : MonoBehaviour
 
     public void SetStage()
     {
-        if (DataContainer.Instance.StageTileSprites.Count == 0)
+        if (DataContainer.Instance.StageSprites.Count == 0)
         {
             Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
             return;
@@ -112,7 +112,7 @@ public class MapManager : MonoBehaviour
             }
         }
 
-        DataContainer.Instance.StageTileSprites.Clear();
+        DataContainer.Instance.StageSprites.Clear();
     }
 
     //------------------ Create Tiles
@@ -129,15 +129,17 @@ public class MapManager : MonoBehaviour
         var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
         var exitScript = exitTile.GetComponent<ExitTile>();
 
-        TileBase.TileInfo info = new TileBase.TileInfo
+        TileBase.TileInfo baseInfo = new TileBase.TileInfo
         {
             Type = _TileType,
             Pos = randomPos,
-            SpritePath = "",
+            SpritePath = "Images/Map/Forest/Forest_Center",
             Root = random
         };
 
-        exitScript.Initialize(info);
+        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).WithSubType("").Build();
+
+        exitScript.Initialize(tileInfo);
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
@@ -173,15 +175,25 @@ public class MapManager : MonoBehaviour
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
 
-                TileBase.TileInfo info = new TileBase.TileInfo
+                // eg. SeedTile 의 타입들 중 Dafault 타입에 대한 데이터를 SeedTable에서 가져오기
+                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type);
+
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
                     Type = _TileType,
                     Pos = randomPos,
-                    SpritePath = "",
+                    SpritePath = targetSeedData.SpritePath,
                     Root = random
                 };
 
-                seedScript.Initialize(info);
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(stageTable.SeedData[i].Type)
+                    .WithActiveTime(targetSeedData.ActiveTime)
+                    .Build();
+
+                seedScript.Initialize(tileInfo);
 
                 this.seedTiles.Add(seedScript);
             }
@@ -199,7 +211,7 @@ public class MapManager : MonoBehaviour
     {
         for (int i = 0; i < _List.Count; i++)
         {
-            if (_RandomIndex.Equals(_List[i].RootTile))
+            if (_RandomIndex.Equals(_List[i].Info.Root))
             {
                 return true;
             }
@@ -236,7 +248,7 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        this.backgroundImage.sprite = DataContainer.Instance.StageTileSprites[index];
+        this.backgroundImage.sprite = DataContainer.Instance.StageSprites[index];
 
         
     }
@@ -250,7 +262,7 @@ public class MapManager : MonoBehaviour
             if (i < Left_End)
             {
                 index = (int)Define.TileSpriteName.Left;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -259,7 +271,7 @@ public class MapManager : MonoBehaviour
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -268,7 +280,7 @@ public class MapManager : MonoBehaviour
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -277,7 +289,7 @@ public class MapManager : MonoBehaviour
             {
                 //top
                 index = (int)Define.TileSpriteName.Top;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = DataContainer.Instance.StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -288,7 +300,7 @@ public class MapManager : MonoBehaviour
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
-            this.edgeTiles[tileIndex].sprite = DataContainer.Instance.StageTileSprites[index];
+            this.edgeTiles[tileIndex].sprite = DataContainer.Instance.StageSprites[index];
         }
     }
 
@@ -296,7 +308,7 @@ public class MapManager : MonoBehaviour
     private void SetMask()
     {
         Debug.Log("SetMask 시작");
-        var sprite = DataContainer.Instance.StageTileSprites[(int)Define.TileSpriteName.Mask];
+        var sprite = DataContainer.Instance.StageSprites[(int)Define.TileSpriteName.Mask];
         
         this.mask.sprite = sprite;
         Debug.Log("SetMask 끝");

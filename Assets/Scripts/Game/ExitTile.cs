@@ -10,15 +10,6 @@ public class ExitTile : TileBase
     public override void Initialize(TileInfo _Info)
     {
         base.Initialize(_Info);
-
-        // TODO
-        // sprite 나중엔 데이터테이블 경로로 빼야함 지금은 serializeField이지만...
-        // Resources.load
-        // 그리고 베이스 클래스로 옮겨줘야 함 SpritePath 써서 로드하는 걸로
-        //this.tileSprite = sprite;
-        //this.spriteRenderer.sprite = this.tileSprite;
-
-
     }
 
     public override void TileTriggerEvent()

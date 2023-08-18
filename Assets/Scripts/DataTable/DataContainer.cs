@@ -19,8 +19,9 @@ public class DataContainer : MonoSingleton<DataContainer>
     private Table_Seed seedTable;
     public Table_Seed SeedTable => this.seedTable;
 
-    private List<Sprite> stageTileSprites;
-    public List<Sprite> StageTileSprites => this.stageTileSprites;
+
+    private List<Sprite> stageSprites;
+    public List<Sprite> StageSprites => this.stageSprites;
 
     private int tileSpritesCount = 0;
 
@@ -30,7 +31,7 @@ public class DataContainer : MonoSingleton<DataContainer>
     public void Initialize()
     {
         this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        this.stageTileSprites = new List<Sprite>(this.tileSpritesCount);
+        this.stageSprites = new List<Sprite>(this.tileSpritesCount);
     }
 
 
@@ -55,13 +56,9 @@ public class DataContainer : MonoSingleton<DataContainer>
             var item = stageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();
 
             if (item != null)
-            {
-                await LoadTileSprites(item.MapName);
-            }
+                await LoadStageSprites(item.MapName);
             else
-            {
                 Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");
-            }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
@@ -71,7 +68,7 @@ public class DataContainer : MonoSingleton<DataContainer>
         Debug.Log("LoadStageDatas 끝!");
     }
 
-    private async UniTask LoadTileSprites(string _MapName)
+    private async UniTask LoadStageSprites(string _MapName)
     {
         var rootPath = "Images/Map";
 
@@ -89,13 +86,9 @@ public class DataContainer : MonoSingleton<DataContainer>
                 var sprite = resource as Sprite;
 
                 if (sprite != null)
-                {
-                    this.stageTileSprites.Add(sprite);
-                }
+                    this.stageSprites.Add(sprite);
                 else
-                {
                     Debug.Log("### Fail <Sprite> Type Casting ###");
-                }
             }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
