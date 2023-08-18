@@ -18,5 +18,9 @@ MonoBehaviour:
       Type: LimitTime
       Count: 60
     MapName: Forest
-    SeedData: []
+    SeedData:
+    - Type: Default
+      Count: 3
+    - Type: Fade
+      Count: 3
     MonsterData: []

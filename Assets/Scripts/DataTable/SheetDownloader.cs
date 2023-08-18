@@ -327,29 +327,18 @@ public class SheetDownloader : MonoBehaviour
 
     private static List<Table_Base.SerializableTuple<string, int>> ParseObjectData(string input)
     {
-        // "((0, 0), (3, 0))"
-        string[] pairs = input.Replace("(", "").Replace(")", "").Split(new[] { "), (" }, StringSplitOptions.RemoveEmptyEntries);
+        if (input.Equals("NULL"))
+            return null;
 
-        // "0030"
+        string[] tupleStrings = input.Split(new char[] { '(', ')', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>(pairs.Length);
+        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>((tupleStrings.Length / 2));
 
-
-        foreach (string pair in pairs)
+        for (int i = 0; i < tupleStrings.Length; i += 2)
         {
-            string[] keyValue = pair.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-            if (keyValue.Length == 2)
-            {
-                if (int.TryParse(keyValue[1].Trim(), out int value))
-                {
-                    resultList.Add(new Table_Base.SerializableTuple<string, int>(keyValue[0], value));
-                }
-                else
-                {
-                    Debug.Log($"### Error ---> {keyValue[0]}, {keyValue[1]} <--- ParseSeedData ");
-                }
-            }
+            string strValue = tupleStrings[i];
+            int intValue = int.Parse(tupleStrings[i + 1]);
+            resultList.Add(new Table_Base.SerializableTuple<string, int>(strValue, intValue));
         }
 
         return resultList;
