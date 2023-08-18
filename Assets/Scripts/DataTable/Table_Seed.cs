@@ -17,7 +17,7 @@ namespace DataTable
         {
             public int Index;
             public string Type;
-            public int ActiveTime;
+            public float ActiveTime;
             public string SpritePath;
         }
 

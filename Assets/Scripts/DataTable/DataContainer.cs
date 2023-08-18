@@ -87,7 +87,7 @@ public class DataContainer : MonoSingleton<DataContainer>
     private async UniTask LoadStageSprites(string _MapName)
     {
         this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        this.stageTileSprites = new List<Sprite>(this.tileSpritesCount);
+        this.stageSprites = new List<Sprite>(this.tileSpritesCount);
 
         var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
 
@@ -101,7 +101,7 @@ public class DataContainer : MonoSingleton<DataContainer>
 
                 if (resource is Sprite sprite)
                 {
-                    this.stageTileSprites.Add(sprite);
+                    this.stageSprites.Add(sprite);
                 }
                 else
                     Debug.Log("### Fail <Sprite> Type Casting ###");

@@ -17,3 +17,7 @@ MonoBehaviour:
     Type: Default
     ActiveTime: 1
     SpritePath: Images/Map/Forest/Forest_TopLeft
+  - Index: 1
+    Type: Fade
+    ActiveTime: 0.5
+    SpritePath: Images/Map/Forest/Forest_BottomRight

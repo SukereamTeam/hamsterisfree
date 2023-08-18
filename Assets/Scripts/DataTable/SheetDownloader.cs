@@ -221,7 +221,13 @@ public class SheetDownloader : MonoBehaviour
                                 continue;
                             }
 
-                            
+                            if (csvDataField.FieldType.Equals(typeof(float)))
+                            {
+                                csvDataField.SetValue(csvData, float.Parse(value));
+                                continue;
+                            }
+
+
                             csvDataField.SetValue(csvData, value);
                         }
                     }
