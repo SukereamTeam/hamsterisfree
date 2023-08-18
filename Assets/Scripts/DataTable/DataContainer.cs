@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using TMPro;
 using DataTable;
 using System.Threading.Tasks;
 
@@ -19,6 +16,9 @@ public class DataContainer : MonoSingleton<DataContainer>
     private Table_Seed seedTable;
     public Table_Seed SeedTable => this.seedTable;
 
+
+
+    private const string RootPath_Stage = "Images/Map";
 
     private List<Sprite> stageSprites;
     public List<Sprite> StageSprites => this.stageSprites;
@@ -37,8 +37,6 @@ public class DataContainer : MonoSingleton<DataContainer>
 
     public void Initialize()
     {
-        this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        this.stageSprites = new List<Sprite>(this.tileSpritesCount);
         
     }
 
@@ -53,15 +51,13 @@ public class DataContainer : MonoSingleton<DataContainer>
 
 
 
-    public async UniTask LoadStageDatas()
+    public async UniTask LoadStageDatas(int _StageIndex)
     {
         Debug.Log("LoadStageDatas 시작");
 
-        var curIndex = CommonManager.Instance.CurStageIndex;
-
         try
         {
-            var item = stageTable.list.Where(x => x.Index == curIndex).FirstOrDefault();
+            var item = stageTable.list.Where(x => x.Index == _StageIndex).FirstOrDefault();
 
             if (item != null)
             {
@@ -75,7 +71,9 @@ public class DataContainer : MonoSingleton<DataContainer>
                 await LoadSeedSprites(item);
             }
             else
-                Debug.Log($"### Error ---> {curIndex} is Not ContainsKey ###");
+            {
+                Debug.Log($"### Error ---> {_StageIndex} is Not ContainsKey ###");
+            }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
@@ -88,23 +86,23 @@ public class DataContainer : MonoSingleton<DataContainer>
 
     private async UniTask LoadStageSprites(string _MapName)
     {
-        var rootPath = "Images/Map";
+        this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
+        this.stageTileSprites = new List<Sprite>(this.tileSpritesCount);
 
-        var path = $"{rootPath}/{_MapName}/{_MapName}_";
-
-        Define.TileSpriteName spriteName = Define.TileSpriteName.Center;
+        var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
 
         try
         {
-            for (spriteName = 0; (int)spriteName < this.tileSpritesCount; spriteName++)
+            for (Define.TileSpriteName spriteName = 0; (int)spriteName < this.tileSpritesCount; spriteName++)
             {
                 var spritePath = $"{path}{spriteName}";
 
                 var resource = await Resources.LoadAsync<Sprite>(spritePath);
-                var sprite = resource as Sprite;
 
-                if (sprite != null)
-                    this.stageSprites.Add(sprite);
+                if (resource is Sprite sprite)
+                {
+                    this.stageTileSprites.Add(sprite);
+                }
                 else
                     Debug.Log("### Fail <Sprite> Type Casting ###");
             }

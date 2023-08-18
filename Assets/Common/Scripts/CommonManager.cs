@@ -20,7 +20,7 @@ public class CommonManager : MonoSingleton<CommonManager>
         CurStageIndex = 0;
 
         // Table Load
-        DataContainer.Instance.Initialize();
+        //DataContainer.Instance.Initialize();
     }
 
     public void OnDisable()

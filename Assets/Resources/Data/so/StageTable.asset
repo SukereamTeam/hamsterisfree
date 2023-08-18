@@ -21,4 +21,6 @@ MonoBehaviour:
     SeedData:
     - Type: Default
       Count: 3
+    - Type: Fade
+      Count: 3
     MonsterData: []
