@@ -28,6 +28,13 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isGame = value;
     }
 
+    [SerializeField]
+    private int seedCount;
+    public int SeedCount
+    {
+        get => this.seedCount;
+        set => this.seedCount = value;
+    }
 
 
 

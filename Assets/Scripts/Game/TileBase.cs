@@ -43,7 +43,7 @@ public abstract class TileBase : MonoBehaviour
         /// <summary>
         /// 각 타일들이 맵에서 보여지는 시간 지정 
         /// </summary>
-        /// <param name="_Time">eg. 1 : 쭉, 0.5 : 0.5초 간격으로 보였다가 사라지기</param>
+        /// <param name="_Time">eg. 1 : 쭉, 0.5 : 0.5초 간격으로 보였다가 사라지기 등..</param>
         /// <returns></returns>
         public TileBuilder WithActiveTime(float _Time)
         {
@@ -75,21 +75,21 @@ public abstract class TileBase : MonoBehaviour
 
     protected Animator animator;
 
+
+
+    protected void Start()
+    {
+        this.spriteRenderer = this.GetComponent<SpriteRenderer>();
+
+        this.tileCollider = this.GetComponent<BoxCollider2D>();
+
+    }
+
     public virtual void Initialize(TileInfo _Info)
     {
         this.transform.localPosition = new Vector3(_Info.Pos.x, _Info.Pos.y, -0.7f);
 
         info = _Info;
-
-        //var sprite = Resources.Load<Sprite>(_Info.SpritePath);
-        //if (sprite != null)
-        //{
-        //    this.spriteRenderer.sprite = sprite;
-        //}
-        //else
-        //{
-        //    Debug.Log($"### ERROR ---> {_Info.SpritePath} ###");
-        //}
     }
 
     public abstract void TileTriggerEvent();

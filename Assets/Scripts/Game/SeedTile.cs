@@ -21,6 +21,8 @@ public class SeedTile : TileBase
     }
 
 
+
+
     public override void Initialize(TileInfo _Info)
     {
         base.Initialize(_Info);
@@ -37,11 +39,18 @@ public class SeedTile : TileBase
     {
         // Check 타일 지나감
 
-        // TODO
-        // Seed Count 증가
+        Debug.Log("Seed 먹음");
+
         this.tileCollider.enabled = false;
+
+        // TODO : Delete... 테스트 용도
+        this.spriteRenderer.color = Color.red;
+
+        GameManager.Instance.SeedCount++;
+
+        // TODO
         // Trigger Ani 재생
-        //
+        
     }
 
 }
