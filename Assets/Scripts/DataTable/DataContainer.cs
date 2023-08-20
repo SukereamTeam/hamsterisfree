@@ -77,8 +77,10 @@ public class DataContainer : MonoSingleton<DataContainer>
 
         try
         {
-            for (Define.TileSpriteName spriteName = 0; (int)spriteName < this.tileSpritesCount; spriteName++)
+            for (int spriteIndex = 0; spriteIndex < this.tileSpritesCount; spriteIndex++)
             {
+                var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+
                 var spritePath = $"{path}{spriteName}";
 
                 var resource = await Resources.LoadAsync<Sprite>(spritePath);
