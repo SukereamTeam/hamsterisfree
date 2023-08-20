@@ -205,7 +205,7 @@ public class MapManager : MonoBehaviour
     /// <param name="list">체크할 Tile List</param>
     /// <param name="randomPos">중복인지 체크할 포지션</param>
     /// <returns>True를 반환하면 중복이라는 뜻</returns>
-    private bool CheckDuplicateTile<T>(List<T> _List, int _RandomIndex) where T : TileBase
+    private bool CheckDuplicateTile<T>(IReadOnlyList<T> _List, int _RandomIndex) where T : TileBase
     {
         for (int i = 0; i < _List.Count; i++)
         {
