@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -30,6 +28,11 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.IsInstance == false)
+        {
+            return;
+        }
+
         if (GameManager.Instance.IsGame.Value == false)
         {
             return;
@@ -37,9 +40,9 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            var result = RaycastGameScreen(Input.mousePosition);
+            var (hit2D, _) = RaycastGameScreen(Input.mousePosition);
 
-            if (result.Item1.collider.IsNull())
+            if (hit2D.collider.IsNull())
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
@@ -61,7 +64,8 @@ public class Player : MonoBehaviour
         {
             var result = RaycastGameScreen(Input.mousePosition);
 
-            if (result.Item1.collider.IsNull())
+
+            if (result.hit2D.collider.IsNull())
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
@@ -124,7 +128,7 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    private (RaycastHit2D, Vector2) RaycastGameScreen(Vector3 _MousePosition)
+    private (RaycastHit2D hit2D, Vector2 mousePos) RaycastGameScreen(Vector3 _MousePosition)
     {
         Vector2 mousePosition = gameCamera.ScreenToWorldPoint(_MousePosition);
 

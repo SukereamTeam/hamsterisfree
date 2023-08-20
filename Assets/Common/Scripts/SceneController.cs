@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using Cysharp.Threading.Tasks;
@@ -26,17 +25,16 @@ public class SceneController : MonoSingleton<SceneController>
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
     [SerializeField]
-    private GameObject fadeCanvas = null;
-
-    private Image fade = null;
+    private Image fade;
 
     
 
     public void Initialize()
     {
-        var canvas = Instantiate<GameObject>(fadeCanvas, this.transform);
+        //var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
+        //var canvas = Instantiate<GameObject>(prefab, this.transform);
 
-        this.fade = canvas.GetComponentInChildren<Image>();
+        //this.fade = canvas.GetComponentInChildren<Image>();
 
         this.loadingTask = new List<UniTask>();
     }
@@ -106,7 +104,7 @@ public class SceneController : MonoSingleton<SceneController>
         while (!operation.isDone)
         {
             await UniTask.Yield(); // 다음 프레임까지 대기
-        }
+       }
     }
 
 
@@ -150,6 +148,8 @@ public class SceneController : MonoSingleton<SceneController>
                     .OnKill(() =>
                     {
                         Debug.Log("Fade was OnKill.");
+
+                        this.fade.raycastTarget = false;
                     })
                     .OnComplete(() =>
                     {

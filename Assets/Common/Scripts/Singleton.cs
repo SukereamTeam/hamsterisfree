@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -52,6 +50,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
                     {
                         string name = String.Concat("Singleton.", typeof(T).ToString());
                         _instance = new GameObject(name, typeof(T)).GetComponent<T>();
+                        
                     }
 
                     if (Application.isPlaying)

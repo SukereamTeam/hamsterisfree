@@ -32,6 +32,7 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
+
     private async void Start()
     {
         Debug.Log("GameManagere에서 Start 진입");
@@ -50,6 +51,11 @@ public class GameManager : MonoSingleton<GameManager>
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
         this.isGame.Value = true;
+
+        if (GameManager.IsInstance == false)
+        {
+            var obj = GameManager.Instance;
+        }
     }
 
 
@@ -64,5 +70,12 @@ public class GameManager : MonoSingleton<GameManager>
         MapManager.IsFade.Value = false;
     }
 
-    
+    public async void OnClick_Back()
+    {
+        await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
+
+        SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
+
+        Clear();
+    }
 }
