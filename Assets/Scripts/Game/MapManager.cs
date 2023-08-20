@@ -170,7 +170,7 @@ public class MapManager : MonoBehaviour
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
 
-                // eg. SeedTile 의 타입들 중 Dafault 타입에 대한 데이터를 SeedTable에서 가져오기
+                // eg. SeedTile 의 타입들 중 Default 타입에 대한 데이터를 SeedTable에서 가져오기
                 var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type);
 
                 // 기본 정보 초기화
