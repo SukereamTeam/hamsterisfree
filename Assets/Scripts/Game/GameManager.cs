@@ -58,7 +58,8 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        MapManager.SetStage();
+
+        MapManager.SetStage(CommonManager.Instance.CurStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 

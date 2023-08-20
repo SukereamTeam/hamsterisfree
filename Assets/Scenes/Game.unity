@@ -3508,7 +3508,7 @@ GameObject:
   - component: {fileID: 611568939}
   - component: {fileID: 611568941}
   m_Layer: 11
-  m_Name: Background
+  m_Name: BackgroundRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5929,6 +5929,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapManager: {fileID: 1975502251}
   fadeDuration: 0.5
+  seedCount: 0
 --- !u!1 &1055597776
 GameObject:
   m_ObjectHideFlags: 0
@@ -9514,7 +9515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eaf7b42052015f43b30406db7a3bb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundImage: {fileID: 611568939}
+  backgroundRenderer: {fileID: 611568939}
   backTiles: []
   outlineTiles:
   - {fileID: 58289440}

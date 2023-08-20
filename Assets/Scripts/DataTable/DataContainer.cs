@@ -21,7 +21,7 @@ public class DataContainer : MonoSingleton<DataContainer>
     private const string RootPath_Stage = "Images/Map";
 
     private List<Sprite> stageSprites;
-    public List<Sprite> StageSprites => this.stageSprites;
+    public IReadOnlyList<Sprite> StageSprites => this.stageSprites;
 
     private int tileSpritesCount = 0;
 
