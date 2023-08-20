@@ -44,6 +44,11 @@ public class GameManager : MonoSingleton<GameManager>
     {
         Debug.Log("GameManagere에서 Start 진입");
 
+        if (Instance == null)
+        {
+            _instance = this;
+        }
+
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Where(x => x == false)
@@ -58,11 +63,6 @@ public class GameManager : MonoSingleton<GameManager>
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
         this.isGame.Value = true;
-
-        if (GameManager.IsInstance == false)
-        {
-            var obj = GameManager.Instance;
-        }
     }
 
 

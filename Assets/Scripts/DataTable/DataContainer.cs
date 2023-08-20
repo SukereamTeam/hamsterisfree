@@ -35,13 +35,21 @@ public class DataContainer : MonoSingleton<DataContainer>
 
 
 
-    public void Initialize()
+
+    private void Awake()
     {
-        
+        if (Instance == null)
+        {
+            _instance = this;
+        }
     }
 
 
-    
+    //public void Initialize()
+    //{
+
+    //}
+
 
     // TODO
     // Json 으로 진행상황 저장하는 함수 만들기
