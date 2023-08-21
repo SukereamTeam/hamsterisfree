@@ -11,8 +11,6 @@ public abstract class TileBase : MonoBehaviour
     {
         public Define.TileType Type;
         public Vector2 Pos;
-        public string SpritePath;
-        public int Root;
 
         public string SubType;
         public float ActiveTime;
@@ -26,13 +24,16 @@ public abstract class TileBase : MonoBehaviour
         public TileBuilder(TileInfo _Info)
         {
             _tileInfo = _Info;
+
+            // 추가 정보 기본값으로 초기화
+            _tileInfo.SubType = "";
+            _tileInfo.ActiveTime = 0f;
         }
 
         /// <summary>
         /// 각 타일들의 서브 타입 지정
         /// </summary>
         /// <param name="_Type">eg. SeedTile의 Default, Disappear, Fake 타입</param>
-        /// <returns></returns>
         public TileBuilder WithSubType(string _Type)
         {
             _tileInfo.SubType = _Type;
@@ -44,7 +45,6 @@ public abstract class TileBase : MonoBehaviour
         /// 각 타일들이 맵에서 보여지는 시간 지정 
         /// </summary>
         /// <param name="_Time">eg. 1 : 쭉, 0.5 : 0.5초 간격으로 보였다가 사라지기 등..</param>
-        /// <returns></returns>
         public TileBuilder WithActiveTime(float _Time)
         {
             _tileInfo.ActiveTime = _Time;

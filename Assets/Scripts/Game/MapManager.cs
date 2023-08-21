@@ -7,6 +7,7 @@ using System.Linq;
 using UniRx;
 using DG.Tweening;
 using Cysharp.Threading.Tasks;
+using DataTable;
 
 public class MapManager : MonoBehaviour
 {
@@ -57,6 +58,8 @@ public class MapManager : MonoBehaviour
 
     private List<SeedTile> seedTiles;
 
+    private int randomSeed = 0;
+
 
 
 
@@ -71,6 +74,9 @@ public class MapManager : MonoBehaviour
             .ToArray();
 
         this.seedTiles = new List<SeedTile>();
+
+        this.randomSeed = (int)DateTime.Now.Ticks;
+        UnityEngine.Random.InitState(this.randomSeed);
     }
 
     private void Start()
@@ -115,10 +121,6 @@ public class MapManager : MonoBehaviour
 
     private void CreateExitTile(Define.TileType _TileType)
     {
-        UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
-
-        
-
         var random = UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
@@ -129,10 +131,9 @@ public class MapManager : MonoBehaviour
         {
             Type = _TileType,
             Pos = randomPos,
-            Root = random
         };
 
-        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).WithSubType("").Build();
+        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).Build();
 
         exitScript.Initialize(tileInfo);
 
@@ -145,27 +146,15 @@ public class MapManager : MonoBehaviour
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
-        UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
+        var posList = GetRandomPosList(stageTable.SeedData);
+        int k = 0;
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
         {
             for (int j = 0; j < stageTable.SeedData[i].Count; j++)
             {
-                var random = UnityEngine.Random.Range(0, this.backTiles.Length);
-                
-                while (true)
-                {
-                    if (CheckDuplicateTile(this.seedTiles, random))
-                    {
-                        random = UnityEngine.Random.Range(0, this.backTiles.Length);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                var randomPos = new Vector2(this.backTiles[random].transform.position.x, this.backTiles[random].transform.position.y);
+                var randomPos = new Vector2(posList[k].position.x, posList[k].position.y);
+                k++;
 
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
@@ -178,7 +167,6 @@ public class MapManager : MonoBehaviour
                 {
                     Type = _TileType,
                     Pos = randomPos,
-                    Root = random
                 };
 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
@@ -195,23 +183,29 @@ public class MapManager : MonoBehaviour
     }
 
     /// <summary>
-    /// SeedTile, MonsterTile 둘 다 사용할거라 where T : TileBase 붙임
+    /// Random Pos가 필요한 타일 리스트를 매개변수로 넣어주면
+    /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
     /// </summary>
-    /// <typeparam name="T">타입은 TileBase 를 상속받은 클래스여야 함</typeparam>
-    /// <param name="list">체크할 Tile List</param>
-    /// <param name="randomPos">중복인지 체크할 포지션</param>
-    /// <returns>True를 반환하면 중복이라는 뜻</returns>
-    private bool CheckDuplicateTile<T>(IReadOnlyList<T> _List, int _RandomIndex) where T : TileBase
+    private List<Transform> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
     {
-        for (int i = 0; i < _List.Count; i++)
+        // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
+        var randomCount = _List.Select(x => x.Count).Sum();
+
+        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
+        var targetTiles = new List<Transform>(this.backTiles);
+
+        var resultTile = new List<Transform>(randomCount);
+
+        for (int i = 0; i < randomCount; i++)
         {
-            if (_RandomIndex.Equals(_List[i].Info.Root))
-            {
-                return true;
-            }
+            var random = UnityEngine.Random.Range(0, targetTiles.Count);
+
+            resultTile.Add(targetTiles[random]);
+
+            targetTiles.RemoveAt(random);
         }
 
-        return false;
+        return resultTile;
     }
 
     //------------------
