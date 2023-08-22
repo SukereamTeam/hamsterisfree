@@ -19,12 +19,13 @@ public class DataContainer : MonoSingleton<DataContainer>
 
 
     private const string RootPath_Stage = "Images/Map";
+    private readonly int Tile_Sprite_Count = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
+
 
     private List<Sprite> stageSprites;
     public IReadOnlyList<Sprite> StageSprites => this.stageSprites;
 
-    private int tileSpritesCount = 0;
-
+    
     private Sprite exitSprite;
     public Sprite ExitSprite => this.exitSprite;
 
@@ -42,6 +43,8 @@ public class DataContainer : MonoSingleton<DataContainer>
         {
             _instance = this;
         }
+
+        this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
     }
 
 
@@ -94,14 +97,13 @@ public class DataContainer : MonoSingleton<DataContainer>
 
     private async UniTask LoadStageSprites(string _MapName)
     {
-        this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        this.stageSprites = new List<Sprite>(this.tileSpritesCount);
+        this.stageSprites.Clear();
 
         var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
 
         try
         {
-            for (int spriteIndex = 0; spriteIndex < this.tileSpritesCount; spriteIndex++)
+            for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
                 var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
 

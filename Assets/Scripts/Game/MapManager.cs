@@ -147,14 +147,14 @@ public class MapManager : MonoBehaviour
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
         var posList = GetRandomPosList(stageTable.SeedData);
-        int k = 0;
+        int posIdx = 0;
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
         {
             for (int j = 0; j < stageTable.SeedData[i].Count; j++)
             {
-                var randomPos = new Vector2(posList[k].position.x, posList[k].position.y);
-                k++;
+                var randomPos = new Vector2(posList[posIdx].position.x, posList[posIdx].position.y);
+                posIdx++;
 
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
