@@ -11,6 +11,7 @@ public abstract class TileBase : MonoBehaviour
     {
         public Define.TileType Type;
         public Vector2 Pos;
+        public int RootIdx;
 
         public string SubType;
         public float ActiveTime;
@@ -57,11 +58,7 @@ public abstract class TileBase : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 각 타일이 생성되는 위치의 기반이 되는 타일의 index
-    /// (ExitTile은 MapManager의 outlineTiles 중 하나일 것.. 그것의 index)
-    /// (SeedTile, MonsterTile은 MapManager의 backTiles 중 하나)
-    /// </summary>
+
     [SerializeField]
     protected TileInfo info;
     public TileInfo Info => this.info;
@@ -74,6 +71,8 @@ public abstract class TileBase : MonoBehaviour
     protected BoxCollider2D tileCollider;
 
     protected Animator animator;
+
+    protected readonly float FADE_TIME = 0.3f;
 
 
 

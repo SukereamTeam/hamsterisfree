@@ -57,6 +57,7 @@ public class MapManager : MonoBehaviour
     }
 
     private List<SeedTile> seedTiles;
+    public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
 
     private int randomSeed = 0;
 
@@ -153,9 +154,8 @@ public class MapManager : MonoBehaviour
         {
             for (int j = 0; j < stageTable.SeedData[i].Count; j++)
             {
-                var randomPos = new Vector2(posList[posIdx].position.x, posList[posIdx].position.y);
-                posIdx++;
-
+                var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
+                
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
 
@@ -167,6 +167,7 @@ public class MapManager : MonoBehaviour
                 {
                     Type = _TileType,
                     Pos = randomPos,
+                    RootIdx = posList[posIdx].root
                 };
 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
@@ -178,6 +179,8 @@ public class MapManager : MonoBehaviour
                 seedScript.Initialize(tileInfo);
 
                 this.seedTiles.Add(seedScript);
+
+                posIdx++;
             }
         }
     }
@@ -186,7 +189,8 @@ public class MapManager : MonoBehaviour
     /// Random Pos가 필요한 타일 리스트를 매개변수로 넣어주면
     /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
     /// </summary>
-    private List<Transform> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
+    /// <returns>Transform은 Pos값을 위해, int는 backTiles중 어느 타일을 참조했는지 파악하려고</returns>
+    private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
         var randomCount = _List.Select(x => x.Count).Sum();
@@ -194,19 +198,54 @@ public class MapManager : MonoBehaviour
         // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
         var targetTiles = new List<Transform>(this.backTiles);
 
-        var resultTile = new List<Transform>(randomCount);
+        var resultTile = new List<(Transform transform, int root)>();
+
 
         for (int i = 0; i < randomCount; i++)
         {
             var random = UnityEngine.Random.Range(0, targetTiles.Count);
 
-            resultTile.Add(targetTiles[random]);
+            resultTile.Add((transform: targetTiles[random], root: random));
 
             targetTiles.RemoveAt(random);
         }
 
         return resultTile;
     }
+
+    //public void GetRandomPos_Next(TileBase _Tile)
+    //{
+    //    switch(_Tile.Info.Type)
+    //    {
+    //        // Seed나 Monster의 경우 outlineTiles가 아닌 backTiles를 참조하여 Random Pos 생성
+    //        case Define.TileType.Seed:
+    //        case Define.TileType.Monster:
+    //            {
+    //                var targetTiles = new List<Transform>(this.backTiles);
+
+    //                if (_Tile.Info.Type == Define.TileType.Seed)
+    //                {
+    //                    List<int> seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+
+    //                    // targetTiles 리스트를 순회하면서
+    //                    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
+    //                    // 다음 RandomPos를 뽑을 Pool이 될 것
+    //                    var tilePool = targetTiles
+    //                        .Where((x, index) => seedTilesRoot.Contains(index) == false)
+    //                        .ToList();
+
+    //                    var random = UnityEngine.Random.Range(0, tilePool.Count);
+    //                    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+
+                        
+    //                }
+    //            }
+    //            break;
+
+    //        case Define.TileType.Exit:
+    //            break;
+    //    }
+    //}
 
     //------------------
 

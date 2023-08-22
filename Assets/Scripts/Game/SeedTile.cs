@@ -4,18 +4,21 @@ using UnityEngine;
 using UniRx;
 using System;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
-public class SeedTile : TileBase
+public partial class SeedTile : TileBase
 {
-
     private bool isTouch = false;
     public bool IsTouch {
         get => this.isTouch;
         set => this.isTouch = value;
     }
 
-    private readonly Subject<Unit> actionSubject = new Subject<Unit>();
-    private bool isActionRunning = false;
+    [SerializeField]
+    private Define.SeedTile_Type tileType = Define.SeedTile_Type.Default;
+
+    private bool isFuncStart = false;
+
 
 
 
@@ -24,57 +27,54 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info);
 
-        var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
+        this.tileType = (Define.SeedTile_Type)Enum.Parse(typeof(Define.SeedTile_Type), _Info.SubType);
 
+        var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
         {
             this.spriteRenderer.sprite = sprite;
         }
 
-        switch(this.info.SubType)
+        TileFuncStart().Forget();
+    }
+
+    private async UniTaskVoid TileFuncStart()
+    {
+        // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때, 타일 타입마다 부여된 액션 실행
+        await UniTask.WaitUntil(() => GameManager.Instance.IsGame.Value == true);
+
+        if (this.isFuncStart == false)
         {
-            case "Fade":
+            Debug.Log("SeedTile Func Start!");
+            this.isFuncStart = true;
+        }
+
+        switch (this.tileType)
+        {
+            case Define.SeedTile_Type.Disappear:
                 {
-                    StartFadeAction();
+                    Func_Disappear(this.info.ActiveTime).Forget();
+                }break;
+            case Define.SeedTile_Type.Moving:
+                {
+                    Func_Moving(this.info.ActiveTime).Forget();
+                }break;
+            case Define.SeedTile_Type.Fade:
+                {
+                    Func_Fade(this.info.ActiveTime).Forget();
                 }
                 break;
         }
     }
 
-    private void StartFadeAction()
-    {
-        // Fade 타입의 동작을 시작
-        if (isActionRunning == false)
-        {
-            isActionRunning = true;
-            Observable.Start(() =>
-            {
-                // Fade 타입의 동작 코드
-                Debug.Log("Fade 타입 동작 시작");
-                // 여기에서 필요한 동작 수행
 
-                var sequence = DOTween.Sequence()
-            .Append(spriteRenderer.DOFade(0f, 0.5f)) // FadeOut
-            .AppendCallback(() => this.tileCollider.enabled = false) // Collider 비활성화
-            .AppendInterval(0.5f) // 0.5초 대기
-            .Append(spriteRenderer.DOFade(1f, 0.5f)) // FadeIn
-            .AppendCallback(() => this.tileCollider.enabled = true) // Collider 활성화
-            .AppendInterval(0.5f) // 0.5초 대기
-            .SetLoops(-1); // 무한 루프
-
-            }).DoOnCompleted(() =>
-            {
-                isActionRunning = false;
-                actionSubject.OnCompleted(); // 동작이 끝나면 이벤트를 완료
-            }).Subscribe();
-        }
-    }
+    
 
     public override void TileTriggerEvent()
     {
-        // Check 타일 지나감
-
         Debug.Log("Seed 먹음");
+
+        this.isFuncStart = false;
 
         this.tileCollider.enabled = false;
 

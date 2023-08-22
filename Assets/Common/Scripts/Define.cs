@@ -7,14 +7,6 @@ public class Define
         Game,
     }
 
-    public enum Direction
-    {
-        Left = 0,
-        Right,
-        Top,
-        Bottom
-    }
-
     public enum TileType
     {
         None,
@@ -37,10 +29,14 @@ public class Define
         Mask
     }
 
-    public enum ObjectDataField
+    public enum SeedTile_Type
     {
-        Type = 0,
-        Size,
-        Pos
+        // https://github.com/users/eggmong/projects/1/views/1?pane=issue&itemId=35747000
+        Default = 0,    // 기본 씨앗
+        Disappear,      // 안녕 씨앗
+        Fake,           // 위장 씨앗
+        Moving,         // 이동 씨앗
+        Appear,         // 짜잔 씨앗
+        Fade,           // 빼꼼 씨앗
     }
 }
