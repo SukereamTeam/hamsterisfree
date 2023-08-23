@@ -20,7 +20,23 @@ public partial class SeedTile : TileBase
     private bool isFuncStart = false;
 
 
+//    interface ITileActor
+//    {
+//        async act()
+//}
 
+//    class FadeActor : ITileActor
+//    {
+//        async act()
+//    }
+
+//...
+
+//-------------------------------
+
+
+
+    private ITileActor tileActor;
 
 
     public override void Initialize(TileInfo _Info)
@@ -53,6 +69,8 @@ public partial class SeedTile : TileBase
         {
             case Define.SeedTile_Type.Disappear:
                 {
+                    tileActor = new FadeActor();
+                    await tileActor.Act();
                     Func_Disappear(this.info.ActiveTime).Forget();
                 }break;
             case Define.SeedTile_Type.Moving:
