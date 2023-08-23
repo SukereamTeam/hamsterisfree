@@ -13,8 +13,6 @@ public enum SeedType
 
 public class SeedTile : TileBase
 {
-    [SerializeField]
-    private Sprite sprite = null;
 
     private bool isTouch = false;
     public bool IsTouch {
@@ -22,28 +20,37 @@ public class SeedTile : TileBase
         set => this.isTouch = value;
     }
 
-    private void Awake()
+
+
+
+    public override void Initialize(TileInfo _Info)
     {
+        base.Initialize(_Info);
 
-    }
+        var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
 
-    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
-    {
-        base.Initialize(_Type, _SpritePath, _Pos);
-
-        // TODO
-        // sprite 나중엔 데이터테이블 경로로 빼야함 지금은 serializeField이지만...
-        // Resources.load
-        // 그리고 베이스 클래스로 옮겨줘야 함 SpritePath 써서 로드하는 걸로
-        this.tileSprite = sprite;
-        this.spriteRenderer.sprite = this.tileSprite;
-
-        
+        if (sprite != null)
+        {
+            this.spriteRenderer.sprite = sprite;
+        }
     }
 
     public override void TileTriggerEvent()
     {
         // Check 타일 지나감
+
+        Debug.Log("Seed 먹음");
+
+        this.tileCollider.enabled = false;
+
+        // TODO : Delete... 테스트 용도
+        this.spriteRenderer.color = Color.red;
+
+        GameManager.Instance.SeedCount++;
+
+        // TODO
+        // Trigger Ani 재생
+        
     }
 
 }

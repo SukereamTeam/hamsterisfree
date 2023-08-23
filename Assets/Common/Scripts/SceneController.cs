@@ -27,7 +27,19 @@ public class SceneController : MonoSingleton<SceneController>
     [SerializeField]
     private Image fade;
 
-    
+
+
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            _instance = this;
+        }
+
+        this.loadingTask = new List<UniTask>();
+    }
+
 
     public void Initialize()
     {
@@ -35,8 +47,6 @@ public class SceneController : MonoSingleton<SceneController>
         //var canvas = Instantiate<GameObject>(prefab, this.transform);
 
         //this.fade = canvas.GetComponentInChildren<Image>();
-
-        this.loadingTask = new List<UniTask>();
     }
 
 

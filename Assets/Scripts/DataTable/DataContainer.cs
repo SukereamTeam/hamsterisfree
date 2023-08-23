@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using DataTable;
-
+using System.Threading.Tasks;
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
@@ -16,24 +16,43 @@ public class DataContainer : MonoSingleton<DataContainer>
     private Table_Seed seedTable;
     public Table_Seed SeedTable => this.seedTable;
 
-    private List<Sprite> stageTileSprites;
-    public List<Sprite> StageTileSprites => this.stageTileSprites;
 
 
     private const string RootPath_Stage = "Images/Map";
-
-    private int tileSpritesCount = 0;
-
+    private readonly int Tile_Sprite_Count = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
 
 
+    private List<Sprite> stageSprites;
+    public IReadOnlyList<Sprite> StageSprites => this.stageSprites;
 
-    public void Initialize()
+    
+    private Sprite exitSprite;
+    public Sprite ExitSprite => this.exitSprite;
+
+    private Dictionary<string, Sprite> seedSprites;
+    public Dictionary<string, Sprite> SeedSprites => this.seedSprites;
+
+
+
+
+
+
+    private void Awake()
     {
-        
+        if (Instance == null)
+        {
+            _instance = this;
+        }
+
+        this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
     }
 
 
-    
+    //public void Initialize()
+    //{
+
+    //}
+
 
     // TODO
     // Json 으로 진행상황 저장하는 함수 만들기
@@ -53,7 +72,14 @@ public class DataContainer : MonoSingleton<DataContainer>
 
             if (item != null)
             {
-                await LoadTileSprites(item.MapName);
+                await LoadStageSprites(item.MapName);
+
+                // TODO : Modify
+                this.exitSprite = await Resources.LoadAsync<Sprite>("Images/Map/Forest/Forest_Center") as Sprite;
+                if (this.exitSprite == null)
+                    Debug.Log("### ERROR ---> ExitSprite is Null ###");
+
+                await LoadSeedSprites(item);
             }
             else
             {
@@ -68,16 +94,16 @@ public class DataContainer : MonoSingleton<DataContainer>
         Debug.Log("LoadStageDatas 끝!");
     }
 
-    private async UniTask LoadTileSprites(string _MapName)
+
+    private async UniTask LoadStageSprites(string _MapName)
     {
-        this.tileSpritesCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
-        this.stageTileSprites = new List<Sprite>(this.tileSpritesCount);
+        this.stageSprites.Clear();
 
         var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
 
         try
         {
-            for (int spriteIndex = 0; spriteIndex < this.tileSpritesCount; spriteIndex++)
+            for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
                 var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
 
@@ -87,17 +113,36 @@ public class DataContainer : MonoSingleton<DataContainer>
 
                 if (resource is Sprite sprite)
                 {
-                    this.stageTileSprites.Add(sprite);
+                    this.stageSprites.Add(sprite);
                 }
                 else
-                {
                     Debug.Log("### Fail <Sprite> Type Casting ###");
-                }
             }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
             Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
+        }
+    }
+
+    private async UniTask LoadSeedSprites(Table_Stage.Param item)
+    {
+        var seedCount = item.SeedData.Count;
+
+        this.seedSprites = new Dictionary<string, Sprite>(seedCount);
+
+        for (int i = 0; i < seedCount; i++)
+        {
+            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Type);
+
+            var sprite = await Resources.LoadAsync<Sprite>(seedData.SpritePath) as Sprite;
+
+            if (sprite != null)
+            {
+                this.seedSprites.Add(item.SeedData[i].Type, sprite);
+            }
+            else
+                Debug.Log($"### ERROR LoadSeedSprites ---> {seedData.Type} ###");
         }
     }
 }

@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6129180821252814348}
   - component: {fileID: 4064399325268235642}
-  - component: {fileID: 3087220569408394150}
   - component: {fileID: 6047484347872543225}
   m_Layer: 0
-  m_Name: ExitTile
+  m_Name: MonsterTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,26 +85,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3087220569408394150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1242813034118986203}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab3371830c87b764f9d49472572cba39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  info:
-    Type: 0
-    SubType: 
-    Pos: {x: 0, y: 0}
-    SpritePath: 
-    Root: 0
-  spriteRenderer: {fileID: 4064399325268235642}
-  sprite: {fileID: 0}
 --- !u!61 &6047484347872543225
 BoxCollider2D:
   m_ObjectHideFlags: 0

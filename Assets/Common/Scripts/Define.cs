@@ -17,7 +17,7 @@ public class Define
 
     public enum TileType
     {
-        Normal = 0,
+        None,
         Exit,
         Seed,
         Monster

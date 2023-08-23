@@ -4,23 +4,15 @@ using UnityEngine;
 
 public class ExitTile : TileBase
 {
-    [SerializeField]
-    private Sprite sprite;
-
-    public override void Initialize(Define.TileType _Type, string _SpritePath, Vector2 _Pos)
+    public override void Initialize(TileInfo _Info)
     {
-        base.Initialize(_Type, _SpritePath, _Pos);
+        base.Initialize(_Info);
 
-        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
-
-        // TODO
-        // sprite 나중엔 데이터테이블 경로로 빼야함 지금은 serializeField이지만...
-        // Resources.load
-        // 그리고 베이스 클래스로 옮겨줘야 함 SpritePath 써서 로드하는 걸로
-        //this.tileSprite = sprite;
-        //this.spriteRenderer.sprite = this.tileSprite;
-
-
+        var sprite = DataContainer.Instance.ExitSprite;
+        if (sprite != null)
+        {
+            this.spriteRenderer.sprite = sprite;
+        }
     }
 
     public override void TileTriggerEvent()

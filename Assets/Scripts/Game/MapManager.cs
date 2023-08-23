@@ -7,22 +7,23 @@ using System.Linq;
 using UniRx;
 using DG.Tweening;
 using Cysharp.Threading.Tasks;
+using DataTable;
 
 public class MapManager : MonoBehaviour
 {
     // 맵 생성
     [SerializeField]
-    private SpriteRenderer background = null;
-    public SpriteRenderer Background => this.background;
+    private SpriteRenderer backgroundRenderer;
+    public SpriteRenderer BackgroundRenderer => this.backgroundRenderer;
 
     [SerializeField]
-    private Transform[] backTiles = null;
+    private Transform[] backTiles;
 
     [SerializeField]
-    private Transform[] outlineTiles = null;
+    private Transform[] outlineTiles;
 
     [SerializeField]
-    private SpriteRenderer[] edgeTiles = null;
+    private SpriteRenderer[] edgeTiles;
 
     [SerializeField]
     private SpriteRenderer mask;
@@ -33,10 +34,14 @@ public class MapManager : MonoBehaviour
     public float FadeTime => this.fadeTime;
 
     [SerializeField]
-    private GameObject exitPrefab = null;
+    private Transform tileRoot;
 
     [SerializeField]
-    private Image fadeImage = null;
+    private GameObject exitPrefab;
+
+    [SerializeField]
+    private GameObject seedPrefab;
+
 
 
     private const int Left_End = 9;
@@ -51,13 +56,27 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
+    private List<SeedTile> seedTiles;
+
+    private int randomSeed = 0;
 
 
 
 
     private void Awake()
     {
+        // 하이어라키의 타일 오브젝트들 보기 편하도록 이름 바꿔주기
         ChangeNameOutlineTiles();
+
+        this.backTiles = this.backgroundRenderer.transform.parent.GetComponentsInChildren<SpriteRenderer>()
+            .Select(x => x.transform)
+            .Where(x => x != this.backgroundRenderer.transform)
+            .ToArray();
+
+        this.seedTiles = new List<SeedTile>();
+
+        this.randomSeed = (int)DateTime.Now.Ticks;
+        UnityEngine.Random.InitState(this.randomSeed);
     }
 
     private void Start()
@@ -73,32 +92,125 @@ public class MapManager : MonoBehaviour
         
     }
 
-    public void SetStage()
+    public void SetStage(int _CurStage, IReadOnlyList<Sprite> _StageSprites)
     {
-        if (DataContainer.Instance.StageTileSprites.Count == 0)
+        if (_StageSprites.Count == 0)
         {
             Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
             return;
         }
 
-        SetBackground();
-        SetOutlineTiles();
-        SetMask();
+        SetBackground(_StageSprites);
+        SetOutlineTiles(_StageSprites);
+        SetMask(_StageSprites);
 
-        CreateExitTile();
-
-        DataContainer.Instance.StageTileSprites.Clear();
-    }
-
-
-
-    private void ChangeNameOutlineTiles()
-    {
-        for (int i = 0; i < outlineTiles.Length; i++)
+        for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
         {
-            outlineTiles[i].name = $"Tile ({outlineTiles[i].localPosition.x}, {outlineTiles[i].localPosition.y})";
+            if (i == (int)Define.TileType.Exit)
+            {
+                CreateExitTile(Define.TileType.Exit);
+            }
+            else if (i == (int)Define.TileType.Seed)
+            {
+                CreateSeedTile(_CurStage, Define.TileType.Seed);
+            }
         }
     }
+
+    //------------------ Create Tiles
+
+    private void CreateExitTile(Define.TileType _TileType)
+    {
+        var random = UnityEngine.Random.Range(0, outlineTiles.Length);
+        var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
+
+        var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
+        var exitScript = exitTile.GetComponent<ExitTile>();
+
+        TileBase.TileInfo baseInfo = new TileBase.TileInfo
+        {
+            Type = _TileType,
+            Pos = randomPos,
+        };
+
+        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).Build();
+
+        exitScript.Initialize(tileInfo);
+
+        // TODO
+        // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
+        // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
+    }
+
+    private void CreateSeedTile(int _CurStage, Define.TileType _TileType)
+    {
+        var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+
+        var posList = GetRandomPosList(stageTable.SeedData);
+        int posIdx = 0;
+
+        for (int i = 0; i < stageTable.SeedData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.SeedData[i].Count; j++)
+            {
+                var randomPos = new Vector2(posList[posIdx].position.x, posList[posIdx].position.y);
+                posIdx++;
+
+                var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
+                var seedScript = seedTile.GetComponent<SeedTile>();
+
+                // eg. SeedTile 의 타입들 중 Default 타입에 대한 데이터를 SeedTable에서 가져오기
+                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type);
+
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                {
+                    Type = _TileType,
+                    Pos = randomPos,
+                };
+
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(targetSeedData.Type)
+                    .WithActiveTime(targetSeedData.ActiveTime)
+                    .Build();
+
+                seedScript.Initialize(tileInfo);
+
+                this.seedTiles.Add(seedScript);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Random Pos가 필요한 타일 리스트를 매개변수로 넣어주면
+    /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
+    /// </summary>
+    private List<Transform> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
+    {
+        // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
+        var randomCount = _List.Select(x => x.Count).Sum();
+
+        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
+        var targetTiles = new List<Transform>(this.backTiles);
+
+        var resultTile = new List<Transform>(randomCount);
+
+        for (int i = 0; i < randomCount; i++)
+        {
+            var random = UnityEngine.Random.Range(0, targetTiles.Count);
+
+            resultTile.Add(targetTiles[random]);
+
+            targetTiles.RemoveAt(random);
+        }
+
+        return resultTile;
+    }
+
+    //------------------
+
+
 
     private void FadeMap()
     {
@@ -120,16 +232,16 @@ public class MapManager : MonoBehaviour
 
     //------------ Setting Stage Data
 
-    private void SetBackground()
+    private void SetBackground(IReadOnlyList<Sprite> _StageSprites)
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        this.background.sprite = DataContainer.Instance.StageTileSprites[index];
+        this.backgroundRenderer.sprite = _StageSprites[index];
 
         
     }
 
-    private void SetOutlineTiles()
+    private void SetOutlineTiles(IReadOnlyList<Sprite> _StageSprites)
     {
         var index = (int)Define.TileSpriteName.Center;
 
@@ -138,7 +250,7 @@ public class MapManager : MonoBehaviour
             if (i < Left_End)
             {
                 index = (int)Define.TileSpriteName.Left;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = _StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -147,7 +259,7 @@ public class MapManager : MonoBehaviour
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = _StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -156,7 +268,7 @@ public class MapManager : MonoBehaviour
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = _StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -165,7 +277,7 @@ public class MapManager : MonoBehaviour
             {
                 //top
                 index = (int)Define.TileSpriteName.Top;
-                var sprite = DataContainer.Instance.StageTileSprites[index];
+                var sprite = _StageSprites[index];
 
                 var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
@@ -176,41 +288,26 @@ public class MapManager : MonoBehaviour
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
-            this.edgeTiles[tileIndex].sprite = DataContainer.Instance.StageTileSprites[index];
+            this.edgeTiles[tileIndex].sprite = _StageSprites[index];
         }
     }
 
 
-    private void SetMask()
+    private void SetMask(IReadOnlyList<Sprite> _StageSprites)
     {
         Debug.Log("SetMask 시작");
-        var sprite = DataContainer.Instance.StageTileSprites[(int)Define.TileSpriteName.Mask];
+        var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
         
         this.mask.sprite = sprite;
         Debug.Log("SetMask 끝");
     }
 
 
-    private void CreateExitTile()
+    private void ChangeNameOutlineTiles()
     {
-        UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
-
-        var random = UnityEngine.Random.Range(0, outlineTiles.Length);
-        var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
-
-        var exitTile = Instantiate<GameObject>(exitPrefab, this.transform);
-        var exitScript = exitTile.GetComponent<ExitTile>();
-        exitScript.Initialize(Define.TileType.Exit, "", randomPos);
-
-        // TODO
-        // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
-        // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
-    }
-
-    
-
-    private void CreateTile()
-    {
-
+        for (int i = 0; i < outlineTiles.Length; i++)
+        {
+            outlineTiles[i].name = $"Tile ({outlineTiles[i].localPosition.x}, {outlineTiles[i].localPosition.y})";
+        }
     }
 }

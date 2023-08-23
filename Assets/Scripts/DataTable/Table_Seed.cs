@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace DataTable
 {
@@ -16,7 +17,13 @@ namespace DataTable
         {
             public int Index;
             public string Type;
-            public int ActiveTime;
+            public float ActiveTime;
+            public string SpritePath;
+        }
+
+        public Param GetParamFromType(string _Type)
+        {
+            return list.FirstOrDefault(x => x.Type.Equals(_Type));
         }
     }
 }
