@@ -196,39 +196,42 @@ public class SheetDownloader : MonoBehaviour
                         FieldInfo csvDataField = listType.GetField(headers[j]);
                         if (csvDataField != null)
                         {
-                            // StageType 필드인 경우 파싱 필요해서
-                            // 시트 string 값 : "(LimitTime, 60)" -> Type: LimitTime, Count: 60(60초) 로 파싱이 필요함
-                            Type stageTypeField = typeof(Table_Base.SerializableTuple<string, int>);
-                            if (csvDataField.FieldType.Equals(stageTypeField))
+                            if (csvDataField.Name.Equals(headers[j]))
                             {
-                                csvDataField.SetValue(csvData, ParseStageType(value));
-                                continue;
+                                // StageType 필드인 경우 파싱 필요해서
+                                // 시트 string 값 : "(LimitTime, 60)" -> Type: LimitTime, Count: 60(60초) 로 파싱이 필요함
+                                Type stageTypeField = typeof(Table_Base.SerializableTuple<string, int>);
+                                if (csvDataField.FieldType.Equals(stageTypeField))
+                                {
+                                    csvDataField.SetValue(csvData, ParseStageType(value));
+                                    continue;
+                                }
+
+                                // List<ObjectData> 필드인 경우 파싱 필요
+                                // 시트 string 값 : "((Default, 3), (Boss, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
+                                Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
+                                if (csvDataField.FieldType.Equals(objectDataTypeField))
+                                {
+                                    csvDataField.SetValue(csvData, ParseObjectData(value));
+                                    continue;
+                                }
+
+                                // Int 타입인 경우 파싱 필요
+                                if (csvDataField.FieldType.Equals(typeof(Int32)))
+                                {
+                                    csvDataField.SetValue(csvData, Int32.Parse(value));
+                                    continue;
+                                }
+
+                                if (csvDataField.FieldType.Equals(typeof(float)))
+                                {
+                                    csvDataField.SetValue(csvData, float.Parse(value));
+                                    continue;
+                                }
+
+
+                                csvDataField.SetValue(csvData, value);
                             }
-
-                            // List<ObjectData> 필드인 경우 파싱 필요
-                            // 시트 string 값 : "((Default, 3), (Boss, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
-                            Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
-                            if (csvDataField.FieldType.Equals(objectDataTypeField))
-                            {
-                                csvDataField.SetValue(csvData, ParseObjectData(value));
-                                continue;
-                            }
-
-                            // Int 타입인 경우 파싱 필요
-                            if (csvDataField.FieldType.Equals(typeof(Int32)))
-                            {
-                                csvDataField.SetValue(csvData, Int32.Parse(value));
-                                continue;
-                            }
-
-                            if (csvDataField.FieldType.Equals(typeof(float)))
-                            {
-                                csvDataField.SetValue(csvData, float.Parse(value));
-                                continue;
-                            }
-
-
-                            csvDataField.SetValue(csvData, value);
                         }
                     }
 
@@ -344,7 +347,23 @@ public class SheetDownloader : MonoBehaviour
         {
             string strValue = tupleStrings[i];
             int intValue = int.Parse(tupleStrings[i + 1]);
-            resultList.Add(new Table_Base.SerializableTuple<string, int>(strValue, intValue));
+
+            bool isFind = false;
+            for (int j = 0; j < resultList.Count; j++)
+            {
+                if (resultList[j].Type == strValue)
+                {
+                    // 원하는 string 값을 찾았을 때 int 값을 수정
+                    isFind = true;
+                    resultList[j].Count += intValue;
+                    break;
+                }
+            }
+
+            if (isFind == false)
+            {
+                resultList.Add(new Table_Base.SerializableTuple<string, int>(strValue, intValue));
+            }
         }
 
         return resultList;
