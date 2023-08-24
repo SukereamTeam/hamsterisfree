@@ -14,13 +14,16 @@ public class TileActor_Moving : ITileActor
         {
             while(_Cts.IsCancellationRequested == false)
             {
-                // TODO : 다음 좌표 가져오기
+                // 다음 좌표 가져오기
+                var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime));
 
                 // TODO : 이동 Effect
 
-                // TODO : 다음 좌표로 이동, _Tile의 TileInfo.Pos를 다음 좌표로 넣어주기(RootIdx도), 다음 좌표 초기화
+                // 다음 좌표로 이동, 다음 좌표를 _Tile의 TileInfo.Pos로 넣어주기(RootIdx도)
+                _Tile.SetPosition(nextData.rootIdx, nextData.pos);
+
 
                 // TODO : 이동 완료 대기
             }

@@ -20,7 +20,9 @@ MonoBehaviour:
     MapName: Forest
     SeedData:
     - Type: Default
-      Count: 6
+      Count: 3
     - Type: Fade
       Count: 3
+    - Type: Moving
+      Count: 1
     MonsterData: []

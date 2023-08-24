@@ -216,24 +216,51 @@ public class MapManager : MonoBehaviour
         return resultTile;
     }
 
-    //public (int rootIdx, Vector2 pos) GetRandomPosition_Next(TileBase _Tile)
-    //{
-    //    var targetTiles = new List<Transform>(this.backTiles);
-
-    //    var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
-
-    //    //targetTiles 리스트를 순회하면서
-    //    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
-    //    // 다음 RandomPos를 뽑을 Pool이 될 것임
-    //    var tilePool = targetTiles
-    //        .Where((x, index) => seedTilesRoot.Contains(index) == false)
-    //        .ToList();
-
-    //    var random = UnityEngine.Random.Range(0, tilePool.Count);
-    //    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+    public (int rootIdx, Vector2 pos) GetRandomPosition_Next(TileBase _Tile)
+    {
+        int rootIdx = -1;
+        Vector2 pos = Vector2.zero;
 
 
-    //}
+        switch(_Tile.Info.Type)
+        {
+            case Define.TileType.Seed:
+            case Define.TileType.Monster:
+                {
+                    // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
+                    var targetTiles = new List<Transform>(this.backTiles);
+
+                    if (_Tile.Info.Type == Define.TileType.Seed)
+                    {
+                        var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+
+                        // targetTiles 리스트를 순회하면서
+                        // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
+                        // 다음 RandomPos를 뽑을 Pool이 될 것임
+                        var tilePool = targetTiles
+                            .Where((x, index) => seedTilesRoot.Contains(index) == false)
+                            .ToList();
+
+                        var random = UnityEngine.Random.Range(0, tilePool.Count);
+                        var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+
+                        // 참조한 타일이 어느 타일인지
+                        int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+
+                        rootIdx = index;
+                        pos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+                    }
+                    //else if (_Tile.Info.Type == Define.TileType.Monster)
+                    //{
+                    //    ...
+                    //}
+                }
+                break;
+        }
+
+
+        return (rootIdx, pos);
+    }
 
     //public void GetRandomPos_Next(TileBase _Tile)
     //{

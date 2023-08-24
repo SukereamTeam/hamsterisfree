@@ -1,2 +1,2 @@
 Index,StageType,MapName,SeedData,MonsterData
-0,"(LimitTime, 60)",Forest,"((Default, 3), (Fade, 3), (Default, 3))",NULL
+0,"(LimitTime, 60)",Forest,"((Default, 3), (Fade, 3), (Moving, 1))",NULL

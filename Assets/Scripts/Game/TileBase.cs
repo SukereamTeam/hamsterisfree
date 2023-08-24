@@ -74,6 +74,7 @@ public abstract class TileBase : MonoBehaviour
 
     protected Animator animator;
 
+
     public const float FADE_TIME = 0.3f;
 
 
@@ -92,6 +93,16 @@ public abstract class TileBase : MonoBehaviour
 
         info = _Info;
     }
+
+    // For tiles with a SubType of Moving (Common SeedTile, MonsterTile)
+    public void SetPosition(int _RootIdx, Vector2 _Pos)
+    {
+        this.info.RootIdx = _RootIdx;
+        this.info.Pos = _Pos;
+
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+    }
+
 
     public abstract UniTaskVoid TileTriggerEvent();
 }

@@ -75,7 +75,8 @@ public class SeedTile : TileBase
                 }break;
             case Define.SeedTile_Type.Moving:
                 {
-
+                    this.tileActor = new TileActor_Moving();
+                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
             case Define.SeedTile_Type.Fade:
                 {
