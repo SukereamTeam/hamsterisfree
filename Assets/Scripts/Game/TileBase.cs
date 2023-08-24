@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
+using Cysharp.Threading.Tasks;
 
 public abstract class TileBase : MonoBehaviour
 {
@@ -65,14 +65,16 @@ public abstract class TileBase : MonoBehaviour
 
     [SerializeField]
     protected SpriteRenderer spriteRenderer;
+    public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
     protected Sprite tileSprite;
 
     protected BoxCollider2D tileCollider;
+    public BoxCollider2D TileCollider => this.tileCollider;
 
     protected Animator animator;
 
-    protected readonly float FADE_TIME = 0.3f;
+    public const float FADE_TIME = 0.3f;
 
 
 
@@ -91,5 +93,5 @@ public abstract class TileBase : MonoBehaviour
         info = _Info;
     }
 
-    public abstract void TileTriggerEvent();
+    public abstract UniTaskVoid TileTriggerEvent();
 }

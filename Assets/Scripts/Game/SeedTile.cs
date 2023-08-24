@@ -5,8 +5,9 @@ using UniRx;
 using System;
 using DG.Tweening;
 using Cysharp.Threading.Tasks;
+using System.Threading;
 
-public partial class SeedTile : TileBase
+public class SeedTile : TileBase
 {
     private bool isTouch = false;
     public bool IsTouch {
@@ -17,27 +18,19 @@ public partial class SeedTile : TileBase
     [SerializeField]
     private Define.SeedTile_Type tileType = Define.SeedTile_Type.Default;
 
-    private bool isFuncStart = false;
-
-
-//    interface ITileActor
-//    {
-//        async act()
-//}
-
-//    class FadeActor : ITileActor
-//    {
-//        async act()
-//    }
-
-//...
-
-//-------------------------------
-
-
-
+    
     private ITileActor tileActor;
 
+    private bool isFuncStart = false;
+    private CancellationTokenSource cts;
+
+
+    private new void Start()
+    {
+        base.Start();
+
+        this.cts = new CancellationTokenSource();
+    }
 
     public override void Initialize(TileInfo _Info)
     {
@@ -56,12 +49,13 @@ public partial class SeedTile : TileBase
 
     private async UniTaskVoid TileFuncStart()
     {
-        // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때, 타일 타입마다 부여된 액션 실행
+        // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
+        // 그 때 타일 타입마다 부여된 액션 실행
         await UniTask.WaitUntil(() => GameManager.Instance.IsGame.Value == true);
 
         if (this.isFuncStart == false)
         {
-            Debug.Log("SeedTile Func Start!");
+            Debug.Log("SeedTile Func Start !!!");
             this.isFuncStart = true;
         }
 
@@ -69,41 +63,50 @@ public partial class SeedTile : TileBase
         {
             case Define.SeedTile_Type.Disappear:
                 {
-                    tileActor = new FadeActor();
-                    await tileActor.Act();
-                    Func_Disappear(this.info.ActiveTime).Forget();
+                    this.tileActor = new TileActor_Disappear();
+                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
             case Define.SeedTile_Type.Moving:
                 {
-                    Func_Moving(this.info.ActiveTime).Forget();
+
                 }break;
             case Define.SeedTile_Type.Fade:
                 {
-                    Func_Fade(this.info.ActiveTime).Forget();
-                }
-                break;
+                    this.tileActor = new TileActor_Fade();
+                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+                }break;
         }
     }
 
 
     
 
-    public override void TileTriggerEvent()
+    public override async UniTaskVoid TileTriggerEvent()
     {
         Debug.Log("Seed 먹음");
 
-        this.isFuncStart = false;
-
         this.tileCollider.enabled = false;
+        GameManager.Instance.SeedCount++;
+
+        if (this.tileActor == null)
+        {
+            // Default 등 Func가 따로 없는 타일들을 위한
+            this.isFuncStart = false;
+        }
+        else
+        {
+            this.cts.Cancel();
+        }
+
+        await UniTask.WaitUntil(() => this.isFuncStart == false);
+
+        this.tileActor = null;
 
         // TODO : Delete... 테스트 용도
         this.spriteRenderer.color = Color.red;
 
-        GameManager.Instance.SeedCount++;
-
         // TODO
         // Trigger Ani 재생
-        
     }
 
 }
