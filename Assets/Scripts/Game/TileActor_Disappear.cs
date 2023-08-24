@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class TileActor_Disappear : ITileActor
 {
-    public async UniTask<bool> Act(TileBase _Tile, float _ActiveTime = 0, CancellationTokenSource _CancellationToken = null)
+    public async UniTask<bool> Act(TileBase _Tile, float _ActiveTime = 0, CancellationTokenSource _Cts = default)
     {
         try
         {

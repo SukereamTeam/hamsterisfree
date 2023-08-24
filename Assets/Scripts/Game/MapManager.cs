@@ -205,13 +205,35 @@ public class MapManager : MonoBehaviour
         {
             var random = UnityEngine.Random.Range(0, targetTiles.Count);
 
-            resultTile.Add((transform: targetTiles[random], root: random));
+            // 참조한 타일이 어느 타일인지
+            int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+
+            resultTile.Add((transform: targetTiles[random], root: index));
 
             targetTiles.RemoveAt(random);
         }
 
         return resultTile;
     }
+
+    //public (int rootIdx, Vector2 pos) GetRandomPosition_Next(TileBase _Tile)
+    //{
+    //    var targetTiles = new List<Transform>(this.backTiles);
+
+    //    var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+
+    //    //targetTiles 리스트를 순회하면서
+    //    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
+    //    // 다음 RandomPos를 뽑을 Pool이 될 것임
+    //    var tilePool = targetTiles
+    //        .Where((x, index) => seedTilesRoot.Contains(index) == false)
+    //        .ToList();
+
+    //    var random = UnityEngine.Random.Range(0, tilePool.Count);
+    //    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+
+
+    //}
 
     //public void GetRandomPos_Next(TileBase _Tile)
     //{
@@ -237,7 +259,7 @@ public class MapManager : MonoBehaviour
     //                    var random = UnityEngine.Random.Range(0, tilePool.Count);
     //                    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
 
-                        
+
     //                }
     //            }
     //            break;

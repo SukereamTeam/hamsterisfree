@@ -25,6 +25,8 @@ public class SeedTile : TileBase
     private CancellationTokenSource cts;
 
 
+
+
     private new void Start()
     {
         base.Start();
@@ -57,6 +59,11 @@ public class SeedTile : TileBase
         {
             Debug.Log("SeedTile Func Start !!!");
             this.isFuncStart = true;
+        }
+
+        if (this.tileActor != null)
+        {
+            this.tileActor = null;
         }
 
         switch (this.tileType)
