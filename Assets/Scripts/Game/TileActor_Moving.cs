@@ -17,7 +17,7 @@ public class TileActor_Moving : ITileActor
                 // 다음 좌표 가져오기
                 var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile);
 
-                await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime));
+                await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
 
                 // TODO : 이동 Effect
 

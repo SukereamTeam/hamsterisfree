@@ -23,6 +23,7 @@ public class SeedTile : TileBase
 
     private bool isFuncStart = false;
     private CancellationTokenSource cts;
+    private IDisposable disposable = null;
 
 
 
@@ -71,18 +72,27 @@ public class SeedTile : TileBase
             case Define.SeedTile_Type.Disappear:
                 {
                     this.tileActor = new TileActor_Disappear();
-                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+                    
                 }break;
             case Define.SeedTile_Type.Moving:
                 {
                     this.tileActor = new TileActor_Moving();
-                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+                    //this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
             case Define.SeedTile_Type.Fade:
                 {
                     this.tileActor = new TileActor_Fade();
-                    this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+                    //this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
+        }
+
+        if (this.tileActor != null)
+        {
+            var task = this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+            this.disposable = task.ToObservable().Subscribe(x =>
+            {
+                this.isFuncStart = x;
+            });
         }
     }
 
@@ -117,4 +127,14 @@ public class SeedTile : TileBase
         // Trigger Ani 재생
     }
 
+    private void OnDestroy()
+    {
+        this.cts.Cancel();
+        
+        if (this.disposable != null)
+        {
+            Debug.Log("Dispose!!!");
+            this.disposable.Dispose();
+        }
+    }
 }
