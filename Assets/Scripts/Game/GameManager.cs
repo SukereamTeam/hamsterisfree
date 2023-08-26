@@ -63,6 +63,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
+        await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
+
         this.isGame.Value = true;
     }
 

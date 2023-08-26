@@ -21,3 +21,7 @@ MonoBehaviour:
     Type: Fade
     ActiveTime: 0.5
     SpritePath: Images/Map/Forest/Forest_BottomRight
+  - Index: 2
+    Type: Moving
+    ActiveTime: 2
+    SpritePath: Images/Map/Forest/Forest_Left

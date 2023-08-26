@@ -1,12 +1,13 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ExitTile : TileBase
 {
-    public override void Initialize(TileInfo _Info)
+    public override void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        base.Initialize(_Info);
+        base.Initialize(_Info, _Pos);
 
         var sprite = DataContainer.Instance.ExitSprite;
         if (sprite != null)
@@ -15,7 +16,7 @@ public class ExitTile : TileBase
         }
     }
 
-    public override void TileTriggerEvent()
+    public override async UniTaskVoid TileTriggerEvent()
     {
         //Debug.Log("Game End");
 
@@ -24,6 +25,6 @@ public class ExitTile : TileBase
 
         GameManager.Instance.IsGame.Value = false;
 
-        
+        await UniTask.CompletedTask;
     }
 }

@@ -1,3 +1,4 @@
 Index,Type,ActiveTime,SpritePath
 0,Default,1,Images/Map/Forest/Forest_TopLeft
 1,Fade,0.5,Images/Map/Forest/Forest_BottomRight
+2,Moving,2,Images/Map/Forest/Forest_Left

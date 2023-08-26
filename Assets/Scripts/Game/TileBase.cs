@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
+using Cysharp.Threading.Tasks;
 
 public abstract class TileBase : MonoBehaviour
 {
@@ -10,7 +10,7 @@ public abstract class TileBase : MonoBehaviour
     public struct TileInfo
     {
         public Define.TileType Type;
-        public Vector2 Pos;
+        public int RootIdx;
 
         public string SubType;
         public float ActiveTime;
@@ -57,23 +57,24 @@ public abstract class TileBase : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 각 타일이 생성되는 위치의 기반이 되는 타일의 index
-    /// (ExitTile은 MapManager의 outlineTiles 중 하나일 것.. 그것의 index)
-    /// (SeedTile, MonsterTile은 MapManager의 backTiles 중 하나)
-    /// </summary>
+
     [SerializeField]
     protected TileInfo info;
     public TileInfo Info => this.info;
 
     [SerializeField]
     protected SpriteRenderer spriteRenderer;
+    public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
     protected Sprite tileSprite;
 
     protected BoxCollider2D tileCollider;
+    public BoxCollider2D TileCollider => this.tileCollider;
 
     protected Animator animator;
+    
+
+    public const float FADE_TIME = 0.3f;
 
 
 
@@ -85,12 +86,21 @@ public abstract class TileBase : MonoBehaviour
 
     }
 
-    public virtual void Initialize(TileInfo _Info)
+    public virtual void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        this.transform.localPosition = new Vector3(_Info.Pos.x, _Info.Pos.y, -0.7f);
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
 
         info = _Info;
     }
 
-    public abstract void TileTriggerEvent();
+    // For tiles with a SubType of Moving (Common SeedTile, MonsterTile)
+    public void SetPosition(int _RootIdx, Vector2 _Pos)
+    {
+        this.info.RootIdx = _RootIdx;
+
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+    }
+
+
+    public abstract UniTaskVoid TileTriggerEvent();
 }
