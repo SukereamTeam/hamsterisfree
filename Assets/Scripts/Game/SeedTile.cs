@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using System;
-using DG.Tweening;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 
@@ -72,17 +69,14 @@ public class SeedTile : TileBase
             case Define.SeedTile_Type.Disappear:
                 {
                     this.tileActor = new TileActor_Disappear();
-                    
                 }break;
             case Define.SeedTile_Type.Moving:
                 {
                     this.tileActor = new TileActor_Moving();
-                    //this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
             case Define.SeedTile_Type.Fade:
                 {
                     this.tileActor = new TileActor_Fade();
-                    //this.isFuncStart = await this.tileActor.Act(this, this.info.ActiveTime, this.cts);
                 }break;
         }
 

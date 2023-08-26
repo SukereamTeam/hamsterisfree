@@ -1,11 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UniRx;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using System.Threading;
 
 public class GameManager : MonoSingleton<GameManager>
