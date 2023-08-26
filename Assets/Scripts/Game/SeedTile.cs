@@ -35,9 +35,9 @@ public class SeedTile : TileBase
         this.cts = new CancellationTokenSource();
     }
 
-    public override void Initialize(TileInfo _Info)
+    public override void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        base.Initialize(_Info);
+        base.Initialize(_Info, _Pos);
 
         this.tileType = (Define.SeedTile_Type)Enum.Parse(typeof(Define.SeedTile_Type), _Info.SubType);
 

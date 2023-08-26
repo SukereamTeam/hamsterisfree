@@ -10,7 +10,6 @@ public abstract class TileBase : MonoBehaviour
     public struct TileInfo
     {
         public Define.TileType Type;
-        public Vector2 Pos;
         public int RootIdx;
 
         public string SubType;
@@ -73,7 +72,7 @@ public abstract class TileBase : MonoBehaviour
     public BoxCollider2D TileCollider => this.tileCollider;
 
     protected Animator animator;
-
+    
 
     public const float FADE_TIME = 0.3f;
 
@@ -87,9 +86,9 @@ public abstract class TileBase : MonoBehaviour
 
     }
 
-    public virtual void Initialize(TileInfo _Info)
+    public virtual void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        this.transform.localPosition = new Vector3(_Info.Pos.x, _Info.Pos.y, -0.7f);
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
 
         info = _Info;
     }
@@ -98,7 +97,6 @@ public abstract class TileBase : MonoBehaviour
     public void SetPosition(int _RootIdx, Vector2 _Pos)
     {
         this.info.RootIdx = _RootIdx;
-        this.info.Pos = _Pos;
 
         this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
     }

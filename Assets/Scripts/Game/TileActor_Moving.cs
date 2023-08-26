@@ -15,7 +15,7 @@ public class TileActor_Moving : ITileActor
             while(_Cts.IsCancellationRequested == false)
             {
                 // 다음 좌표 가져오기
-                var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile);
+                var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile.Info.Type);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
 

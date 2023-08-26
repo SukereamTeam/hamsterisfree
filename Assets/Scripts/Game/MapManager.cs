@@ -131,12 +131,12 @@ public class MapManager : MonoBehaviour
         TileBase.TileInfo baseInfo = new TileBase.TileInfo
         {
             Type = _TileType,
-            Pos = randomPos,
+            RootIdx = random
         };
 
         TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).Build();
 
-        exitScript.Initialize(tileInfo);
+        exitScript.Initialize(tileInfo, randomPos);
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
@@ -166,7 +166,6 @@ public class MapManager : MonoBehaviour
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
                     Type = _TileType,
-                    Pos = randomPos,
                     RootIdx = posList[posIdx].root
                 };
 
@@ -176,7 +175,7 @@ public class MapManager : MonoBehaviour
                     .WithActiveTime(targetSeedData.ActiveTime)
                     .Build();
 
-                seedScript.Initialize(tileInfo);
+                seedScript.Initialize(tileInfo, randomPos);
 
                 this.seedTiles.Add(seedScript);
 
@@ -216,13 +215,13 @@ public class MapManager : MonoBehaviour
         return resultTile;
     }
 
-    public (int rootIdx, Vector2 pos) GetRandomPosition_Next(TileBase _Tile)
+    public (int rootIdx, Vector2 pos) GetRandomPosition_Next(Define.TileType _TileType)
     {
         int rootIdx = -1;
         Vector2 pos = Vector2.zero;
 
 
-        switch(_Tile.Info.Type)
+        switch(_TileType)
         {
             case Define.TileType.Seed:
             case Define.TileType.Monster:
@@ -230,7 +229,7 @@ public class MapManager : MonoBehaviour
                     // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
                     var targetTiles = new List<Transform>(this.backTiles);
 
-                    if (_Tile.Info.Type == Define.TileType.Seed)
+                    if (_TileType == Define.TileType.Seed)
                     {
                         var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
 

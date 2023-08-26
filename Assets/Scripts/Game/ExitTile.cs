@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class ExitTile : TileBase
 {
-    public override void Initialize(TileInfo _Info)
+    public override void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        base.Initialize(_Info);
+        base.Initialize(_Info, _Pos);
 
         var sprite = DataContainer.Instance.ExitSprite;
         if (sprite != null)
