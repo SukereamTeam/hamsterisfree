@@ -5,17 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bc5cbd0e-719c-4dd5-9ae3-b4c40eb310b2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Game.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Game.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/ExitTile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/ExitTile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/ITileActor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/ITileActor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/Line.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/Line.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/LineManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/LineManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/SeedTile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/SeedTile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Disappear.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Disappear.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Fade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Fade.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Moving.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Moving.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileBase.cs" afterDir="false" />
     </list>
@@ -41,9 +33,6 @@
       </UrlAndAccount>
     </option>
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/GradientToMinMax.cginc" root0="FORCE_HIGHLIGHTING" />
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -61,8 +50,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
+    "git-widget-placeholder": "TileType",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -126,8 +114,6 @@
       <updated>1693032408751</updated>
       <workItem from="1693032410530" duration="270000" />
       <workItem from="1693032692574" duration="5888000" />
-      <workItem from="1693060837054" duration="94000" />
-      <workItem from="1693061018790" duration="2744000" />
     </task>
     <servers />
   </component>

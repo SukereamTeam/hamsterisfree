@@ -5,13 +5,13 @@ using System.Linq;
 using UniRx;
 using DG.Tweening;
 using DataTable;
+using UnityEngine.Serialization;
 
 public class MapManager : MonoBehaviour
 {
     // 맵 생성
-    [SerializeField]
-    private SpriteRenderer backgroundRenderer;
-    public SpriteRenderer BackgroundRenderer => this.backgroundRenderer;
+    [FormerlySerializedAs("backgroundRenderer")] [SerializeField]
+    private SpriteRenderer tileBackRenderer;
 
     [SerializeField]
     private Transform[] backTiles;
@@ -22,9 +22,12 @@ public class MapManager : MonoBehaviour
     [SerializeField]
     private SpriteRenderer[] edgeTiles;
 
+    [FormerlySerializedAs("mask")] [SerializeField]
+    private SpriteRenderer blockRenderer;
+    public SpriteRenderer BlockRenderer => this.blockRenderer;
+
     [SerializeField]
-    private SpriteRenderer mask;
-    public SpriteRenderer Mask => this.mask;
+    private Image backgroundImage;
 
     [SerializeField]
     private float fadeTime = 0f;
@@ -66,9 +69,9 @@ public class MapManager : MonoBehaviour
         // 하이어라키의 타일 오브젝트들 보기 편하도록 이름 바꿔주기
         ChangeNameOutlineTiles();
 
-        this.backTiles = this.backgroundRenderer.transform.parent.GetComponentsInChildren<SpriteRenderer>()
+        this.backTiles = this.tileBackRenderer.transform.parent.GetComponentsInChildren<SpriteRenderer>()
             .Select(x => x.transform)
-            .Where(x => x != this.backgroundRenderer.transform)
+            .Where(x => x != this.tileBackRenderer.transform)
             .ToArray();
 
         this.seedTiles = new List<SeedTile>();
@@ -302,13 +305,13 @@ public class MapManager : MonoBehaviour
 
         if (this.isFade.Value == true)
         {
-            this.mask.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));
+            this.blockRenderer.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));
         }
         else
         {
-            this.mask.DOKill(true);
+            this.blockRenderer.DOKill(true);
 
-            this.mask.color = new Color(1f, 1f, 1f, 0f);
+            this.blockRenderer.color = new Color(1f, 1f, 1f, 0f);
         }
     }
 
@@ -320,9 +323,11 @@ public class MapManager : MonoBehaviour
     {
         var index = (int)Define.TileSpriteName.Center;
 
-        this.backgroundRenderer.sprite = _StageSprites[index];
+        this.tileBackRenderer.sprite = _StageSprites[index];
 
-        
+        index = (int)Define.TileSpriteName.Background;
+
+        this.backgroundImage.sprite = _StageSprites[index];
     }
 
     private void SetOutlineTiles(IReadOnlyList<Sprite> _StageSprites)
@@ -382,7 +387,7 @@ public class MapManager : MonoBehaviour
         Debug.Log("SetMask 시작");
         var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
         
-        this.mask.sprite = sprite;
+        this.blockRenderer.sprite = sprite;
         Debug.Log("SetMask 끝");
     }
 
