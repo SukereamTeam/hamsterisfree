@@ -6,6 +6,7 @@ using UniRx;
 using DG.Tweening;
 using DataTable;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class MapManager : MonoBehaviour
 {
