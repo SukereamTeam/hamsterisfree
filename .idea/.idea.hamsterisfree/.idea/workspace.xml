@@ -5,10 +5,153 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bc5cbd0e-719c-4dd5-9ae3-b4c40eb310b2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/ExitTile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/ExitTile.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/activation.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Documentation.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Documentation.pdf.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Editor.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Editor/MaskEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Editor/MaskEditor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Mask.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Mask.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Materials.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Materials/Mask-Material.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Materials/Mask-Material.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Materials/Sprites-Alpha-Mask-WorldCoords.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Materials/Sprites-Alpha-Mask-WorldCoords.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 2D (Sprites).meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 2D (Sprites)/Sprites-Alpha-Mask-WorldCoords.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 2D (Sprites)/Sprites-Alpha-Mask-WorldCoords.shader.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 3D.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 3D/Unlit-Alpha-Mask-WorldCoords.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Resources/Shaders 3D/Unlit-Alpha-Mask-WorldCoords.shader.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text2.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text2_specularity.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text2_specularity.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text_specularity.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text_specularity.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text_specularity_mask.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Logo Sample/logo_text_specularity_mask.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character.controller" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character.controller.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_1.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_2.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_3.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_4.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_animation.anim" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Character/character_animation.anim.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire.controller" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire.controller.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_1.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_2.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_3.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_4.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_animation.anim" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fire Animation/fire_animation.anim.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fog of War Alpha Texture.renderTexture" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/Fog of War Alpha Texture.renderTexture.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/black.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/black.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/dungeon_background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/dungeon_background.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/fog_of_war_alpha.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/fog_of_war_alpha.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/white.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Multiple Masks Sample/white.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/day.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/day.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/night.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/night.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/night_and_day_mask.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Night And Day Sample/night_and_day_mask.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/ship.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/ship.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/water_texture.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/water_texture.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/wave_mask.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Ship Sample/wave_mask.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_background.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_item.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_item.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_mask.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_mask.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_top.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/UI Sample/UI_top.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_background.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_item_background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_item_background.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_mask.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_mask.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_tick.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Images/Unity UI Sample/unity_ui_tick.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Fog of War Alpha.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Fog of War Alpha.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Fog of War Masked.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Fog of War Masked.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Ship.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Ship.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Water.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Materials/Water.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/SampleScene.unity" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/SampleScene.unity.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/SampleSceneSettings.lighting" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/SampleSceneSettings.lighting.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/DungeonCharacterAnimator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/DungeonCharacterAnimator.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/FogOfWarAlphaPositioner.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/FogOfWarAlphaPositioner.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/LogoSpecularityAnimator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/LogoSpecularityAnimator.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/NightAndDayMaskAnimator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/NightAndDayMaskAnimator.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/ShipMover.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/ShipMover.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/UVAnimator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/Samples/Scripts/UVAnimator.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/ToJAlphaMasking.cginc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/ToJAlphaMasking.cginc.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/UIMaterialModifier.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Alpha Masking/UIMaterialModifier.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Background_Gradation.shadergraph" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Background_Gradation.shadergraph.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Background.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Shader Graphs_Background_Gradation.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Shader Graphs_Background_Gradation.mat.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Common/Scripts/Define.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Common/Scripts/Define.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Mask.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Mask.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Mask.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Images/Map/Forest/Forest_Mask.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Game.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Game.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/SeedTile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/SeedTile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Moving.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileActor_Moving.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/TileBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/TileBase.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,7 +193,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "TileType",
+    "git-widget-placeholder": "Merging TileType",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -125,5 +268,6 @@
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
 </project>
