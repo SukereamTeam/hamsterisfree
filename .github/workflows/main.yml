@@ -40,7 +40,8 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
-          targetPlatform: WebGL
+          targetPlatform: StandaloneWindows
+          # targetPlatform: WebGL
 
       # Output
       - uses: actions/upload-artifact@v3
