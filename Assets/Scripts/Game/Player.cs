@@ -96,7 +96,7 @@ public class Player : MonoBehaviour
             }
 
 
-            GameManager.Instance.MapManager.Mask.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.Mask.transform.position.z);
+            GameManager.Instance.MapManager.BlockRenderer.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.BlockRenderer.transform.position.z);
 
             if (this.lineManager.CurrentLine != null)
                 this.lineManager.DrawLine(result.Item2);

@@ -88,7 +88,7 @@ public abstract class TileBase : MonoBehaviour
 
     public virtual void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, 0f);
 
         info = _Info;
     }
@@ -98,7 +98,7 @@ public abstract class TileBase : MonoBehaviour
     {
         this.info.RootIdx = _RootIdx;
 
-        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, -0.7f);
+        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, 0f);
     }
 
 

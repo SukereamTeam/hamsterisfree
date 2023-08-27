@@ -26,7 +26,8 @@ public class Define
         TopRight,
         BottomLeft,
         BottomRight,
-        Mask
+        Mask,
+        Background,
     }
 
     public enum SeedTile_Type
