@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
         {
             var (hit2D, _) = RaycastGameScreen(Input.mousePosition);
 
-            if (hit2D.collider.IsNull())
+            if (hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
@@ -65,7 +65,7 @@ public class Player : MonoBehaviour
             var result = RaycastGameScreen(Input.mousePosition);
 
 
-            if (result.hit2D.collider.IsNull())
+            if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
             {
                 var tile = RaycastTile(Input.mousePosition);
 
-                if (tile.IsNotNull())
+                if (tile != null)
                 {
                     tile.TileTriggerEvent();
                 }
@@ -118,7 +118,7 @@ public class Player : MonoBehaviour
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
-        if (raycastResult.collider.IsNotNull())
+        if (raycastResult.collider != null)
         {
             var tile = raycastResult.transform.GetComponent<TileBase>();
 

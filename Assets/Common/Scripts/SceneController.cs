@@ -41,15 +41,6 @@ public class SceneController : MonoSingleton<SceneController>
     }
 
 
-    public void Initialize()
-    {
-        //var prefab = Resources.Load<GameObject>("Prefabs/FadeCanvas");
-        //var canvas = Instantiate<GameObject>(prefab, this.transform);
-
-        //this.fade = canvas.GetComponentInChildren<Image>();
-    }
-
-
     public async UniTaskVoid LoadScene(Define.Scene _SceneName, bool _WithLoading)
     {
         try
