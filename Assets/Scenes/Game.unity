@@ -6992,7 +6992,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1312208247}
   - component: {fileID: 1312208249}
-  - component: {fileID: 1312208248}
+  - component: {fileID: 1312208250}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -7019,7 +7019,15 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1312208248
+--- !u!222 &1312208249
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312208246}
+  m_CullTransparentMesh: 1
+--- !u!114 &1312208250
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7049,14 +7057,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!222 &1312208249
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312208246}
-  m_CullTransparentMesh: 1
 --- !u!1 &1332912469
 GameObject:
   m_ObjectHideFlags: 0
