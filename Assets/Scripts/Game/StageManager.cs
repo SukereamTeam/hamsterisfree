@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Unity.Collections;
+using UnityEngine.Serialization;
 
 public class StageManager : MonoBehaviour
 {
     [Serializable]
     public struct StageInfoData
     {
-        public Define.StageType StageType;
-        public int StageLimitValue;
+        public Define.StageType Type;
+        public int LimitValue;
 
         public StageInfoData(Define.StageType _Type, int _LimitValue)
         {
-            StageType = _Type;
-            StageLimitValue = _LimitValue;
+            Type = _Type;
+            LimitValue = _LimitValue;
         }
     }
     
@@ -31,5 +32,10 @@ public class StageManager : MonoBehaviour
     public void SetStage(Define.StageType _Type, int _LimitValue)
     {
         this.stageInfo = new StageInfoData(_Type, _LimitValue);
+    }
+
+    public void ChangeStageValue(int _Value)
+    {
+        this.stageInfo.LimitValue += _Value;
     }
 }
