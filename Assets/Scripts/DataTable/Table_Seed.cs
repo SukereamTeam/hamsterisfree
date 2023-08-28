@@ -18,6 +18,7 @@ namespace DataTable
             public int Index;
             public string Type;
             public float ActiveTime;
+            public int SeedValue;
             public string SpritePath;
         }
 

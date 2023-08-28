@@ -177,6 +177,7 @@ public class MapManager : MonoBehaviour
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
                     .WithSubType(targetSeedData.Type)
                     .WithActiveTime(targetSeedData.ActiveTime)
+                    .WithSeedValue(targetSeedData.SeedValue)
                     .Build();
 
                 seedScript.Initialize(tileInfo, randomPos);

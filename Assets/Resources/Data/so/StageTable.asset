@@ -16,13 +16,26 @@ MonoBehaviour:
   - Index: 0
     StageType:
       Type: LimitTime
-      Count: 60
+      Value: 60
     MapName: Forest
     SeedData:
     - Type: Default
-      Count: 3
+      Value: 3
     - Type: Fade
-      Count: 3
+      Value: 3
     - Type: Moving
-      Count: 1
+      Value: 1
+    MonsterData: []
+  - Index: 1
+    StageType:
+      Type: LimitTime
+      Value: 60
+    MapName: Forest
+    SeedData:
+    - Type: Fake
+      Value: 3
+    - Type: Heart
+      Value: 3
+    - Type: Moving
+      Value: 1
     MonsterData: []

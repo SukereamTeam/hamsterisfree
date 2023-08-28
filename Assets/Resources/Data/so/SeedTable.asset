@@ -16,12 +16,30 @@ MonoBehaviour:
   - Index: 0
     Type: Default
     ActiveTime: 1
+    SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_TopLeft
   - Index: 1
     Type: Fade
     ActiveTime: 0.5
+    SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_BottomRight
   - Index: 2
     Type: Moving
     ActiveTime: 2
+    SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_Left
+  - Index: 3
+    Type: Disappear
+    ActiveTime: 5
+    SeedValue: 1
+    SpritePath: Images/Map/Forest/Forest_Right
+  - Index: 4
+    Type: Fake
+    ActiveTime: 1
+    SeedValue: -1
+    SpritePath: Images/Map/Forest/Forest_Top
+  - Index: 5
+    Type: Heart
+    ActiveTime: 1
+    SeedValue: 1
+    SpritePath: Images/Map/Forest/Forest_Bottom

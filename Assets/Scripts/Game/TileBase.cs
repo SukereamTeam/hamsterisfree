@@ -12,6 +12,7 @@ public abstract class TileBase : MonoBehaviour
 
         public string SubType;
         public float ActiveTime;
+        public int SeedValue;
     }
 
     // Builder 패턴
@@ -26,6 +27,7 @@ public abstract class TileBase : MonoBehaviour
             // 추가 정보 기본값으로 초기화
             _tileInfo.SubType = "";
             _tileInfo.ActiveTime = 0f;
+            _tileInfo.SeedValue = 0;
         }
 
         /// <summary>
@@ -46,6 +48,12 @@ public abstract class TileBase : MonoBehaviour
         public TileBuilder WithActiveTime(float _Time)
         {
             _tileInfo.ActiveTime = _Time;
+            return this;
+        }
+
+        public TileBuilder WithSeedValue(int _Value)
+        {
+            _tileInfo.SeedValue = _Value;
             return this;
         }
 

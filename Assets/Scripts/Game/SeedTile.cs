@@ -126,15 +126,9 @@ public class SeedTile : TileBase
 
     private void TriggerEvent(Define.SeedTile_Type _type)
     {
-        if (_type == Define.SeedTile_Type.Heart)
+        if (_type == Define.SeedTile_Type.Heart || _type == Define.SeedTile_Type.Fake)
         {
-            // TODO : 상수값이 아니라 데이터테이블에서 받아온 값으로 Value를 깎거나 증가시켜야 함
-            GameManager.Instance.StageManager.ChangeStageValue(1);
-        }
-        else if (_type == Define.SeedTile_Type.Fake)
-        {
-            // TODO : 상수값이 아니라 데이터테이블에서 받아온 값으로 Value를 깎거나 증가시켜야 함
-            GameManager.Instance.StageManager.ChangeStageValue(-1);
+            GameManager.Instance.StageManager.ChangeStageValue(this.info.SeedValue);
         }
         else
         {
