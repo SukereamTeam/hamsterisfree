@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class Player : MonoBehaviour
     private LineManager lineManager = null;
 
 
-    private readonly float dragDistance = 0.3f;
+    private readonly float dragDistance = 0.5f;
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
@@ -34,6 +35,11 @@ public class Player : MonoBehaviour
         }
 
         if (GameManager.Instance.IsGame.Value == false)
+        {
+            return;
+        }
+        
+        if (EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
@@ -96,7 +102,7 @@ public class Player : MonoBehaviour
             }
 
 
-            GameManager.Instance.MapManager.BlockRenderer.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.BlockRenderer.transform.position.z);
+            GameManager.Instance.MapManager.Mask.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.BlockRenderer.transform.position.z);
 
             if (this.lineManager.CurrentLine != null)
                 this.lineManager.DrawLine(result.Item2);

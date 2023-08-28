@@ -2909,7 +2909,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &519420029
 AudioListener:
   m_ObjectHideFlags: 0
@@ -9770,6 +9770,7 @@ MonoBehaviour:
   - {fileID: 1073668755}
   - {fileID: 1932792664}
   - {fileID: 723572833}
+  mask: {fileID: 1162894042}
   blockRenderer: {fileID: 1983302965}
   backgroundImage: {fileID: 857869363}
   fadeTime: 1.5
@@ -9934,7 +9935,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

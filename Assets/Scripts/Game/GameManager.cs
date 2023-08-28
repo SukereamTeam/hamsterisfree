@@ -38,7 +38,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private async void Start()
     {
-        Debug.Log("GameManagere에서 Start 진입");
+        Debug.Log("GameManager에서 Start 진입");
 
         if (Instance == null)
         {
@@ -61,6 +61,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
 
+        // 게임 시작 할 수 있는 상태로 전환
         this.isGame.Value = true;
     }
 

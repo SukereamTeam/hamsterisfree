@@ -23,6 +23,9 @@ public class MapManager : MonoBehaviour
     [SerializeField]
     private SpriteRenderer[] edgeTiles;
 
+    [SerializeField] private GameObject mask;
+    public GameObject Mask => this.mask;
+    
     [FormerlySerializedAs("mask")] [SerializeField]
     private SpriteRenderer blockRenderer;
     public SpriteRenderer BlockRenderer => this.blockRenderer;
