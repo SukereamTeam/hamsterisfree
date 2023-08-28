@@ -12,6 +12,8 @@ using UnityEditor;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+
+#if UNITY_EDITOR
 public class SheetDownloader : MonoBehaviour
 {
     public enum SheetName
@@ -369,3 +371,5 @@ public class SheetDownloader : MonoBehaviour
         return resultList;
     }
 }
+
+#endif
