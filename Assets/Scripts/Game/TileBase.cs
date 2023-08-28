@@ -100,5 +100,5 @@ public abstract class TileBase : MonoBehaviour
     }
 
 
-    public abstract UniTaskVoid TileTriggerEvent();
+    public abstract UniTaskVoid TileTrigger();
 }

@@ -97,7 +97,7 @@ public class Player : MonoBehaviour
 
                 if (tile != null)
                 {
-                    tile.TileTriggerEvent();
+                    tile.TileTrigger();
                 }
             }
 

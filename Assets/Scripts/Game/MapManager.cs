@@ -97,7 +97,7 @@ public class MapManager : MonoBehaviour
         
     }
 
-    public void SetStage(int _CurStage, IReadOnlyList<Sprite> _StageSprites)
+    public void SetMap(int _CurStage, IReadOnlyList<Sprite> _StageSprites)
     {
         if (_StageSprites.Count == 0)
         {
@@ -156,7 +156,7 @@ public class MapManager : MonoBehaviour
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
         {
-            for (int j = 0; j < stageTable.SeedData[i].Count; j++)
+            for (int j = 0; j < stageTable.SeedData[i].Value; j++)
             {
                 var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
                 
@@ -196,7 +196,7 @@ public class MapManager : MonoBehaviour
     private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
-        var randomCount = _List.Select(x => x.Count).Sum();
+        var randomCount = _List.Select(x => x.Value).Sum();
 
         // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
         var targetTiles = new List<Transform>(this.backTiles);
@@ -265,42 +265,8 @@ public class MapManager : MonoBehaviour
         return (rootIdx, pos);
     }
 
-    //public void GetRandomPos_Next(TileBase _Tile)
-    //{
-    //    switch(_Tile.Info.Type)
-    //    {
-    //        // Seed나 Monster의 경우 outlineTiles가 아닌 backTiles를 참조하여 Random Pos 생성
-    //        case Define.TileType.Seed:
-    //        case Define.TileType.Monster:
-    //            {
-    //                var targetTiles = new List<Transform>(this.backTiles);
-
-    //                if (_Tile.Info.Type == Define.TileType.Seed)
-    //                {
-    //                    List<int> seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
-
-    //                    // targetTiles 리스트를 순회하면서
-    //                    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
-    //                    // 다음 RandomPos를 뽑을 Pool이 될 것
-    //                    var tilePool = targetTiles
-    //                        .Where((x, index) => seedTilesRoot.Contains(index) == false)
-    //                        .ToList();
-
-    //                    var random = UnityEngine.Random.Range(0, tilePool.Count);
-    //                    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
-
-
-    //                }
-    //            }
-    //            break;
-
-    //        case Define.TileType.Exit:
-    //            break;
-    //    }
-    //}
-
+    
     //------------------
-
 
 
     private void FadeMap()
@@ -343,36 +309,28 @@ public class MapManager : MonoBehaviour
             if (i < Left_End)
             {
                 index = (int)Define.TileSpriteName.Left;
-                var sprite = _StageSprites[index];
-
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
             }
             else if (i < Bottom_End)
             {
                 //bottom
                 index = (int)Define.TileSpriteName.Bottom;
-                var sprite = _StageSprites[index];
-
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
             }
             else if (i < Right_End)
             {
                 //right
                 index = (int)Define.TileSpriteName.Right;
-                var sprite = _StageSprites[index];
-
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
             }
             else
             {
                 //top
                 index = (int)Define.TileSpriteName.Top;
-                var sprite = _StageSprites[index];
+            }
+            
+            var sprite = _StageSprites[index];
 
-                var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+            var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
                 renderer.sprite = sprite;
             }
         }

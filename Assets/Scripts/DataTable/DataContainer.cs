@@ -21,7 +21,6 @@ public class DataContainer : MonoSingleton<DataContainer>
     private const string RootPath_Stage = "Images/Map";
     private readonly int Tile_Sprite_Count = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
 
-
     private List<Sprite> stageSprites;
     public IReadOnlyList<Sprite> StageSprites => this.stageSprites;
 
@@ -47,11 +46,6 @@ public class DataContainer : MonoSingleton<DataContainer>
         this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
     }
 
-
-    //public void Initialize()
-    //{
-
-    //}
 
 
     // TODO

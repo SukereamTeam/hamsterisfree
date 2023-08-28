@@ -3,9 +3,12 @@ using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+    [SerializeField] private StageManager stageManager;
+    public StageManager StageManager => this.stageManager;
 
     [SerializeField]
     private MapManager mapManager;
@@ -24,12 +27,12 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isGame = value;
     }
 
-    [SerializeField]
-    private int seedCount;
-    public int SeedCount
+    [FormerlySerializedAs("seedCount")] [SerializeField]
+    private int seedScore;
+    public int SeedScore
     {
-        get => this.seedCount;
-        set => this.seedCount = value;
+        get => this.seedScore;
+        set => this.seedScore = value;
     }
 
 
@@ -54,8 +57,13 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
+        var curStageIndex = CommonManager.Instance.CurStageIndex;
+        var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        MapManager.SetStage(CommonManager.Instance.CurStageIndex, DataContainer.Instance.StageSprites);
+        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
+        
+        StageManager.SetStage(stageType, stageTable.StageType.Value);
+        MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 

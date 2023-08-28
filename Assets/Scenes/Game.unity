@@ -5917,6 +5917,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1043671496}
   - component: {fileID: 1043671497}
+  - component: {fileID: 1043671498}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5951,9 +5952,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b7b06ec37ddcb24587bb513f515a5bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stageManager: {fileID: 1043671498}
   mapManager: {fileID: 1975502251}
   fadeDuration: 0.5
-  seedCount: 0
+  seedScore: 0
+--- !u!114 &1043671498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043671495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9914fd0d29b566144aec906c734a1895, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageInfo:
+    StageType: 0
+    StageLimitValue: 0
 --- !u!1 &1055597776
 GameObject:
   m_ObjectHideFlags: 0

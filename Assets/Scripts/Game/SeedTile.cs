@@ -3,6 +3,7 @@ using UniRx;
 using System;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using UnityEngine.Serialization;
 
 public class SeedTile : TileBase
 {
@@ -12,8 +13,8 @@ public class SeedTile : TileBase
         set => this.isTouch = value;
     }
 
-    [SerializeField]
-    private Define.SeedTile_Type tileType = Define.SeedTile_Type.Default;
+    [FormerlySerializedAs("tileType")] [SerializeField]
+    private Define.SeedTile_Type seedType = Define.SeedTile_Type.Default;
 
     
     private ITileActor tileActor;
@@ -36,7 +37,7 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info, _Pos);
 
-        this.tileType = (Define.SeedTile_Type)Enum.Parse(typeof(Define.SeedTile_Type), _Info.SubType);
+        this.seedType = (Define.SeedTile_Type)Enum.Parse(typeof(Define.SeedTile_Type), _Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
@@ -64,20 +65,23 @@ public class SeedTile : TileBase
             this.tileActor = null;
         }
 
-        switch (this.tileType)
+        switch (this.seedType)
         {
             case Define.SeedTile_Type.Disappear:
-                {
-                    this.tileActor = new TileActor_Disappear();
-                }break;
+            {
+                this.tileActor = new TileActor_Disappear();
+            }
+                break;
             case Define.SeedTile_Type.Moving:
-                {
-                    this.tileActor = new TileActor_Moving();
-                }break;
+            {
+                this.tileActor = new TileActor_Moving();
+            }
+                break;
             case Define.SeedTile_Type.Fade:
-                {
-                    this.tileActor = new TileActor_Fade();
-                }break;
+            {
+                this.tileActor = new TileActor_Fade();
+            }
+                break;
         }
 
         if (this.tileActor != null)
@@ -89,16 +93,15 @@ public class SeedTile : TileBase
             });
         }
     }
-
-
     
-
-    public override async UniTaskVoid TileTriggerEvent()
+    
+    public override async UniTaskVoid TileTrigger()
     {
         Debug.Log("Seed 먹음");
 
         this.tileCollider.enabled = false;
-        GameManager.Instance.SeedCount++;
+        
+        TriggerEvent(this.seedType);
 
         if (this.tileActor == null)
         {
@@ -119,6 +122,22 @@ public class SeedTile : TileBase
 
         // TODO
         // Trigger Ani 재생
+    }
+
+    private void TriggerEvent(Define.SeedTile_Type _type)
+    {
+        if (_type == Define.SeedTile_Type.Heart)
+        {
+            
+        }
+        else if (_type == Define.SeedTile_Type.Fake)
+        {
+            
+        }
+        else
+        {
+            GameManager.Instance.SeedScore++;
+        }
     }
 
     private void OnDestroy()

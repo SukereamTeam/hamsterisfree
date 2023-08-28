@@ -357,7 +357,7 @@ public class SheetDownloader : MonoBehaviour
                 {
                     // 원하는 string 값을 찾았을 때 int 값을 수정
                     isFind = true;
-                    resultList[j].Count += intValue;
+                    resultList[j].Value += intValue;
                     break;
                 }
             }
