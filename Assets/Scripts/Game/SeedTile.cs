@@ -97,7 +97,7 @@ public class SeedTile : TileBase
     
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log("Seed 먹음");
+        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.info.SeedValue} 먹음");
 
         this.tileCollider.enabled = false;
         

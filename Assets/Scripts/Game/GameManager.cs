@@ -48,6 +48,7 @@ public class GameManager : MonoSingleton<GameManager>
             _instance = this;
         }
 
+        // isGame 변수가 false가 되면 게임이 종료되었다는 것
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Where(x => x == false)
@@ -58,6 +59,7 @@ public class GameManager : MonoSingleton<GameManager>
 
 
         var curStageIndex = CommonManager.Instance.CurStageIndex;
+        Debug.Log($"### Current Stage Index : {curStageIndex}");
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
         var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
@@ -67,6 +69,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
+        // TODO : Delete (테스트용으로 5초 대기 걸어놓음)
         await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
 
         // 게임 시작 할 수 있는 상태로 전환

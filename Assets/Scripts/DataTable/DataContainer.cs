@@ -5,6 +5,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using DataTable;
 using System.Threading.Tasks;
+using Random = System.Random;
 
 public class DataContainer : MonoSingleton<DataContainer>
 {
@@ -69,7 +70,7 @@ public class DataContainer : MonoSingleton<DataContainer>
                 await LoadStageSprites(item.MapName);
 
                 // TODO : Modify
-                this.exitSprite = await Resources.LoadAsync<Sprite>("Images/Map/Forest/Forest_Center") as Sprite;
+                this.exitSprite = this.stageSprites[0];//await Resources.LoadAsync<Sprite>("Images/Map/Forest/Forest_Center") as Sprite;
                 if (this.exitSprite == null)
                     Debug.Log("### ERROR ---> ExitSprite is Null ###");
 
@@ -93,25 +94,109 @@ public class DataContainer : MonoSingleton<DataContainer>
     {
         this.stageSprites.Clear();
 
+        // eg. Images/Map/Forest/Forset_
         var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
 
         try
         {
+            // Forest_Map 이라는 Sprite 한 장을 Multiple로 Slice해서, 각각 잘린 스프라이트들을 사용할것임
+            
+
             for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
-                var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
-
-                var spritePath = $"{path}{spriteName}";
-
-                var resource = await Resources.LoadAsync<Sprite>(spritePath);
-
-                if (resource is Sprite sprite)
+                if (spriteIndex <= (int)Define.TileSpriteName.BottomRight)
                 {
-                    this.stageSprites.Add(sprite);
+                    var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
+                    
+                    var sliceName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+
+                    if (sliceName == Define.TileSpriteName.Top.ToString() ||
+                        sliceName == Define.TileSpriteName.Bottom.ToString() ||
+                        sliceName == Define.TileSpriteName.Left.ToString() ||
+                        sliceName == Define.TileSpriteName.Right.ToString())
+                    {
+                        var random = UnityEngine.Random.Range(1, 3);
+                        sliceName = $"{sliceName}_{random}";
+                    }
+                
+                    var spriteName = $"{_MapName}_{sliceName}";
+
+                    var sprite = Array.Find(mapSprites, x => x.name == spriteName);
+
+                    if (sprite != null)
+                    {
+                        this.stageSprites.Add(sprite);
+                    }
                 }
                 else
-                    Debug.Log("### Fail <Sprite> Type Casting ###");
+                {
+                    var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+                    var spritePath = $"{path}{spriteName}";
+                    var resource = await Resources.LoadAsync<Sprite>(spritePath);
+                    if (resource is Sprite sprite)
+                    {
+                        this.stageSprites.Add(sprite);
+                    }
+                    else
+                        Debug.Log("### Fail <Sprite> Type Casting ###");
+                }
+                
             }
+            
+            // 기존 버전 (Sprite가 여러장이었음)
+            // for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
+            // {
+            //     var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+            //
+            //     var spritePath = $"{path}{spriteName}";
+            //
+            //     var resource = await Resources.LoadAsync<Sprite>(spritePath);
+            //
+            //     if (resource is Sprite sprite)
+            //     {
+            //         this.stageSprites.Add(sprite);
+            //     }
+            //     else
+            //         Debug.Log("### Fail <Sprite> Type Casting ###");
+            
+            
+            // TODO : Assetbundle or Addressable 로 변경하기
+            /*
+            //자산의 모든 하위 오브젝트를 로드하려면 다음 예제 구문을 사용할 수 있습니다.
+            Addressables.LoadAssetAsync<IList<Sprite>>("MySpriteSheetAddress");
+
+            //자산의 단일 하위 오브젝트를 로드하려면 다음을 수행할 수 있습니다.
+            Addressables.LoadAssetAsync<Sprite>("MySpriteSheetAddress[MySpriteName]");
+
+            // 위의 하위 오브젝트는 모르겠고 폴더를 라벨로 잡고 그 폴더의 내용을 전부 땡겨오는건 이 방법
+            var handle = Addressables.LoadAssetsAsync<GameObject>("Label", obj =>
+            {
+                //Gets called for every loaded asset
+                Debug.Log(obj.name);
+
+            });
+            yield return handle;
+            IList<GameObject> singleKeyResult = handle.Result;
+            ...
+            ...
+            [SerializeField] protected Image m_Image;
+
+            // Start is called before the first frame update
+            IEnumerator Start()
+            {
+                yield return Addressables.InitializeAsync();
+
+                string atlasName = "Atlas_Icon";
+                string imageName = "emoticon_001";
+                var handle = Addressables.LoadAssetAsync<Sprite>($"{atlasName}[{imageName}]"); // Atlas_Icon[emoticon_001]
+
+                yield return handle;
+
+                m_Image.sprite = handle.Result;
+
+                Addressables.Release(handle);
+            }
+            */
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {

@@ -21,18 +21,10 @@ public class LobbyManager : MonoBehaviour
     {
         await SceneController.Instance.Fade(false, this.fadeDuration, false, cancellationToken);
 
-        // TODO
-        // 데이터 로드 같은 작업들만 ListTask에 넣어주고 WhenAlll
-        // 그다음에 씬 로드 하도록 변경
-
-        //var task = DataContainer.LoadStageDatas();
-        //await SceneController.Instance.SceneActivation(task);
-
-        //SceneController.Instance.AddLoadingTask(UniTask.Defer(() => UniTask.FromResult(task)));
-
-        var curIndex = 0;
-
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(curIndex)));
+        // TODO : Test용
+        var curStageIndex = CommonManager.Instance.CurStageIndex;
+        
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(curStageIndex)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }
