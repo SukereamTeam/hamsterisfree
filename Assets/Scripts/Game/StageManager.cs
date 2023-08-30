@@ -51,7 +51,7 @@ public class StageManager : MonoBehaviour
     {
         this.stageInfo = new StageInfoData(_Type, _LimitValue, _StageSeedCount);
         
-        this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
+        // Stage 번호 출력
         this.stageNumberText.text = _StageNumber.ToString();
         
         if (this.stageInfo.Type == Define.StageType.LimitTime ||
@@ -71,18 +71,14 @@ public class StageManager : MonoBehaviour
         
         this.curValue.Subscribe(newValue =>
         {
-            switch (this.stageInfo.Type)
-            {
-                // TODO : 모든 스테이지는 SeedScore를 표시해줘야 함.
-                case Define.StageType.Default:
-                    stageLimitText.text = $"{GameManager.Instance.SeedScore}";
-                    break;
-                case Define.StageType.LimitTime:
-                case Define.StageType.LimitTry:
-                    stageLimitText.text = $"{curValue.Value} / {this.stageInfo.LimitValue}";
-                    break;
-            }
+            stageLimitText.text = $"{curValue.Value} / {this.stageInfo.LimitValue}";
+            
         }).AddTo(this);
+
+        GameManager.Instance.SeedScore.Subscribe(_ =>
+        {
+            this.seedInfoText.text = $"{GameManager.Instance.SeedScore} / {this.stageInfo.StageSeedCount}";
+        });
     }
 
     private void Update()
@@ -93,15 +89,15 @@ public class StageManager : MonoBehaviour
         if (this.stageInfo.Type == Define.StageType.LimitTime)
         {
             timer += Time.deltaTime;
-            if (timer >= 0.1f)
+            if (timer >= 1f)
             {
                 //Debug.Log($"### Update curValue : {this.curValue.Value}");
-                this.curValue.Value -= 0.1f;
+                this.curValue.Value -= 1f;
                 timer = 0f;
             }
         }
 
-        this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
+        //this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
     }
 
     public void ChangeStageValue(int _Value)

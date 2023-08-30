@@ -132,7 +132,7 @@ public class SeedTile : TileBase
         }
         else
         {
-            GameManager.Instance.SeedScore++;
+            GameManager.Instance.SeedScore.Value++;
         }
     }
 

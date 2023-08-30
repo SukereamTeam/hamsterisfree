@@ -29,8 +29,8 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     [FormerlySerializedAs("seedCount")] [SerializeField]
-    private int seedScore;
-    public int SeedScore
+    private IReactiveProperty<int> seedScore = new ReactiveProperty<int>();
+    public IReactiveProperty<int> SeedScore
     {
         get => this.seedScore;
         set => this.seedScore = value;
