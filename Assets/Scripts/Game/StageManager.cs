@@ -15,11 +15,13 @@ public class StageManager : MonoBehaviour
     {
         public Define.StageType Type;
         public int LimitValue;
+        public int StageSeedCount;
 
-        public StageInfoData(Define.StageType _Type, int _LimitValue)
+        public StageInfoData(Define.StageType _Type, int _LimitValue, int _StageSeedCount)
         {
             Type = _Type;
             LimitValue = _LimitValue;
+            StageSeedCount = _StageSeedCount;
         }
     }
     
@@ -30,8 +32,12 @@ public class StageManager : MonoBehaviour
     private StageInfoData stageInfo = new StageInfoData();
     public StageInfoData StageInfo => this.stageInfo;
 
-    [SerializeField] private TextMeshProUGUI stageValueText;
+    [SerializeField] private TextMeshProUGUI stageLimitText;
+    [SerializeField] private TextMeshProUGUI stageNumberText;
+    [SerializeField] private TextMeshProUGUI seedInfoText;
     
+    // LimitTime타입의 스테이지 일 때의 time값 혹은 LimitTry타입의 스테이지 일 때의 try값
+    // default 일 땐 표시하지 않는다.
     private IReactiveProperty<float> curValue = new ReactiveProperty<float>(0f);
     public IReactiveProperty<float> CurValue
     {
@@ -41,9 +47,11 @@ public class StageManager : MonoBehaviour
     private float timer = 0f;
     
     
-    public void SetStage(Define.StageType _Type, int _LimitValue)
+    public void SetStage(Define.StageType _Type, int _LimitValue, int _StageSeedCount)
     {
-        this.stageInfo = new StageInfoData(_Type, _LimitValue);
+        this.stageInfo = new StageInfoData(_Type, _LimitValue, _StageSeedCount);
+        
+        this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
         
         if (this.stageInfo.Type == Define.StageType.LimitTime ||
             this.stageInfo.Type == Define.StageType.LimitTry)
@@ -66,11 +74,11 @@ public class StageManager : MonoBehaviour
             {
                 // TODO : 모든 스테이지는 SeedScore를 표시해줘야 함.
                 case Define.StageType.Default:
-                    stageValueText.text = $"{GameManager.Instance.SeedScore}";
+                    stageLimitText.text = $"{GameManager.Instance.SeedScore}";
                     break;
                 case Define.StageType.LimitTime:
                 case Define.StageType.LimitTry:
-                    stageValueText.text = $"{curValue.Value} / {this.stageInfo.LimitValue}";
+                    stageLimitText.text = $"{curValue.Value} / {this.stageInfo.LimitValue}";
                     break;
             }
         }).AddTo(this);
@@ -91,8 +99,8 @@ public class StageManager : MonoBehaviour
                 timer = 0f;
             }
         }
-        
-        
+
+        this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
     }
 
     public void ChangeStageValue(int _Value)

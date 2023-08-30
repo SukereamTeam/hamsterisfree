@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
@@ -55,11 +56,14 @@ public class GameManager : MonoSingleton<GameManager>
 
         var curStageIndex = CommonManager.Instance.CurStageIndex;
         Debug.Log($"### Current Stage Index : {curStageIndex}");
+        
+        // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
         var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
-        
-        StageManager.SetStage(stageType, stageTable.StageType.Value);
+        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Value)).Sum();
+
+        StageManager.SetStage(stageType, stageTable.StageType.Value, maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());

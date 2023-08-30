@@ -2566,7 +2566,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 95.7
+  m_fontSize: 79.45
   m_fontSizeBase: 100
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6179,7 +6179,7 @@ GameObject:
   - component: {fileID: 1018129621}
   - component: {fileID: 1018129620}
   m_Layer: 5
-  m_Name: StageInfoText
+  m_Name: StageLimitText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6449,7 +6449,10 @@ MonoBehaviour:
   stageInfo:
     Type: 0
     LimitValue: 0
-  stageValueText: {fileID: 1018129620}
+    StageSeedCount: 0
+  stageLimitText: {fileID: 1018129620}
+  stageNumberText: {fileID: 422500212}
+  seedInfoText: {fileID: 91423208}
 --- !u!1 &1055597776
 GameObject:
   m_ObjectHideFlags: 0
