@@ -92,7 +92,5 @@ public class GameManager : MonoSingleton<GameManager>
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
-        
-        Clear();
     }
 }

@@ -52,7 +52,7 @@ public class SeedTile : TileBase
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        await UniTask.WaitUntil(() => GameManager.Instance.IsGame.Value == true);
+        await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
         if (this.isFuncStart == false)
         {

@@ -7,7 +7,7 @@ using DataTable;
 using System.Threading.Tasks;
 using Random = System.Random;
 
-public class DataContainer : MonoSingleton<DataContainer>
+public class DataContainer : GlobalMonoSingleton<DataContainer>
 {
     [SerializeField]
     private Table_Stage stageTable;

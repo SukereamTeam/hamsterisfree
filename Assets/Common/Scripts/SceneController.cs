@@ -9,7 +9,7 @@ using UniRx;
 using UnityEngine.UI;
 using System.Linq;
 
-public class SceneController : MonoSingleton<SceneController>
+public class SceneController : GlobalMonoSingleton<SceneController>
 {
     private List<UniTask> loadingTask;
     public List<UniTask> LoadingTask
