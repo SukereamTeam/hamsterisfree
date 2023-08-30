@@ -43,11 +43,6 @@ public class GameManager : MonoSingleton<GameManager>
     {
         Debug.Log("GameManager에서 Start 진입");
 
-        if (Instance == null)
-        {
-            _instance = this;
-        }
-
         // isGame 변수가 false가 되면 게임이 종료되었다는 것
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
@@ -91,9 +86,9 @@ public class GameManager : MonoSingleton<GameManager>
     public async void OnClick_Back()
     {
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
-
+        
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
-
+        
         Clear();
     }
 }

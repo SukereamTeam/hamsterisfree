@@ -86,7 +86,7 @@ public class StageManager : MonoBehaviour
             timer += Time.deltaTime;
             if (timer >= 0.1f)
             {
-                Debug.Log($"### Update curValue : {this.curValue.Value}");
+                //Debug.Log($"### Update curValue : {this.curValue.Value}");
                 this.curValue.Value -= 0.1f;
                 timer = 0f;
             }

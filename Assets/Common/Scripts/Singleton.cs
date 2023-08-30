@@ -66,6 +66,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
 
     protected virtual void OnDestroy()
     {
+        Debug.Log($"{_instance.name} OnDestroy");
         _instance = null;
     }
 
@@ -73,6 +74,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     {
         if (_instance)
         {
+            Debug.Log($"{_instance.gameObject.name} Clear");
             DestroyImmediate(_instance.gameObject);
             _instance = null;
         }
