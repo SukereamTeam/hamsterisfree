@@ -47,11 +47,12 @@ public class StageManager : MonoBehaviour
     private float timer = 0f;
     
     
-    public void SetStage(Define.StageType _Type, int _LimitValue, int _StageSeedCount)
+    public void SetStage(int _StageNumber, Define.StageType _Type, int _LimitValue, int _StageSeedCount)
     {
         this.stageInfo = new StageInfoData(_Type, _LimitValue, _StageSeedCount);
         
         this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
+        this.stageNumberText.text = _StageNumber.ToString();
         
         if (this.stageInfo.Type == Define.StageType.LimitTime ||
             this.stageInfo.Type == Define.StageType.LimitTry)

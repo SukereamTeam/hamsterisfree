@@ -63,7 +63,7 @@ public class GameManager : MonoSingleton<GameManager>
         var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
         var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Value)).Sum();
 
-        StageManager.SetStage(stageType, stageTable.StageType.Value, maxSeedCount);
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Value, maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
