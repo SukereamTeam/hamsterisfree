@@ -60,10 +60,10 @@ public class GameManager : MonoSingleton<GameManager>
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
-        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Value)).Sum();
+        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
+        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Item3)).Sum();
 
-        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Value, maxSeedCount);
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());

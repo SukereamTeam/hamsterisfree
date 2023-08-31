@@ -16,6 +16,10 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     [SerializeField]
     private Table_Seed seedTable;
     public Table_Seed SeedTable => this.seedTable;
+    
+    [SerializeField]
+    private Table_Monster monsterTable;
+    public Table_Monster MonsterTable => this.monsterTable;
 
 
 
@@ -212,13 +216,13 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 
         for (int i = 0; i < seedCount; i++)
         {
-            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Type, item.SeedData[i].SubType);
+            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Item1, item.SeedData[i].Item2);
 
             var sprite = await Resources.LoadAsync<Sprite>(seedData.SpritePath) as Sprite;
 
             if (sprite != null)
             {
-                this.seedSprites.Add(item.SeedData[i].Type, sprite);
+                this.seedSprites.Add(item.SeedData[i].Item1, sprite);
             }
             else
                 Debug.Log($"### ERROR LoadSeedSprites ---> {seedData.Type} ###");

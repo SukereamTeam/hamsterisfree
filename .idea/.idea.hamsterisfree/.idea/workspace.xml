@@ -6,7 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="bc5cbd0e-719c-4dd5-9ae3-b4c40eb310b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DataTable/DataContainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DataTable/DataContainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DataTable/SheetDownloader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DataTable/SheetDownloader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DataTable/Table_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DataTable/Table_Base.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DataTable/Table_Monster.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DataTable/Table_Monster.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/GameManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/MapManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +70,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "TileType",
+    "git-widget-placeholder": "DataTableRefactoring",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -72,9 +80,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\PC\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache",
-      "C:\\Users\\PC\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache",
-      "C:\\Users\\PC\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\fran_\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache",
+      "C:\\Users\\fran_\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache",
+      "C:\\Users\\fran_\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -105,10 +113,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="11892">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" />
+      <option name="pid" value="11892" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
@@ -128,6 +136,7 @@
       <workItem from="1693032692574" duration="5888000" />
       <workItem from="1693222744952" duration="2719000" />
       <workItem from="1693443084411" duration="8866000" />
+      <workItem from="1693477962298" duration="5361000" />
     </task>
     <servers />
   </component>

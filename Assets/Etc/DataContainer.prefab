@@ -46,3 +46,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageTable: {fileID: 11400000, guid: f1de9983c53fa6c46b35a78c1d7e5d78, type: 2}
   seedTable: {fileID: 11400000, guid: cf91d81cf3ef37f4a80eaac69afc5d25, type: 2}
+  monsterTable: {fileID: 11400000, guid: 771b545134c6e10409cbf34a92cf8e09, type: 2}

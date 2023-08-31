@@ -156,7 +156,7 @@ public class MapManager : MonoBehaviour
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
         {
-            for (int j = 0; j < stageTable.SeedData[i].Value; j++)
+            for (int j = 0; j < stageTable.SeedData[i].Item3; j++)
             {
                 var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
                 
@@ -164,7 +164,7 @@ public class MapManager : MonoBehaviour
                 var seedScript = seedTile.GetComponent<SeedTile>();
 
                 // eg. SeedTile 의 타입들 중 Default_0 타입에 대한 데이터를 SeedTable에서 가져오기
-                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type, stageTable.SeedData[i].SubType);
+                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Item1, stageTable.SeedData[i].Item2);
 
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
@@ -197,7 +197,7 @@ public class MapManager : MonoBehaviour
     private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
-        var randomCount = _List.Select(x => x.Value).Sum();
+        var randomCount = _List.Select(x => x.Item3).Sum();
 
         // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
         var targetTiles = new List<Transform>(this.backTiles);

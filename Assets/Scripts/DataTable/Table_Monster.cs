@@ -20,7 +20,7 @@ namespace DataTable
             public int TypeIndex;
             public float ActiveTime;
             public SerializableTuple<int, int> Size;
-            public int SeedValue;
+            public string Func;
             public string SpritePath;
         }
 
