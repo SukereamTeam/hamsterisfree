@@ -13,33 +13,39 @@ MonoBehaviour:
   m_Name: SeedTable
   m_EditorClassIdentifier: 
   list:
-  - Index: 0
+  - UID: 0
     Type: Default
+    TypeIndex: 0
     ActiveTime: 1
     SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_TopLeft
-  - Index: 1
+  - UID: 1
     Type: Fade
+    TypeIndex: 0
     ActiveTime: 0.5
     SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_BottomRight
-  - Index: 2
+  - UID: 2
     Type: Moving
+    TypeIndex: 0
     ActiveTime: 2
     SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_Left
-  - Index: 3
+  - UID: 3
     Type: Disappear
+    TypeIndex: 0
     ActiveTime: 5
     SeedValue: 1
     SpritePath: Images/Map/Forest/Forest_Right
-  - Index: 4
+  - UID: 4
     Type: Fake
+    TypeIndex: 0
     ActiveTime: 1
     SeedValue: -3
     SpritePath: Images/Map/Forest/Forest_Top
-  - Index: 5
+  - UID: 5
     Type: Heart
+    TypeIndex: 0
     ActiveTime: 1
     SeedValue: 3
     SpritePath: Images/Map/Forest/Forest_Bottom

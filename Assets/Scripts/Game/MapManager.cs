@@ -163,8 +163,8 @@ public class MapManager : MonoBehaviour
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
 
-                // eg. SeedTile 의 타입들 중 Default 타입에 대한 데이터를 SeedTable에서 가져오기
-                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type);
+                // eg. SeedTile 의 타입들 중 Default_0 타입에 대한 데이터를 SeedTable에서 가져오기
+                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Type, stageTable.SeedData[i].SubType);
 
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
@@ -194,7 +194,7 @@ public class MapManager : MonoBehaviour
     /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
     /// </summary>
     /// <returns>Transform은 Pos값을 위해, int는 backTiles중 어느 타일을 참조했는지 파악하려고</returns>
-    private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int>> _List)
+    private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
         var randomCount = _List.Select(x => x.Value).Sum();

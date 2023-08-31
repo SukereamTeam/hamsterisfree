@@ -212,7 +212,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 
         for (int i = 0; i < seedCount; i++)
         {
-            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Type);
+            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Type, item.SeedData[i].SubType);
 
             var sprite = await Resources.LoadAsync<Sprite>(seedData.SpritePath) as Sprite;
 

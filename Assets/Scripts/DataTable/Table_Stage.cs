@@ -17,8 +17,8 @@ namespace DataTable
             public int Index;
             public SerializableTuple<string, int> StageType;
             public string MapName;
-            public List<SerializableTuple<string, int>> SeedData;
-            public List<SerializableTuple<string, int>> MonsterData;
+            public List<SerializableTuple<string, int, int>> SeedData;
+            public List<SerializableTuple<string, int, int>> MonsterData;
         }
     }
 }

@@ -15,16 +15,20 @@ namespace DataTable
         [Serializable]
         public class Param
         {
-            public int Index;
+            public int UID;
             public string Type;
+            public int TypeIndex;
             public float ActiveTime;
             public int SeedValue;
             public string SpritePath;
         }
 
-        public Param GetParamFromType(string _Type)
+        public Param GetParamFromType(string _Type, int _TypeIndex)
         {
-            return list.FirstOrDefault(x => x.Type.Equals(_Type));
+            return list.FirstOrDefault(x =>
+            {
+                return (x.Type.Equals(_Type) && x.TypeIndex.Equals(_TypeIndex));
+            });
         }
     }
 }

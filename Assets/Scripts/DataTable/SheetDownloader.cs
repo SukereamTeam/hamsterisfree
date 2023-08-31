@@ -210,8 +210,8 @@ public class SheetDownloader : MonoBehaviour
                                 }
 
                                 // List<ObjectData> 필드인 경우 파싱 필요
-                                // 시트 string 값 : "((Default, 3), (Boss, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
-                                Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
+                                // 시트 string 값 : "((Default, 0, 3), (Boss, 5, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
+                                Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int, int>>);
                                 if (csvDataField.FieldType.Equals(objectDataTypeField))
                                 {
                                     csvDataField.SetValue(csvData, ParseObjectData(value));
@@ -336,35 +336,36 @@ public class SheetDownloader : MonoBehaviour
         return result;
     }
 
-    private static List<Table_Base.SerializableTuple<string, int>> ParseObjectData(string input)
+    private static List<Table_Base.SerializableTuple<string, int, int>> ParseObjectData(string input)
     {
         if (input.Equals("NULL"))
             return null;
 
         string[] tupleStrings = input.Split(new char[] { '(', ')', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>((tupleStrings.Length / 2));
+        List<Table_Base.SerializableTuple<string, int, int>> resultList = new List<Table_Base.SerializableTuple<string, int, int>>((tupleStrings.Length / 3));
 
-        for (int i = 0; i < tupleStrings.Length; i += 2)
+        for (int i = 0; i < tupleStrings.Length; i += 3)
         {
             string strValue = tupleStrings[i];
-            int intValue = int.Parse(tupleStrings[i + 1]);
+            int typeIndexValue = int.Parse(tupleStrings[i + 1]);
+            int countValue = int.Parse(tupleStrings[i + 2]);
 
             bool isFind = false;
             for (int j = 0; j < resultList.Count; j++)
             {
-                if (resultList[j].Type == strValue)
+                if (resultList[j].Type == strValue && resultList[j].SubType == typeIndexValue)
                 {
                     // 원하는 string 값을 찾았을 때 int 값을 수정
                     isFind = true;
-                    resultList[j].Value += intValue;
+                    resultList[j].Value += countValue;
                     break;
                 }
             }
 
             if (isFind == false)
             {
-                resultList.Add(new Table_Base.SerializableTuple<string, int>(strValue, intValue));
+                resultList.Add(new Table_Base.SerializableTuple<string, int, int>(strValue, typeIndexValue, countValue));
             }
         }
 
