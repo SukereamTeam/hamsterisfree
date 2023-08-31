@@ -52,6 +52,11 @@ jobs:
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
 
+      - name: Clean Up Unity Library
+        run: |
+          # Unity 빌드 후에 Library 폴더를 삭제합니다.
+          rm -rf Library
+
       - uses: actions/upload-artifact@v2
         with:
           name: build-Android
