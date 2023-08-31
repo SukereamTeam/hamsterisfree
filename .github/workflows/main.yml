@@ -42,6 +42,11 @@ jobs:
             Library-build-
             Library-
 
+      - name: Clean Up Unity Library
+        run: |
+          # Unity 빌드 전에 Library 폴더를 삭제합니다.
+          rm -rf Library
+
       - uses: game-ci/unity-builder@v3
         with:
           targetPlatform: Android
@@ -51,11 +56,6 @@ jobs:
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
-
-      - name: Clean Up Unity Library
-        run: |
-          # Unity 빌드 후에 Library 폴더를 삭제합니다.
-          rm -rf Library
 
       - uses: actions/upload-artifact@v2
         with:
