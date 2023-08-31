@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Sprites-Alpha-Mask-WorldCoords
+  m_Name: SpritesAlphaMask
   m_Shader: {fileID: 4800000, guid: 728c0e664f8bc78468d36dcb0c49f8d5, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA _ENABLED_ON
   m_LightmapFlags: 4

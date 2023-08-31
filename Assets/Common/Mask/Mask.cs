@@ -217,29 +217,29 @@ namespace ToJ
 		}
 
 
-		private Material spritesAlphaMaskWorldCoords;
-		private const string SPRITES_RESOURCE_ADDRESS = "Materials/Sprites-Alpha-Mask-WorldCoords";
-		public const string MASKED_SPRITE_SHADER = "Alpha Masked/Sprites Alpha Masked - World Coords";
-		public const string MASKED_UNLIT_SHADER = "Alpha Masked/Unlit Alpha Masked - World Coords";
+		private Material spritesAlphaMask;
+		private const string SPRITES_RESOURCE_ADDRESS = "Materials/SpritesAlphaMask";
+		public const string MASKED_SPRITE_SHADER = "Alpha Masked/Sprites Alpha Masked";
+		public const string MASKED_UNLIT_SHADER = "Alpha Masked/Unlit Alpha Masked";
 
 
-		public Material SpritesAlphaMaskWorldCoords
+		public Material SpritesAlphaMask
 		{
 			get
 			{
-				if (spritesAlphaMaskWorldCoords == null)
+				if (spritesAlphaMask == null)
 				{
-					spritesAlphaMaskWorldCoords = Resources.Load<Material>(SPRITES_RESOURCE_ADDRESS);
-					if (spritesAlphaMaskWorldCoords == null)
+					spritesAlphaMask = Resources.Load<Material>(SPRITES_RESOURCE_ADDRESS);
+					if (spritesAlphaMask == null)
 					{
 						Debug.LogError(SPRITES_RESOURCE_ADDRESS + " not found!");
 					}
 				}
-				return spritesAlphaMaskWorldCoords;
+				return spritesAlphaMask;
 			}
 			set
 			{
-				spritesAlphaMaskWorldCoords = value;
+				spritesAlphaMask = value;
 			}
 		}
 
@@ -951,7 +951,7 @@ namespace ToJ
 				//Version upgrade content. Switches old instantiated materials to reference to core material.
 				if ((targetRen.material.shader.ToString() == DefaultMaskedSpriteShader.ToString()))
 				{
-					if (!targetRen.material.Equals(SpritesAlphaMaskWorldCoords))
+					if (!targetRen.material.Equals(SpritesAlphaMask))
 					{
 						ScheduleFullMaskRefresh();
 						Debug.Log("Version upgrade on: " + targetRen.gameObject.name, targetRen.gameObject);
@@ -959,7 +959,7 @@ namespace ToJ
 						{
 							upgradeDiscards.Add(targetRen.material);
 						}
-						targetRen.material = SpritesAlphaMaskWorldCoords;
+						targetRen.material = SpritesAlphaMask;
 						return;
 					}
 				}
@@ -972,14 +972,14 @@ namespace ToJ
 			{
 				if ((targetRen.sharedMaterial.shader.ToString() == DefaultMaskedSpriteShader.ToString()))
 				{
-					if (!targetRen.sharedMaterial.Equals(SpritesAlphaMaskWorldCoords))
+					if (!targetRen.sharedMaterial.Equals(SpritesAlphaMask))
 					{
 						Debug.Log("Version upgrade on: " + targetRen.gameObject.name, targetRen.gameObject);
 						if (!upgradeDiscards.Contains(targetRen.sharedMaterial))
 						{
 							upgradeDiscards.Add(targetRen.sharedMaterial);
 						}
-						targetRen.material = SpritesAlphaMaskWorldCoords;
+						targetRen.material = SpritesAlphaMask;
 						return;
 					}
 				}
