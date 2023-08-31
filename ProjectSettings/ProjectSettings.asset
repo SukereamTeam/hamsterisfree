@@ -751,7 +751,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     Android: UNITASK_DOTWEEN_SUPPORT;DOTween
     Server: 
-    Standalone: 
+    Standalone: UNITASK_DOTWEEN_SUPPORT
     iPhone: DOTween;UNITASK_DOTWEEN_SUPPORT
   additionalCompilerArguments: {}
   platformArchitecture: {}
