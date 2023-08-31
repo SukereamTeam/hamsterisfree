@@ -36,10 +36,10 @@ MonoBehaviour:
   - Index: 4
     Type: Fake
     ActiveTime: 1
-    SeedValue: -1
+    SeedValue: -3
     SpritePath: Images/Map/Forest/Forest_Top
   - Index: 5
     Type: Heart
     ActiveTime: 1
-    SeedValue: 1
+    SeedValue: 3
     SpritePath: Images/Map/Forest/Forest_Bottom

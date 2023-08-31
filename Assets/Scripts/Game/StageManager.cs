@@ -20,6 +20,11 @@ public class StageManager : MonoBehaviour
         public StageInfoData(Define.StageType _Type, int _LimitValue, int _StageSeedCount)
         {
             Type = _Type;
+            if (_Type == Define.StageType.LimitTime)
+            {
+                // 주어진 초 단위 시간(60)을 밀리초로 변환
+                _LimitValue *= 1000;
+            }
             LimitValue = _LimitValue;
             StageSeedCount = _StageSeedCount;
         }
@@ -71,7 +76,16 @@ public class StageManager : MonoBehaviour
         
         this.curValue.Subscribe(newValue =>
         {
-            stageLimitText.text = $"{curValue.Value} / {this.stageInfo.LimitValue}";
+            var value = curValue.Value;
+            var maxValue = this.stageInfo.LimitValue;
+            if (this.stageInfo.Type == Define.StageType.LimitTime)
+            {
+                // 밀리초 -> 초 변환해서 출력
+                value = Mathf.Floor(value /= 1000);
+                maxValue /= 1000;
+            }
+            
+            stageLimitText.text = $"{value} / {maxValue}";
             
         }).AddTo(this);
 
@@ -89,20 +103,27 @@ public class StageManager : MonoBehaviour
         if (this.stageInfo.Type == Define.StageType.LimitTime)
         {
             timer += Time.deltaTime;
-            if (timer >= 1f)
+            if (timer >= 0.1f)
             {
-                //Debug.Log($"### Update curValue : {this.curValue.Value}");
-                this.curValue.Value -= 1f;
+                // 1초에 1씩 깎는 것
+                this.curValue.Value -= 100f;
                 timer = 0f;
             }
         }
-
-        //this.seedInfoText.text = $"{GameManager.Instance.SeedScore}/{this.stageInfo.StageSeedCount}";
     }
 
     public void ChangeStageValue(int _Value)
     {
         // TODO : 감소하거나 증가할 때 Ani 효과? 파티클 효과? 넣어주기
+        Debug.Log($"Current Value : {this.curValue.Value}");
+        Debug.Log($"{_Value} 만큼 더해짐");
+        Debug.Log($"Result Value : {this.curValue.Value}");
+
+        if (this.stageInfo.Type == Define.StageType.LimitTime)
+        {
+            _Value *= 1000;
+        }
+        
         this.curValue.Value += _Value;
     }
 }

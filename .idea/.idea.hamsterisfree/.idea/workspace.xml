@@ -6,48 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="bc5cbd0e-719c-4dd5-9ae3-b4c40eb310b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Editor/MaskEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Common/Mask/Editor/MaskEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Mask.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Common/Mask/Mask.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Materials/Mask-Material.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Materials/Mask-Material.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Materials/Sprites-Alpha-Mask-WorldCoords.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Materials/Sprites-Alpha-Mask-WorldCoords.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Sprites-Alpha-Mask-WorldCoords.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Sprites-Alpha-Mask-WorldCoords.shader.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Unlit-Alpha-Mask-WorldCoords.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/Unlit-Alpha-Mask-WorldCoords.shader.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/fog_of_war_alpha.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Mask/fog_of_war_alpha.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Documentation.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Documentation.pdf.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/Fog of War Alpha Texture.renderTexture" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/Fog of War Alpha Texture.renderTexture.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/black.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/black.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/dungeon_background.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/dungeon_background.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/white.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Multiple Masks Sample/white.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/day.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/day.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/night.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/night.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/night_and_day_mask.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Images/Night And Day Sample/night_and_day_mask.png.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Fog of War Alpha.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Fog of War Alpha.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Fog of War Masked.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Fog of War Masked.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Ship.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Ship.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Water.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/Alpha Masking/Samples/Materials/Water.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Common/Scripts/CommonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Common/Scripts/CommonManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/csv/SeedTable.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/csv/SeedTable.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +132,7 @@
       <workItem from="1693032410530" duration="270000" />
       <workItem from="1693032692574" duration="5888000" />
       <workItem from="1693222744952" duration="2719000" />
-      <workItem from="1693443084411" duration="678000" />
+      <workItem from="1693443084411" duration="4148000" />
     </task>
     <servers />
   </component>
