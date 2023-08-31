@@ -313,24 +313,56 @@ public class SheetDownloader : MonoBehaviour
         return null; // 일치하는 클래스 타입이 없을 경우 null 반환
     }
 
-    private static Table_Base.SerializableTuple<string, int> ParseStageType(string input)
+    private static Table_Base.SerializableTuple<T, S> ParseStageType<T, S>(string input)
     {
-        Table_Base.SerializableTuple<string, int> result = new("", 0);
+        string[] parts = input.Trim('(', ')').Split(',');
+
+        if (parts.Length == 2)
+        {
+            if (typeof(T) == typeof(string) && typeof(S) == typeof(int))
+            {
+                T type = (T)Convert.ChangeType(parts[0].Trim(), typeof(T));
+
+                if (Int32.TryParse(parts[1].Trim(), out int intValue))
+                {
+                    intValue = (S)Convert.ChangeType(intValue, typeof(S));
+                }
+                else
+                {
+                    Debug.Log($"### Error ---> {parts[0]}, {parts[1]} <--- ParseStageType ");
+                    return null;
+                }
+                
+                Table_Base.SerializableTuple<T, S> result = new Table_Base.SerializableTuple<T, S>(type, intValue);
+
+                return result;
+            }
+        }
+
+        return null;
+    }
+    
+    private static Table_Base.SerializableTuple<int, int> ParseStageType(string input)
+    {
+        Table_Base.SerializableTuple<int, int> result = new(0, 0);
 
         string[] parts = input.Trim('(', ')').Split(',');
 
         if (parts.Length == 2)
         {
-            string type = parts[0].Trim();
-
-            if (Int32.TryParse(parts[1].Trim(), out int value))
+            int xPos = -1;
+            int yPos = -1;
+            if (Int32.TryParse(parts[0].Trim(), out xPos) == false)
             {
-                result = new Table_Base.SerializableTuple<string, int>(type, value);
+                Debug.Log($"### Error ---> {parts[0]}, {parts[1]} <--- ParseStageType");
             }
-            else
+
+            if (Int32.TryParse(parts[1].Trim(), out yPos))
             {
                 Debug.Log($"### Error ---> {parts[0]}, {parts[1]} <--- ParseStageType ");
             }
+            
+            result = new Table_Base.SerializableTuple<int, int>(xPos, yPos);
         }
 
         return result;
