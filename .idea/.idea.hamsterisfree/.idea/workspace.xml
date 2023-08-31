@@ -6,11 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="bc5cbd0e-719c-4dd5-9ae3-b4c40eb310b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hamsterisfree/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Common/Scripts/CommonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Common/Scripts/CommonManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Etc/DataContainer.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/csv/SeedTable.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/csv/SeedTable.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/SeedTable.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Data/so/StageTable.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Game/StageManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,7 +127,7 @@
       <workItem from="1693032410530" duration="270000" />
       <workItem from="1693032692574" duration="5888000" />
       <workItem from="1693222744952" duration="2719000" />
-      <workItem from="1693443084411" duration="4148000" />
+      <workItem from="1693443084411" duration="8866000" />
     </task>
     <servers />
   </component>

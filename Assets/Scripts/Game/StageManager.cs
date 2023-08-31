@@ -81,7 +81,7 @@ public class StageManager : MonoBehaviour
             if (this.stageInfo.Type == Define.StageType.LimitTime)
             {
                 // 밀리초 -> 초 변환해서 출력
-                value = Mathf.Floor(value /= 1000);
+                value = Mathf.Round(value /= 1000);
                 maxValue /= 1000;
             }
             
