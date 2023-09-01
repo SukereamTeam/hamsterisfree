@@ -47,6 +47,15 @@ jobs:
           #   Library-build-
           #   Library-
 
+      # Free up disk space
+      - name: Free Disk Space for Android
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          docker rmi $(docker images -q)
+          df -h
+
       - uses: game-ci/unity-builder@v3
         with:
           targetPlatform: Android
