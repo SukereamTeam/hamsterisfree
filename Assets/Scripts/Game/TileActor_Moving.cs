@@ -20,9 +20,6 @@ public class TileActor_Moving : ITileActor
 
                 // 다음 좌표로 이동, 다음 좌표를 _Tile의 TileInfo.Pos로 넣어주기(RootIdx도)
                 _Tile.SetPosition(nextData.rootIdx, nextData.pos);
-
-
-                // TODO : 이동 완료 대기
             }
 
         }

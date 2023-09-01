@@ -14,6 +14,13 @@ public class Define
         Seed,
         Monster
     }
+
+    public enum MonsterTile_Direction
+    {
+        NONE = 0,
+        LeftToRight,
+        TopToBottom
+    }
     
     public enum TileType_Sub
     {

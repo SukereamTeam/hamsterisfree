@@ -7,6 +7,7 @@ using DG.Tweening;
 using DataTable;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MapManager : MonoBehaviour
 {
@@ -45,6 +46,10 @@ public class MapManager : MonoBehaviour
 
     [SerializeField]
     private GameObject seedPrefab;
+    
+    [SerializeField]
+    private GameObject monsterPrefab;
+    
 
 
 
@@ -61,6 +66,7 @@ public class MapManager : MonoBehaviour
     }
 
     private List<SeedTile> seedTiles;
+    private List<MonsterTile> monsterTiles;
     public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
 
     private int randomSeed = 0;
@@ -79,6 +85,7 @@ public class MapManager : MonoBehaviour
             .ToArray();
 
         this.seedTiles = new List<SeedTile>();
+        this.monsterTiles = new List<MonsterTile>();
 
         this.randomSeed = (int)DateTime.Now.Ticks;
         UnityEngine.Random.InitState(this.randomSeed);
@@ -119,6 +126,10 @@ public class MapManager : MonoBehaviour
             {
                 CreateSeedTile(_CurStage, Define.TileType.Seed);
             }
+            else if (i == (int)Define.TileType.Monster)
+            {
+                CreateMonsterTile(_CurStage, Define.TileType.Monster);
+            }
         }
     }
 
@@ -151,7 +162,7 @@ public class MapManager : MonoBehaviour
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
-        var posList = GetRandomPosList(stageTable.SeedData);
+        var posList = GetRandomPosList(Define.TileType.Seed, stageTable.SeedData);
         int posIdx = 0;
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
@@ -188,30 +199,96 @@ public class MapManager : MonoBehaviour
             }
         }
     }
+    
+    private void CreateMonsterTile(int _CurStage, Define.TileType _TileType)
+    {
+        // MonsterTile은 위아래 혹은 양 옆으로 왔다갔다 한다.
+        // 그러므로 위아래로 움직이게 될 경우 x좌표만 필요하고, 양 옆으로 움직일 경우 y좌표만 필요하다.
+        // 위아래가 될지 양 옆이 될지 랜덤으로 정한 뒤
+        // 각 필요한 좌표를 랜덤으로 지정한다.
+        
+        var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+
+        var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
+        int posIdx = 0;
+
+        for (int i = 0; i < stageTable.MonsterData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
+            {
+                var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
+                
+                var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
+                var monsterScript = monsterTile.GetComponent<MonsterTile>();
+
+                // eg. SeedTile 의 타입들 중 Default_0 타입에 대한 데이터를 SeedTable에서 가져오기
+                var targetMonsterData = DataContainer.Instance.MonsterTable.GetParamFromType(stageTable.MonsterData[i].Item1, stageTable.MonsterData[i].Item2);
+
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                {
+                    Type = _TileType,
+                    RootIdx = posList[posIdx].root
+                };
+
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(targetMonsterData.Type)
+                    .WithActiveTime(targetMonsterData.ActiveTime)
+                    .Build();
+
+                monsterScript.Initialize(tileInfo, randomPos);
+
+                this.monsterTiles.Add(monsterScript);
+
+                posIdx++;
+            }
+        }
+    }
 
     /// <summary>
     /// Random Pos가 필요한 타일 리스트를 매개변수로 넣어주면
     /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
     /// </summary>
     /// <returns>Transform은 Pos값을 위해, int는 backTiles중 어느 타일을 참조했는지 파악하려고</returns>
-    private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int, int>> _List)
+    private List<(Transform transform, int root)> GetRandomPosList(Define.TileType _TileType, List<Table_Base.SerializableTuple<string, int, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
         var randomCount = _List.Select(x => x.Item3).Sum();
-
-        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
-        var targetTiles = new List<Transform>(this.backTiles);
-
+        
         var resultTile = new List<(Transform transform, int root)>();
 
+        Transform[] targetArray = new Transform[] { };
+        
+        if (_TileType == Define.TileType.Monster)
+        {
+            targetArray = this.backTiles
+                .Where(tile => 
+                    (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
+                    ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                )
+                .ToArray();
+        }
+        else if (_TileType == Define.TileType.Seed)
+        {
+            targetArray = this.backTiles;
+        }
+        
+        
+        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
+        var targetTiles = new List<Transform>(targetArray);
 
+        
+        
         for (int i = 0; i < randomCount; i++)
         {
             var random = UnityEngine.Random.Range(0, targetTiles.Count);
 
             // 참조한 타일이 어느 타일인지
-            int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+            int index = 0;
 
+            index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+            
             resultTile.Add((transform: targetTiles[random], root: index));
 
             targetTiles.RemoveAt(random);

@@ -13,8 +13,8 @@ public class SeedTile : TileBase
         set => this.isTouch = value;
     }
 
-    [FormerlySerializedAs("tileType")] [SerializeField]
-    private Define.TileType_Sub seedType = Define.TileType_Sub.Default;
+    [SerializeField]
+    private Define.TileType_Sub subType = Define.TileType_Sub.Default;
 
     
     private ITileActor tileActor;
@@ -37,7 +37,7 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info, _Pos);
 
-        this.seedType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
+        this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
@@ -65,7 +65,7 @@ public class SeedTile : TileBase
             this.tileActor = null;
         }
 
-        switch (this.seedType)
+        switch (this.subType)
         {
             case Define.TileType_Sub.Disappear:
             {
@@ -101,7 +101,7 @@ public class SeedTile : TileBase
 
         this.tileCollider.enabled = false;
         
-        TriggerEvent(this.seedType);
+        TriggerEvent(this.subType);
 
         if (this.tileActor == null)
         {
