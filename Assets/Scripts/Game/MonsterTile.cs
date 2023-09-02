@@ -105,16 +105,31 @@ public class MonsterTile : TileBase
             // 양 옆으로 이동
             if (this.transform.position.x == 1 || this.transform.position.x == 6)
             {
-                endPosition = this.transform.position.x > 1
-                    ? new Vector3(1, this.transform.position.y, this.transform.position.z)
-                    : new Vector3(6, this.transform.position.y, this.transform.position.z);
+                // 기존엔 맵 안에서만 이동했는데, 어려운 것 같아 Outline Tile까지 이동하도록 좌표를 1씩 빼주고 더해줌
+                if (startPosition.x > 1)
+                {
+                    startPosition = new Vector3(7, this.transform.position.y, this.transform.position.z);
+                    endPosition = new Vector3(0, this.transform.position.y, this.transform.position.z);
+                }
+                else
+                {
+                    startPosition = new Vector3(0, this.transform.position.y, this.transform.position.z);
+                    endPosition = new Vector3(7, this.transform.position.y, this.transform.position.z);
+                }
             }
             // 위 아래로 이동
             else if (this.transform.position.y == 0 || this.transform.position.y == 8)
             {
-                endPosition = this.transform.position.y > 0
-                    ? new Vector3(this.transform.position.x, 0, this.transform.position.z)
-                    : new Vector3(this.transform.position.x, 8, this.transform.position.z);
+                if (startPosition.y > 0)
+                {
+                    startPosition = new Vector3(this.transform.position.x, 9, this.transform.position.z);
+                    endPosition = new Vector3(this.transform.position.x, -1, this.transform.position.z);
+                }
+                else
+                {
+                    startPosition = new Vector3(this.transform.position.x, -1, this.transform.position.z);
+                    endPosition = new Vector3(this.transform.position.x, 9, this.transform.position.z);
+                }
             }
 
             float elapsedTime = 0f;
