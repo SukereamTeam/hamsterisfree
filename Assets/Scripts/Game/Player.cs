@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     private LineManager lineManager = null;
 
 
-    private readonly float dragDistance = 0.5f;
+    private readonly float dragDistance = 0.9f;
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
@@ -85,10 +85,10 @@ public class Player : MonoBehaviour
             Vector3 offset = Input.mousePosition - this.mouseDownPos;
             float sqrLen = offset.sqrMagnitude;
 
-            if (sqrLen > (dragDistance * dragDistance) && (Time.time - this.mouseDownTime) <
-                GameManager.Instance.MapManager.FadeTime)
+            if (Vector3.Distance(Input.mousePosition, this.mouseDownPos) > this.dragDistance &&
+                (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
-                Debug.Log("아직 시간 안됨");
+                Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {Vector3.Distance(Input.mousePosition, this.mouseDownPos)}");
 
                 GameManager.Instance.MapManager.IsFade.Value = false;
             }

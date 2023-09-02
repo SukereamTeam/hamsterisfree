@@ -52,7 +52,7 @@ public class MonsterTile : TileBase
         // 그 때 타일 타입마다 부여된 액션 실행
         await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
-        var moveTask = Move(this.info.ActiveTime, this.moveCts);
+        Move(this.info.ActiveTime, this.moveCts).Forget();
         
         // if (this.isFuncStart == false)
         // {
@@ -86,7 +86,7 @@ public class MonsterTile : TileBase
         //
         // if (this.tileActor != null)
         // {
-        //     var task = this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+        //     var task = this.tileActor.Act(this, this.info.ActiveTime, this.actCts);
         //     this.disposable = task.ToObservable().Subscribe(x =>
         //     {
         //         this.isFuncStart = x;
@@ -146,9 +146,7 @@ public class MonsterTile : TileBase
                 await UniTask.Yield();
             }
 
-            Vector3 temp = startPosition;
-            startPosition = endPosition;
-            endPosition = temp;
+            (startPosition, endPosition) = (endPosition, startPosition);
         }
     }
 
