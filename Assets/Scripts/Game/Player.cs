@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     private LineManager lineManager = null;
 
 
-    private readonly float dragDistance = 0.9f;
+    private readonly float dragDistance = 0.5f;
 
     private float mouseDownTime = 0f;
     private Vector3 mouseDownPos = Vector3.zero;
@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
             GameManager.Instance.MapManager.IsFade.Value = true;
 
             this.mouseDownTime = Time.time;
-            this.mouseDownPos = Input.mousePosition;
+            this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);//Input.mousePosition;
 
             this.lineManager.BeginDraw();
         }
@@ -82,13 +82,14 @@ public class Player : MonoBehaviour
                 return;
             }
 
-            Vector3 offset = Input.mousePosition - this.mouseDownPos;
-            float sqrLen = offset.sqrMagnitude;
+            var curMousePos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 distance = curMousePos - this.mouseDownPos;
+            float sqrLen = distance.sqrMagnitude;
 
-            if (Vector3.Distance(Input.mousePosition, this.mouseDownPos) > this.dragDistance &&
+            if (sqrLen > (dragDistance * dragDistance) &&
                 (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
-                Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {Vector3.Distance(Input.mousePosition, this.mouseDownPos)}");
+                Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
 
                 GameManager.Instance.MapManager.IsFade.Value = false;
             }
@@ -121,7 +122,7 @@ public class Player : MonoBehaviour
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
         int layerMask = 0; //(1 << LayerMask.NameToLayer(""));
-        Ray ray = gameCamera.ScreenPointToRay(_MousePosition);
+        Ray ray = this.gameCamera.ScreenPointToRay(_MousePosition);
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
@@ -137,7 +138,7 @@ public class Player : MonoBehaviour
 
     private (RaycastHit2D hit2D, Vector2 mousePos) RaycastGameScreen(Vector3 _MousePosition)
     {
-        Vector2 mousePosition = gameCamera.ScreenToWorldPoint(_MousePosition);
+        Vector2 mousePosition = this.gameCamera.ScreenToWorldPoint(_MousePosition);
 
         var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
 
