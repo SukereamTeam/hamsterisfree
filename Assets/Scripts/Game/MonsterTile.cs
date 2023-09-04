@@ -116,7 +116,7 @@ public class MonsterTile : TileBase
             
             var newPosition = Vector3.Lerp(this.startPos, this.endPos, t);
             
-            this.transform.localPosition = newPosition;
+            this.transform.localPosition = new Vector3(newPosition.x, newPosition.y, -0.5f);
             
             //elapsedTime += Time.deltaTime;
             
@@ -142,39 +142,18 @@ public class MonsterTile : TileBase
 
     private (Vector2 _Start, Vector2 _End) GetStartEndPosition(Vector2 _Pos)
     {
-        var startPosition = new Vector2(_Pos.x, _Pos.y);
-        var endPosition = Vector2.zero;
-        
-        // TODO : 같은 타일이 뽑힐 때가 있음... Monster 일 때...
-        
-        // 양 옆으로 이동
-        if (_Pos.x == 1f || _Pos.x == 6f)
+        Vector2 startPosition = Vector2.zero;
+        Vector2 endPosition = Vector2.zero;
+
+        if (Mathf.Approximately(_Pos.x, 1f) || Mathf.Approximately(_Pos.x, 6f))
         {
-            // 기존엔 맵 안에서만 이동했는데, 어려운 것 같아 Outline Tile까지 이동하도록 좌표를 1씩 빼주고 더해줌
-            if (_Pos.x > 1)
-            {
-                startPosition = new Vector2(7f, this.transform.position.y);
-                endPosition = new Vector2(0f, this.transform.position.y);
-            }
-            else
-            {
-                startPosition = new Vector2(0f, this.transform.position.y);
-                endPosition = new Vector2(7f, this.transform.position.y);
-            }
+            startPosition = new Vector2(Mathf.Approximately(_Pos.x, 1f) ? 7f : 0f, _Pos.y);
+            endPosition = new Vector2(Mathf.Approximately(_Pos.x, 1f) ? 0f : 7f, _Pos.y);
         }
-        // 위 아래로 이동
-        else if (_Pos.y == 0f || _Pos.y == 8f)
+        else if (Mathf.Approximately(_Pos.y, 0f) || Mathf.Approximately(_Pos.y, 8f))
         {
-            if (_Pos.y > 0f)
-            {
-                startPosition = new Vector2(this.transform.position.x, 9f);
-                endPosition = new Vector2(this.transform.position.x, -1f);
-            }
-            else
-            {
-                startPosition = new Vector2(this.transform.position.x, -1f);
-                endPosition = new Vector2(this.transform.position.x, 9f);
-            }
+            startPosition = new Vector2(_Pos.x, Mathf.Approximately(_Pos.y, 0f) ? 9f : -1f);
+            endPosition = new Vector2(_Pos.x, Mathf.Approximately(_Pos.y, 0f) ? -1f : 9f);
         }
 
         return (startPosition, endPosition);

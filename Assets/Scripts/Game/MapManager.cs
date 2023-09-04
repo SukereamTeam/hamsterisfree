@@ -264,7 +264,6 @@ public class MapManager : MonoBehaviour
         
         if (_TileType == Define.TileType.Monster)
         {
-            // TODO : 같은 타일이 뽑힐 때가 있음... Monster 일 때...
             targetArray = this.backTiles
                 .Where(tile => 
                     (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
