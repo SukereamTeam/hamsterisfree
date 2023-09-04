@@ -201,6 +201,7 @@ public class SheetDownloader : MonoBehaviour
                         FieldInfo csvDataField = listType.GetField(headers[j]);
                         if (csvDataField != null)
                         {
+                            // 현재 header와 같은 이름의 필드인지 확인
                             if (csvDataField.Name.Equals(headers[j]))
                             {
                                 // StageType 필드인 경우 파싱 필요해서

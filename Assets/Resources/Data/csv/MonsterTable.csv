@@ -1,5 +1,5 @@
-UID,Type,TypeIndex,ActiveTime,Size,Func,SpritePath
-0,Default,0,1,"(1, 1)",NULL,Images/Map/Forest/Forest_TopLeft
-1,Fade,0,1,"(1, 1)",NULL,Images/Map/Forest/Forest_BottomRight
-2,Moving,0,10,"(1, 1)",NULL,Images/Map/Forest/Forest_Left
-3,Boss,0,1,"(2, 2)",Default,Images/Map/Forest/Forest_Right
+UID,Type,TypeIndex,ActiveTime,MoveSpeed,Size,Func,SpritePath
+0,Default,0,1,0.5,"(1, 1)",NULL,Images/Map/Forest/Forest_TopLeft
+1,Fade,0,1,0.5,"(1, 1)",NULL,Images/Map/Forest/Forest_BottomRight
+2,Moving,0,10,0.5,"(1, 1)",NULL,Images/Map/Forest/Forest_Left
+3,Boss,0,1,1,"(2, 2)",Default,Images/Map/Forest/Forest_Right

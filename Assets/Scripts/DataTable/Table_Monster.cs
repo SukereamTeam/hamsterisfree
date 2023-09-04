@@ -19,6 +19,7 @@ namespace DataTable
             public string Type;
             public int TypeIndex;
             public float ActiveTime;
+            public float MoveSpeed;
             public SerializableTuple<int, int> Size;
             public string Func;
             public string SpritePath;

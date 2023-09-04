@@ -187,6 +187,7 @@ public class MapManager : MonoBehaviour
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
                     .WithSubType(targetSeedData.Type)
+                    .WithSubTypeIndex(targetSeedData.TypeIndex)
                     .WithActiveTime(targetSeedData.ActiveTime)
                     .WithSeedValue(targetSeedData.SeedValue)
                     .Build();
@@ -221,7 +222,7 @@ public class MapManager : MonoBehaviour
                 var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
                 var monsterScript = monsterTile.GetComponent<MonsterTile>();
 
-                // eg. SeedTile 의 타입들 중 Default_0 타입에 대한 데이터를 SeedTable에서 가져오기
+                // eg. MonsterTile 의 타입들 중 Default_0 타입에 대한 데이터를 MonsterTable에서 가져오기
                 var targetMonsterData = DataContainer.Instance.MonsterTable.GetParamFromType(stageTable.MonsterData[i].Item1, stageTable.MonsterData[i].Item2);
 
                 // 기본 정보 초기화
@@ -235,6 +236,7 @@ public class MapManager : MonoBehaviour
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
                     .WithSubType(targetMonsterData.Type)
                     .WithActiveTime(targetMonsterData.ActiveTime)
+                    .WithSubTypeIndex(targetMonsterData.TypeIndex)
                     .Build();
 
                 monsterScript.Initialize(tileInfo, randomPos);
@@ -262,6 +264,7 @@ public class MapManager : MonoBehaviour
         
         if (_TileType == Define.TileType.Monster)
         {
+            // TODO : 같은 타일이 뽑힐 때가 있음... Monster 일 때...
             targetArray = this.backTiles
                 .Where(tile => 
                     (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
@@ -306,36 +309,52 @@ public class MapManager : MonoBehaviour
         switch(_TileType)
         {
             case Define.TileType.Seed:
-            case Define.TileType.Monster:
                 {
                     // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
                     var targetTiles = new List<Transform>(this.backTiles);
 
-                    if (_TileType == Define.TileType.Seed)
-                    {
-                        var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+                    var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
 
-                        // targetTiles 리스트를 순회하면서
-                        // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
-                        // 다음 RandomPos를 뽑을 Pool이 될 것임
-                        var tilePool = targetTiles
-                            .Where((x, index) => seedTilesRoot.Contains(index) == false)
-                            .ToList();
+                    // targetTiles 리스트를 순회하면서
+                    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
+                    // 다음 RandomPos를 뽑을 Pool이 될 것임
+                    var tilePool = targetTiles
+                        .Where((x, index) => seedTilesRoot.Contains(index) == false)
+                        .ToList();
 
-                        var random = UnityEngine.Random.Range(0, tilePool.Count);
-                        var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+                    var random = UnityEngine.Random.Range(0, tilePool.Count);
+                    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
 
-                        // 참조한 타일이 어느 타일인지
-                        int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+                    // 참조한 타일이 어느 타일인지
+                    int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
 
-                        rootIdx = index;
-                        pos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
-                    }
-                    //else if (_Tile.Info.Type == Define.TileType.Monster)
-                    //{
-                    //    ...
-                    //}
+                    rootIdx = index;
+                    pos = randomPos;
                 }
+                break;
+            case Define.TileType.Monster:
+            {
+                var targetTiles = this.backTiles.Where(tile => 
+                        (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
+                        ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                    )
+                    .ToArray();
+                
+                var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
+
+                var tilePool = targetTiles
+                    .Where((x, index) => monsterTilesRoot.Contains(index) == false)
+                    .ToList();
+                
+                var random = UnityEngine.Random.Range(0, tilePool.Count);
+                var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+
+                // 참조한 타일이 어느 타일인지
+                int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+
+                rootIdx = index;
+                pos = randomPos;
+            }
                 break;
         }
 

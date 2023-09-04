@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Threading;
 using System;
 using Cysharp.Threading.Tasks;
+using DataTable;
 using UnityEngine;
 using UniRx;
-using UnityEngine.Serialization;
 
 public class MonsterTile : TileBase
 {
     [SerializeField]
     private Define.TileType_Sub subType = Define.TileType_Sub.Default;
-
+    
     private ITileActor tileActor;
     private bool isFuncStart = false;
-    private Vector2 Pos = new Vector2();
+    private Vector2 startPos = new Vector2();
+    private Vector2 endPos = new Vector2();
+    
     private Define.MonsterTile_Direction directionFlag = Define.MonsterTile_Direction.NONE;
-
+    private Table_Monster.Param monsterData;
+    
     private CancellationTokenSource moveCts;
     private CancellationTokenSource actCts;
     private IDisposable disposable = null;
@@ -31,8 +34,11 @@ public class MonsterTile : TileBase
 
     public override void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        base.Initialize(_Info, _Pos);
-        this.Pos = _Pos;            // this.transform.localPosition 으로 바꿀 수 있지 않나?
+        var posTuple = GetStartEndPosition(_Pos);
+        this.startPos = posTuple._Start;
+        this.endPos = posTuple._End;
+        
+        base.Initialize(_Info, this.startPos);
         
         this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
 
@@ -42,6 +48,9 @@ public class MonsterTile : TileBase
             this.spriteRenderer.sprite = sprite;
             this.spriteRenderer.color = Color.cyan;
         }
+        
+        this.monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(
+            this.info.SubType, (int)this.info.SubTypeIndex);
 
         TileFuncStart().Forget();
     }
@@ -52,7 +61,7 @@ public class MonsterTile : TileBase
         // 그 때 타일 타입마다 부여된 액션 실행
         await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
-        Move(this.info.ActiveTime, this.moveCts).Forget();
+        Move(this.info.ActiveTime, this.monsterData.MoveSpeed, this.moveCts).Forget();
         
         // if (this.isFuncStart == false)
         // {
@@ -95,58 +104,30 @@ public class MonsterTile : TileBase
         
     }
 
-    private async UniTaskVoid Move(float _Time, CancellationTokenSource _Cts)
+    private async UniTaskVoid Move(float _Time, float _Speed, CancellationTokenSource _Cts)
     {
-        Vector3 startPosition = this.transform.position;
-        Vector3 endPosition = Vector3.zero;
-
+        float t = 0f;
         while (this.moveCts.IsCancellationRequested == false)
         {
-            // 양 옆으로 이동
-            if (this.transform.position.x == 1 || this.transform.position.x == 6)
+            //float elapsedTime = 0f;
+
+            t += Time.deltaTime * _Speed; //elapsedTime / _Time;
+            t = Mathf.Clamp01(t);       // 0~1 사이 값 유지
+            
+            var newPosition = Vector3.Lerp(this.startPos, this.endPos, t);
+            
+            this.transform.localPosition = newPosition;
+            
+            //elapsedTime += Time.deltaTime;
+            
+            if (t >= 1f)
             {
-                // 기존엔 맵 안에서만 이동했는데, 어려운 것 같아 Outline Tile까지 이동하도록 좌표를 1씩 빼주고 더해줌
-                if (startPosition.x > 1)
-                {
-                    startPosition = new Vector3(7, this.transform.position.y, this.transform.position.z);
-                    endPosition = new Vector3(0, this.transform.position.y, this.transform.position.z);
-                }
-                else
-                {
-                    startPosition = new Vector3(0, this.transform.position.y, this.transform.position.z);
-                    endPosition = new Vector3(7, this.transform.position.y, this.transform.position.z);
-                }
+                t = 0f;
+                    
+                (this.startPos, this.endPos) = (this.endPos, this.startPos);
             }
-            // 위 아래로 이동
-            else if (this.transform.position.y == 0 || this.transform.position.y == 8)
-            {
-                if (startPosition.y > 0)
-                {
-                    startPosition = new Vector3(this.transform.position.x, 9, this.transform.position.z);
-                    endPosition = new Vector3(this.transform.position.x, -1, this.transform.position.z);
-                }
-                else
-                {
-                    startPosition = new Vector3(this.transform.position.x, -1, this.transform.position.z);
-                    endPosition = new Vector3(this.transform.position.x, 9, this.transform.position.z);
-                }
-            }
-
-            float elapsedTime = 0f;
-
-            while (this.moveCts.IsCancellationRequested == false && elapsedTime < _Time)
-            {
-                float t = elapsedTime / _Time;
-                Vector3 newPosition = Vector3.Lerp(startPosition, endPosition, t);
-
-                this.transform.position = newPosition;
-
-                elapsedTime += Time.deltaTime;
-
-                await UniTask.Yield();
-            }
-
-            (startPosition, endPosition) = (endPosition, startPosition);
+            
+            await UniTask.Yield();
         }
     }
 
@@ -157,6 +138,46 @@ public class MonsterTile : TileBase
 
         this.tileCollider.enabled = false;
 
+    }
+
+    private (Vector2 _Start, Vector2 _End) GetStartEndPosition(Vector2 _Pos)
+    {
+        var startPosition = new Vector2(_Pos.x, _Pos.y);
+        var endPosition = Vector2.zero;
+        
+        // TODO : 같은 타일이 뽑힐 때가 있음... Monster 일 때...
+        
+        // 양 옆으로 이동
+        if (_Pos.x == 1f || _Pos.x == 6f)
+        {
+            // 기존엔 맵 안에서만 이동했는데, 어려운 것 같아 Outline Tile까지 이동하도록 좌표를 1씩 빼주고 더해줌
+            if (_Pos.x > 1)
+            {
+                startPosition = new Vector2(7f, this.transform.position.y);
+                endPosition = new Vector2(0f, this.transform.position.y);
+            }
+            else
+            {
+                startPosition = new Vector2(0f, this.transform.position.y);
+                endPosition = new Vector2(7f, this.transform.position.y);
+            }
+        }
+        // 위 아래로 이동
+        else if (_Pos.y == 0f || _Pos.y == 8f)
+        {
+            if (_Pos.y > 0f)
+            {
+                startPosition = new Vector2(this.transform.position.x, 9f);
+                endPosition = new Vector2(this.transform.position.x, -1f);
+            }
+            else
+            {
+                startPosition = new Vector2(this.transform.position.x, -1f);
+                endPosition = new Vector2(this.transform.position.x, 9f);
+            }
+        }
+
+        return (startPosition, endPosition);
     }
     
     private void OnDestroy()

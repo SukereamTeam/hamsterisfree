@@ -11,6 +11,7 @@ public abstract class TileBase : MonoBehaviour
         public int RootIdx;
 
         public string SubType;
+        public int SubTypeIndex;
         public float ActiveTime;
         public int SeedValue;
     }
@@ -37,6 +38,17 @@ public abstract class TileBase : MonoBehaviour
         public TileBuilder WithSubType(string _Type)
         {
             _tileInfo.SubType = _Type;
+            return this;
+        }
+        
+        /// <summary>
+        /// 서브 타입의 Index 지정
+        /// </summary>
+        /// <param name="_Index">Fade0, Fade1 이런식임</param>
+        /// <returns></returns>
+        public TileBuilder WithSubTypeIndex(int _Index)
+        {
+            _tileInfo.SubTypeIndex = _Index;
             return this;
         }
 
