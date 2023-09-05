@@ -334,23 +334,24 @@ public class MapManager : MonoBehaviour
                 break;
             case Define.TileType.Monster:
             {
-                var targetTiles = this.backTiles.Where(tile => 
-                        (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
-                        ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                    )
-                    .ToArray();
-                
+                // TODO : monsterTiles에 업데이트 해줘야함 (SeedTile도 마찬가지)
                 var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
 
-                var tilePool = targetTiles
+                var exceptContainTiles = this.backTiles
                     .Where((x, index) => monsterTilesRoot.Contains(index) == false)
                     .ToList();
                 
-                var random = UnityEngine.Random.Range(0, tilePool.Count);
-                var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+                var targetTiles = exceptContainTiles.Where(tile => 
+                        (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
+                        ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                    )
+                    .ToList();
+                
+                var random = UnityEngine.Random.Range(0, targetTiles.Count);
+                var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
 
                 // 참조한 타일이 어느 타일인지
-                int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+                int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
 
                 rootIdx = index;
                 pos = randomPos;

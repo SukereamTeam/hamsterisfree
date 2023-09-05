@@ -14,6 +14,7 @@ public class MonsterTile : TileBase
     
     private ITileActor tileActor;
     private bool isFuncStart = false;
+    private bool isMovingDone = false;
 
     private Vector2 originPos = new Vector2();
     private Vector2 startPos = new Vector2();
@@ -67,49 +68,49 @@ public class MonsterTile : TileBase
 
         Move(this.info.ActiveTime, this.monsterData.MoveSpeed, this.moveCts).Forget();
         
-        // if (this.isFuncStart == false)
-        // {
-        //     Debug.Log("Monster Func Start !!!");
-        //     this.isFuncStart = true;
-        // }
-        //
-        // if (this.tileActor != null)
-        // {
-        //     this.tileActor = null;
-        // }
-        //
-        // switch (this.subType)
-        // {
-        //     case Define.TileType_Sub.Disappear:
-        //     {
-        //         this.tileActor = new TileActor_Disappear();
-        //     }
-        //         break;
-        //     case Define.TileType_Sub.Moving:
-        //     {
-        //         this.tileActor = new TileActor_Moving();
-        //     }
-        //         break;
-        //     case Define.TileType_Sub.Fade:
-        //     {
-        //         this.tileActor = new TileActor_Fade();
-        //     }
-        //         break;
-        // }
-        //
-        // if (this.tileActor != null)
-        // {
-        //     if (this.subType == Define.TileType_Sub.Moving)
-        //     {
-        //         return;
-        //     }
-        //     
-        //     var task = this.tileActor.Act(this, this.actCts, this.info.ActiveTime);
-        //     this.disposable = task.ToObservable().Subscribe(x =>
-        //     {
-        //         this.isFuncStart = x;
-        //     });
-        // }
+        if (this.isFuncStart == false)
+        {
+            Debug.Log("Monster Func Start !!!");
+            this.isFuncStart = true;
+        }
+        
+        if (this.tileActor != null)
+        {
+            this.tileActor = null;
+        }
+        
+        switch (this.subType)
+        {
+            case Define.TileType_Sub.Disappear:
+            {
+                this.tileActor = new TileActor_Disappear();
+            }
+                break;
+            case Define.TileType_Sub.Moving:
+            {
+                this.tileActor = new TileActor_Moving();
+            }
+                break;
+            case Define.TileType_Sub.Fade:
+            {
+                this.tileActor = new TileActor_Fade();
+            }
+                break;
+        }
+        
+        if (this.tileActor != null)
+        {
+            if (this.subType == Define.TileType_Sub.Moving)
+            {
+                return;
+            }
+            
+            var task = this.tileActor.Act(this, this.actCts, this.info.ActiveTime);
+            this.disposable = task.ToObservable().Subscribe(x =>
+            {
+                this.isFuncStart = x;
+            });
+        }
         
     }
 
@@ -137,42 +138,35 @@ public class MonsterTile : TileBase
                 
                     if (timer >= _Time)
                     {
-                        // TODO : Delete
+                        timer = 0f;
+                        
                         if (this.subType == Define.TileType_Sub.Moving)
                         {
-                            Debug.Log($"{timer} ActiveTime만큼 시간이 흘러꾼...");
-                            _Cts.Cancel();
+                            // 타일이 끝으로 완전히 간 다음 Position을 바꿔주고 싶어서 이렇게 구현
+                            if (this.tileActor != null)
+                            {
+                                this.isMovingDone = false;
+                                var task = this.tileActor.Act(this, this.actCts);
+                                this.disposable = task.ToObservable().Subscribe(x =>
+                                {
+                                    this.isMovingDone = true;
+                                    this.isFuncStart = x;
+                                });
+
+                                await UniTask.WaitUntil(() => this.isMovingDone == true);
+
+                                this.isMovingDone = false;
+                                Vector2 changePos = new Vector2(this.transform.localPosition.x,
+                                    this.transform.localPosition.y);
+                                var posTuple = GetStartEndPosition(changePos);
+                                this.startPos = posTuple._Start;
+                                this.endPos = posTuple._End;
+                        
+                                this.originPos = changePos;
+                                
+                                continue;
+                            }
                         }
-                        
-                        
-                        
-                        // if (this.subType == Define.TileType_Sub.Moving)
-                        // {
-                        //     // 타일이 끝으로 완전히 간 다음 Position을 바꿔주고 싶어서 이렇게 구현
-                        //     if (this.tileActor != null)
-                        //     {
-                        //         var task = this.tileActor.Act(this, this.actCts);
-                        //         if (this.disposable == null)
-                        //         {
-                        //             this.disposable = task.ToObservable().Subscribe(x =>
-                        //             {
-                        //                 this.isFuncStart = x;
-                        //             });
-                        //         }
-                        //     }
-                        //
-                        //     timer = 0f;
-                        //
-                        //     Vector2 changePos = new Vector2(this.transform.localPosition.x,
-                        //         this.transform.localPosition.y);
-                        //     var posTuple = GetStartEndPosition(changePos);
-                        //     this.startPos = posTuple._Start;
-                        //     this.endPos = posTuple._End;
-                        //
-                        //     this.originPos = changePos;
-                        //     
-                        //     continue;
-                        // }
                     }
                     
                     (this.startPos, this.endPos) = (this.endPos, this.startPos);
