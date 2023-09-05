@@ -13,6 +13,7 @@ public abstract class TileBase : MonoBehaviour
         public string SubType;
         public int SubTypeIndex;
         public float ActiveTime;
+        public string Func;
         public int SeedValue;
     }
 
@@ -29,6 +30,7 @@ public abstract class TileBase : MonoBehaviour
             _tileInfo.SubType = "";
             _tileInfo.ActiveTime = 0f;
             _tileInfo.SeedValue = 0;
+            _tileInfo.Func = "";
         }
 
         /// <summary>
@@ -69,6 +71,17 @@ public abstract class TileBase : MonoBehaviour
             return this;
         }
 
+        /// <summary>
+        /// MonsterTile에 부여되는 Func 세팅 (For Boss)
+        /// </summary>
+        /// <param name="_Func"></param>
+        /// <returns></returns>
+        public TileBuilder WithFunc(string _Func)
+        {
+            _tileInfo.Func = _Func;
+            return this;
+        }
+
         public TileInfo Build()
         {
             return _tileInfo;
@@ -92,7 +105,7 @@ public abstract class TileBase : MonoBehaviour
     protected Animator animator;
     
 
-    public const float FADE_TIME = 0.3f;
+    public const float TILE_FADE_TIME = 0.3f;
 
 
 

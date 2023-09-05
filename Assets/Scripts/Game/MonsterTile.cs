@@ -14,6 +14,8 @@ public class MonsterTile : TileBase
     
     private ITileActor tileActor;
     private bool isFuncStart = false;
+
+    private Vector2 originPos = new Vector2();
     private Vector2 startPos = new Vector2();
     private Vector2 endPos = new Vector2();
     
@@ -37,6 +39,8 @@ public class MonsterTile : TileBase
         var posTuple = GetStartEndPosition(_Pos);
         this.startPos = posTuple._Start;
         this.endPos = posTuple._End;
+
+        this.originPos = _Pos;
         
         base.Initialize(_Info, this.startPos);
         
@@ -65,7 +69,7 @@ public class MonsterTile : TileBase
         
         // if (this.isFuncStart == false)
         // {
-        //     Debug.Log("SeedTile Func Start !!!");
+        //     Debug.Log("Monster Func Start !!!");
         //     this.isFuncStart = true;
         // }
         //
@@ -95,7 +99,12 @@ public class MonsterTile : TileBase
         //
         // if (this.tileActor != null)
         // {
-        //     var task = this.tileActor.Act(this, this.info.ActiveTime, this.actCts);
+        //     if (this.subType == Define.TileType_Sub.Moving)
+        //     {
+        //         return;
+        //     }
+        //     
+        //     var task = this.tileActor.Act(this, this.actCts, this.info.ActiveTime);
         //     this.disposable = task.ToObservable().Subscribe(x =>
         //     {
         //         this.isFuncStart = x;
@@ -106,28 +115,83 @@ public class MonsterTile : TileBase
 
     private async UniTaskVoid Move(float _Time, float _Speed, CancellationTokenSource _Cts)
     {
-        float t = 0f;
-        while (this.moveCts.IsCancellationRequested == false)
-        {
-            //float elapsedTime = 0f;
+        float timer = 0f;
+        float progress = 0f;
 
-            t += Time.deltaTime * _Speed; //elapsedTime / _Time;
-            t = Mathf.Clamp01(t);       // 0~1 사이 값 유지
-            
-            var newPosition = Vector3.Lerp(this.startPos, this.endPos, t);
-            
-            this.transform.localPosition = new Vector3(newPosition.x, newPosition.y, -0.5f);
-            
-            //elapsedTime += Time.deltaTime;
-            
-            if (t >= 1f)
+        try
+        {
+            while (_Cts.IsCancellationRequested == false)
             {
-                t = 0f;
-                    
-                (this.startPos, this.endPos) = (this.endPos, this.startPos);
-            }
+                timer += Time.deltaTime;
             
-            await UniTask.Yield();
+                progress += Time.deltaTime * _Speed; //elapsedTime / _Time;
+                progress = Mathf.Clamp01(progress);       // 0~1 사이 값 유지
+            
+                var newPosition = Vector3.Lerp(this.startPos, this.endPos, progress);
+            
+                this.transform.localPosition = new Vector3(newPosition.x, newPosition.y, -0.5f);
+            
+                if (progress >= 1f)
+                {
+                    progress = 0f;
+                
+                    if (timer >= _Time)
+                    {
+                        // TODO : Delete
+                        if (this.subType == Define.TileType_Sub.Moving)
+                        {
+                            Debug.Log($"{timer} ActiveTime만큼 시간이 흘러꾼...");
+                            _Cts.Cancel();
+                        }
+                        
+                        
+                        
+                        // if (this.subType == Define.TileType_Sub.Moving)
+                        // {
+                        //     // 타일이 끝으로 완전히 간 다음 Position을 바꿔주고 싶어서 이렇게 구현
+                        //     if (this.tileActor != null)
+                        //     {
+                        //         var task = this.tileActor.Act(this, this.actCts);
+                        //         if (this.disposable == null)
+                        //         {
+                        //             this.disposable = task.ToObservable().Subscribe(x =>
+                        //             {
+                        //                 this.isFuncStart = x;
+                        //             });
+                        //         }
+                        //     }
+                        //
+                        //     timer = 0f;
+                        //
+                        //     Vector2 changePos = new Vector2(this.transform.localPosition.x,
+                        //         this.transform.localPosition.y);
+                        //     var posTuple = GetStartEndPosition(changePos);
+                        //     this.startPos = posTuple._Start;
+                        //     this.endPos = posTuple._End;
+                        //
+                        //     this.originPos = changePos;
+                        //     
+                        //     continue;
+                        // }
+                    }
+                    
+                    (this.startPos, this.endPos) = (this.endPos, this.startPos);
+                }
+            
+                await UniTask.Yield();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Cancel 토큰으로 종료되었을 때
+            if (ex is OperationCanceledException)
+            {
+                Debug.Log("### MonsterTile Move ---> " + ex.Message + " ###");
+            }
+            else
+            {
+                Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
+            }
         }
     }
 

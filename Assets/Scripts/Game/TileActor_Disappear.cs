@@ -10,7 +10,7 @@ public class TileActor_Disappear : ITileActor
 {
     private FadeTweener tweener = null;
 
-    public async UniTask<bool> Act(TileBase _Tile, float _ActiveTime = 0, CancellationTokenSource _Cts = default)
+    public async UniTask<bool> Act(TileBase _Tile, CancellationTokenSource _Cts, float _ActiveTime = 0)
     {
         try
         {
@@ -20,7 +20,7 @@ public class TileActor_Disappear : ITileActor
 
             _Tile.TileCollider.enabled = false;
 
-            this.tweener = _Tile.SpriteRenderer.DOFade(0f, TileBase.FADE_TIME);
+            this.tweener = _Tile.SpriteRenderer.DOFade(0f, TileBase.TILE_FADE_TIME);
             
             await tweener;
         }

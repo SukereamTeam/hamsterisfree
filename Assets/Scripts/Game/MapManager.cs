@@ -237,6 +237,7 @@ public class MapManager : MonoBehaviour
                     .WithSubType(targetMonsterData.Type)
                     .WithActiveTime(targetMonsterData.ActiveTime)
                     .WithSubTypeIndex(targetMonsterData.TypeIndex)
+                    .WithFunc(targetMonsterData.Func)
                     .Build();
 
                 monsterScript.Initialize(tileInfo, randomPos);

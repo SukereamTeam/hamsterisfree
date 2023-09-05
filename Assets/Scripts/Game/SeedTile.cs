@@ -86,7 +86,7 @@ public class SeedTile : TileBase
 
         if (this.tileActor != null)
         {
-            var task = this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+            var task = this.tileActor.Act(this, this.cts, this.info.ActiveTime);
             this.disposable = task.ToObservable().Subscribe(x =>
             {
                 this.isFuncStart = x;
