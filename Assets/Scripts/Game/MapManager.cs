@@ -65,7 +65,10 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
+    private object lockSeed = new object();
     private List<SeedTile> seedTiles;
+    
+    private object lockMonster = new object();
     private List<MonsterTile> monsterTiles;
     public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
 
@@ -306,9 +309,11 @@ public class MapManager : MonoBehaviour
         Vector2 pos = Vector2.zero;
 
 
-        switch(_TileType)
+        switch (_TileType)
         {
             case Define.TileType.Seed:
+            {
+                lock (lockSeed)
                 {
                     // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
                     var targetTiles = new List<Transform>(this.backTiles);
@@ -331,30 +336,36 @@ public class MapManager : MonoBehaviour
                     rootIdx = index;
                     pos = randomPos;
                 }
+            }
                 break;
+            
             case Define.TileType.Monster:
             {
-                // TODO : monsterTiles에 업데이트 해줘야함 (SeedTile도 마찬가지)
-                var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
+                lock (lockMonster)
+                {
+                    var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
 
-                var exceptContainTiles = this.backTiles
-                    .Where((x, index) => monsterTilesRoot.Contains(index) == false)
-                    .ToList();
-                
-                var targetTiles = exceptContainTiles.Where(tile => 
-                        (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
-                        ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                    )
-                    .ToList();
-                
-                var random = UnityEngine.Random.Range(0, targetTiles.Count);
-                var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
+                    var exceptContainTiles = this.backTiles
+                        .Where((x, index) => monsterTilesRoot.Contains(index) == false)
+                        .ToList();
 
-                // 참조한 타일이 어느 타일인지
-                int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+                    var targetTiles = exceptContainTiles.Where(tile =>
+                            (tile.position.x >= 1 && tile.position.x <= 6 &&
+                             (tile.position.y == 0 || tile.position.y == 8)) ||
+                            ((tile.position.x == 1 || tile.position.x == 6) &&
+                             (tile.position.y >= 0 && tile.position.y <= 8))
+                        )
+                        .ToList();
 
-                rootIdx = index;
-                pos = randomPos;
+                    var random = UnityEngine.Random.Range(0, targetTiles.Count);
+                    var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
+
+                    // 참조한 타일이 어느 타일인지
+                    int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+
+                    rootIdx = index;
+                    pos = randomPos;
+                }
             }
                 break;
         }
