@@ -65,6 +65,8 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
+    private ExitTile exitTile;
+    
     private object lockSeed = new object();
     private List<SeedTile> seedTiles;
     
@@ -134,6 +136,11 @@ public class MapManager : MonoBehaviour
                 CreateMonsterTile(_CurStage, Define.TileType.Monster);
             }
         }
+
+        // Save Setting StageData
+        SaveStageToJson();
+        
+        // TODO : 입장해서 로드할 땐, 입장한 스테이지가 현재 진행중인 스테이지인지 파악하고, 맞으면 Json 로드, 아니면 그냥 랜덤 생성
     }
 
     //------------------ Create Tiles
@@ -155,6 +162,8 @@ public class MapManager : MonoBehaviour
         TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo).Build();
 
         exitScript.Initialize(tileInfo, randomPos);
+
+        this.exitTile = exitScript;
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
@@ -268,10 +277,9 @@ public class MapManager : MonoBehaviour
         {
             targetArray = this.backTiles
                 .Where(tile => 
-                    (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
+                    ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
                     ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                )
-                .ToArray();
+                ).ToArray();
         }
         else if (_TileType == Define.TileType.Seed)
         {
@@ -367,6 +375,35 @@ public class MapManager : MonoBehaviour
 
 
         return (rootIdx, pos);
+    }
+
+    private void SaveStageToJson()
+    {
+        List<TileData> seedDatas = new List<TileData>(this.seedTiles.Count);
+        List<TileData> monsterDatas = new List<TileData>(this.monsterTiles.Count);
+        int exitData = -1;
+        
+        foreach (var tile in seedTiles)
+        {
+            TileData data = new TileData(tile.Info.SubType,
+                tile.Info.SubTypeIndex,
+                tile.Info.RootIdx);
+            
+            seedDatas.Add(data);
+        }
+        
+        foreach (var tile in monsterTiles)
+        {
+            TileData data = new TileData(tile.Info.SubType,
+                tile.Info.SubTypeIndex,
+                tile.Info.RootIdx);
+            
+            monsterDatas.Add(data);
+        }
+
+        exitData = this.exitTile.Info.RootIdx;
+
+        JsonManager.Instance.SaveStageData(seedDatas, monsterDatas, exitData);
     }
 
     
