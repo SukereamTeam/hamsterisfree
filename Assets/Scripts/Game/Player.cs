@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
             return;
         }
 
+        // 게임이 종료되었거나, 아직 시작한 상태가 아니라면 return
         if (GameManager.Instance.IsGame.Value == false)
         {
             return;

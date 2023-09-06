@@ -14,7 +14,7 @@ public class SeedTile : TileBase
     }
 
     [FormerlySerializedAs("tileType")] [SerializeField]
-    private Define.SeedTile_Type seedType = Define.SeedTile_Type.Default;
+    private Define.TileType_Sub seedType = Define.TileType_Sub.Default;
 
     
     private ITileActor tileActor;
@@ -37,7 +37,7 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info, _Pos);
 
-        this.seedType = (Define.SeedTile_Type)Enum.Parse(typeof(Define.SeedTile_Type), _Info.SubType);
+        this.seedType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
@@ -52,7 +52,7 @@ public class SeedTile : TileBase
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        await UniTask.WaitUntil(() => GameManager.Instance.IsGame.Value == true);
+        await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
         if (this.isFuncStart == false)
         {
@@ -67,17 +67,17 @@ public class SeedTile : TileBase
 
         switch (this.seedType)
         {
-            case Define.SeedTile_Type.Disappear:
+            case Define.TileType_Sub.Disappear:
             {
                 this.tileActor = new TileActor_Disappear();
             }
                 break;
-            case Define.SeedTile_Type.Moving:
+            case Define.TileType_Sub.Moving:
             {
                 this.tileActor = new TileActor_Moving();
             }
                 break;
-            case Define.SeedTile_Type.Fade:
+            case Define.TileType_Sub.Fade:
             {
                 this.tileActor = new TileActor_Fade();
             }
@@ -97,7 +97,7 @@ public class SeedTile : TileBase
     
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log("Seed 먹음");
+        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.info.SeedValue} 먹음");
 
         this.tileCollider.enabled = false;
         
@@ -124,15 +124,15 @@ public class SeedTile : TileBase
         // Trigger Ani 재생
     }
 
-    private void TriggerEvent(Define.SeedTile_Type _type)
+    private void TriggerEvent(Define.TileType_Sub _type)
     {
-        if (_type == Define.SeedTile_Type.Heart || _type == Define.SeedTile_Type.Fake)
+        if (_type == Define.TileType_Sub.Heart || _type == Define.TileType_Sub.Fake)
         {
             GameManager.Instance.StageManager.ChangeStageValue(this.info.SeedValue);
         }
         else
         {
-            GameManager.Instance.SeedScore++;
+            GameManager.Instance.SeedScore.Value++;
         }
     }
 

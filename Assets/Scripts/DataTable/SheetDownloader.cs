@@ -67,10 +67,13 @@ public class SheetDownloader : MonoBehaviour
         foreach (var sheet in sheetDatas)
         {
             CreateScriptableObject(sheet);
+            
+            EditorUtility.SetDirty(this.dataContainer);
+            
         }
 
-        EditorUtility.SetDirty(this.dataContainer);
         AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
 
     private async UniTask Download(SheetData _SheetData, string _Format)
@@ -202,19 +205,27 @@ public class SheetDownloader : MonoBehaviour
                             {
                                 // StageType 필드인 경우 파싱 필요해서
                                 // 시트 string 값 : "(LimitTime, 60)" -> Type: LimitTime, Count: 60(60초) 로 파싱이 필요함
-                                Type stageTypeField = typeof(Table_Base.SerializableTuple<string, int>);
-                                if (csvDataField.FieldType.Equals(stageTypeField))
+                                Type pairOfStringInt = typeof(Table_Base.SerializableTuple<string, int>);
+                                if (csvDataField.FieldType.Equals(pairOfStringInt))
                                 {
-                                    csvDataField.SetValue(csvData, ParseStageType(value));
+                                    csvDataField.SetValue(csvData, ParseStageType<string, int>(value));
+                                    continue;
+                                }
+                                
+                                Type pairOfInt = typeof(Table_Base.SerializableTuple<int, int>);
+                                if (csvDataField.FieldType.Equals(pairOfInt))
+                                {
+                                    csvDataField.SetValue(csvData, ParseStageType<int, int>(value));
                                     continue;
                                 }
 
                                 // List<ObjectData> 필드인 경우 파싱 필요
-                                // 시트 string 값 : "((Default, 3), (Boss, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
-                                Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int>>);
+                                // stageTable에서 사용중
+                                // 시트 string 값 : "((Default, 0, 3), (Boss, 5, 1))" -> 각각 나눠 List로 저장하는 파싱 작업 필요
+                                Type objectDataTypeField = typeof(List<Table_Base.SerializableTuple<string, int, int>>);
                                 if (csvDataField.FieldType.Equals(objectDataTypeField))
                                 {
-                                    csvDataField.SetValue(csvData, ParseObjectData(value));
+                                    csvDataField.SetValue(csvData, ParseObjectData<string, int, int>(value));
                                     continue;
                                 }
 
@@ -231,6 +242,10 @@ public class SheetDownloader : MonoBehaviour
                                     continue;
                                 }
 
+                                if (value.Equals("NULL"))
+                                {
+                                    value = string.Empty;
+                                }
 
                                 csvDataField.SetValue(csvData, value);
                             }
@@ -247,6 +262,8 @@ public class SheetDownloader : MonoBehaviour
         AssetDatabase.SaveAssets();
 
         SetDataContainer(foundType, data);
+        
+        AssetDatabase.Refresh();
     }
 
 
@@ -313,60 +330,61 @@ public class SheetDownloader : MonoBehaviour
         return null; // 일치하는 클래스 타입이 없을 경우 null 반환
     }
 
-    private static Table_Base.SerializableTuple<string, int> ParseStageType(string input)
-    {
-        Table_Base.SerializableTuple<string, int> result = new("", 0);
-
-        string[] parts = input.Trim('(', ')').Split(',');
-
-        if (parts.Length == 2)
-        {
-            string type = parts[0].Trim();
-
-            if (Int32.TryParse(parts[1].Trim(), out int value))
-            {
-                result = new Table_Base.SerializableTuple<string, int>(type, value);
-            }
-            else
-            {
-                Debug.Log($"### Error ---> {parts[0]}, {parts[1]} <--- ParseStageType ");
-            }
-        }
-
-        return result;
-    }
-
-    private static List<Table_Base.SerializableTuple<string, int>> ParseObjectData(string input)
+    private static Table_Base.SerializableTuple<T, U> ParseStageType<T, U>(string input)
     {
         if (input.Equals("NULL"))
             return null;
-
+        
         string[] tupleStrings = input.Split(new char[] { '(', ')', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        List<Table_Base.SerializableTuple<string, int>> resultList = new List<Table_Base.SerializableTuple<string, int>>((tupleStrings.Length / 2));
+        T item1 = (T)Convert.ChangeType(tupleStrings[0], typeof(T));
+        U item2 = (U)Convert.ChangeType(tupleStrings[1], typeof(U));
 
-        for (int i = 0; i < tupleStrings.Length; i += 2)
+        return new Table_Base.SerializableTuple<T, U>(item1, item2);
+    }
+
+    private static List<Table_Base.SerializableTuple<T, U, V>> ParseObjectData<T, U, V>(string input)
+    {
+        if (input.Equals("NULL"))
+            return null;
+        
+        string[] tupleStrings = input.Split(new char[] { '(', ')', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        List<Table_Base.SerializableTuple<T, U, V>> resultList = new List<Table_Base.SerializableTuple<T, U, V>>();
+
+        for (int i = 0; i < tupleStrings.Length; i += 3)
         {
-            string strValue = tupleStrings[i];
-            int intValue = int.Parse(tupleStrings[i + 1]);
-
+            T item1 = (T)Convert.ChangeType(tupleStrings[i], typeof(T));
+            U item2 = (U)Convert.ChangeType(tupleStrings[i + 1], typeof(U));
+            V item3 = (V)Convert.ChangeType(tupleStrings[i + 2], typeof(V));
+            
             bool isFind = false;
             for (int j = 0; j < resultList.Count; j++)
             {
-                if (resultList[j].Type == strValue)
+                // Type, TypeIndex가 같은 항목일 떄 (== StasgeTable에서 혹시 모를 중복 항목 찾는 것)
+                if ((typeof(T) == typeof(string) && (typeof(U) == typeof(int))))
                 {
-                    // 원하는 string 값을 찾았을 때 int 값을 수정
-                    isFind = true;
-                    resultList[j].Value += intValue;
-                    break;
+                    if (EqualityComparer<T>.Default.Equals(resultList[j].Item1, item1) &&
+                        EqualityComparer<U>.Default.Equals(resultList[j].Item2, item2))
+                    {
+                        isFind = true;
+                        
+                        Type typeOfV = typeof(V);
+                        bool isNumeric = typeOfV.IsPrimitive || typeOfV.IsEnum;
+                        if (isNumeric)
+                        {
+                            resultList[j].Item3 = (V)((dynamic)resultList[j].Item3 + (dynamic)item3);
+                        }
+                    }
                 }
             }
 
             if (isFind == false)
             {
-                resultList.Add(new Table_Base.SerializableTuple<string, int>(strValue, intValue));
+                resultList.Add(new Table_Base.SerializableTuple<T, U, V>(item1, item2, item3));
             }
         }
+        
 
         return resultList;
     }

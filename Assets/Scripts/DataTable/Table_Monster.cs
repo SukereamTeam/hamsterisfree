@@ -7,7 +7,7 @@ using System.Linq;
 namespace DataTable
 {
     [Serializable]
-    public class Table_Seed : Table_Base
+    public class Table_Monster : Table_Base
     {
         [SerializeField]
         public List<Param> list = new List<Param>();
@@ -19,7 +19,8 @@ namespace DataTable
             public string Type;
             public int TypeIndex;
             public float ActiveTime;
-            public int SeedValue;
+            public SerializableTuple<int, int> Size;
+            public string Func;
             public string SpritePath;
         }
 

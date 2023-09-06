@@ -15,27 +15,33 @@ MonoBehaviour:
   list:
   - Index: 0
     StageType:
-      Type: LimitTime
-      Value: 60
+      Item1: LimitTime
+      Item2: 60
     MapName: Forest
     SeedData:
-    - Type: Default
-      Value: 3
-    - Type: Fade
-      Value: 3
-    - Type: Moving
-      Value: 1
+    - Item1: Default
+      Item2: 0
+      Item3: 3
+    - Item1: Fade
+      Item2: 0
+      Item3: 3
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
     MonsterData: []
   - Index: 1
     StageType:
-      Type: LimitTime
-      Value: 60
+      Item1: LimitTime
+      Item2: 60
     MapName: Forest
     SeedData:
-    - Type: Fake
-      Value: 3
-    - Type: Heart
-      Value: 3
-    - Type: Moving
-      Value: 1
+    - Item1: Fake
+      Item2: 0
+      Item3: 3
+    - Item1: Heart
+      Item2: 0
+      Item3: 3
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
     MonsterData: []

@@ -9,43 +9,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b125c40689211a3438670dc1f619411e, type: 3}
-  m_Name: SeedTable
+  m_Script: {fileID: 11500000, guid: 87c6a8a6cb6a9794ab77363008a39f9b, type: 3}
+  m_Name: MonsterTable
   m_EditorClassIdentifier: 
   list:
   - UID: 0
     Type: Default
     TypeIndex: 0
     ActiveTime: 1
-    SeedValue: 1
+    Size:
+      Item1: 1
+      Item2: 1
+    Func: 
     SpritePath: Images/Map/Forest/Forest_TopLeft
   - UID: 1
     Type: Fade
     TypeIndex: 0
-    ActiveTime: 0.5
-    SeedValue: 1
+    ActiveTime: 1
+    Size:
+      Item1: 1
+      Item2: 1
+    Func: 
     SpritePath: Images/Map/Forest/Forest_BottomRight
   - UID: 2
     Type: Moving
     TypeIndex: 0
-    ActiveTime: 2
-    SeedValue: 1
+    ActiveTime: 10
+    Size:
+      Item1: 1
+      Item2: 1
+    Func: 
     SpritePath: Images/Map/Forest/Forest_Left
   - UID: 3
-    Type: Disappear
+    Type: Boss
     TypeIndex: 0
-    ActiveTime: 5
-    SeedValue: 1
+    ActiveTime: 1
+    Size:
+      Item1: 2
+      Item2: 2
+    Func: Default
     SpritePath: Images/Map/Forest/Forest_Right
-  - UID: 4
-    Type: Fake
-    TypeIndex: 0
-    ActiveTime: 1
-    SeedValue: -3
-    SpritePath: Images/Map/Forest/Forest_Top
-  - UID: 5
-    Type: Heart
-    TypeIndex: 0
-    ActiveTime: 1
-    SeedValue: 3
-    SpritePath: Images/Map/Forest/Forest_Bottom

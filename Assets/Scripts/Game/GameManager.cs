@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
@@ -28,8 +29,8 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     [FormerlySerializedAs("seedCount")] [SerializeField]
-    private int seedScore;
-    public int SeedScore
+    private IReactiveProperty<int> seedScore = new ReactiveProperty<int>();
+    public IReactiveProperty<int> SeedScore
     {
         get => this.seedScore;
         set => this.seedScore = value;
@@ -43,11 +44,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         Debug.Log("GameManager에서 Start 진입");
 
-        if (Instance == null)
-        {
-            _instance = this;
-        }
-
+        // isGame 변수가 false가 되면 게임이 종료되었다는 것
         this.isGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Where(x => x == false)
@@ -58,15 +55,20 @@ public class GameManager : MonoSingleton<GameManager>
 
 
         var curStageIndex = CommonManager.Instance.CurStageIndex;
+        Debug.Log($"### Current Stage Index : {curStageIndex}");
+        
+        // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Type);
-        
-        StageManager.SetStage(stageType, stageTable.StageType.Value);
+        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
+        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Item3)).Sum();
+
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
+        // TODO : Delete (테스트용으로 5초 대기 걸어놓음)
         await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
 
         // 게임 시작 할 수 있는 상태로 전환
@@ -88,9 +90,7 @@ public class GameManager : MonoSingleton<GameManager>
     public async void OnClick_Back()
     {
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
-
+        
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
-
-        Clear();
     }
 }
