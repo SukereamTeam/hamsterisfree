@@ -192,7 +192,6 @@ public class MapManager : MonoBehaviour
                     .WithSubType(targetSeedData.Type)
                     .WithSubTypeIndex(targetSeedData.TypeIndex)
                     .WithActiveTime(targetSeedData.ActiveTime)
-                    .WithSeedValue(targetSeedData.SeedValue)
                     .Build();
 
                 seedScript.Initialize(tileInfo, randomPos);
@@ -240,7 +239,6 @@ public class MapManager : MonoBehaviour
                     .WithSubType(targetMonsterData.Type)
                     .WithActiveTime(targetMonsterData.ActiveTime)
                     .WithSubTypeIndex(targetMonsterData.TypeIndex)
-                    .WithFunc(targetMonsterData.Func)
                     .Build();
 
                 monsterScript.Initialize(tileInfo, randomPos);
@@ -350,12 +348,9 @@ public class MapManager : MonoBehaviour
                         .ToList();
 
                     var targetTiles = exceptContainTiles.Where(tile =>
-                            (tile.position.x >= 1 && tile.position.x <= 6 &&
-                             (tile.position.y == 0 || tile.position.y == 8)) ||
-                            ((tile.position.x == 1 || tile.position.x == 6) &&
-                             (tile.position.y >= 0 && tile.position.y <= 8))
-                        )
-                        .ToList();
+                            ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
+                            ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                        ).ToList();
 
                     var random = UnityEngine.Random.Range(0, targetTiles.Count);
                     var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
@@ -421,17 +416,14 @@ public class MapManager : MonoBehaviour
             }
             else if (i < Bottom_End)
             {
-                //bottom
                 index = (int)Define.TileSpriteName.Bottom;
             }
             else if (i < Right_End)
             {
-                //right
                 index = (int)Define.TileSpriteName.Right;
             }
             else
             {
-                //top
                 index = (int)Define.TileSpriteName.Top;
             }
             

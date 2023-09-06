@@ -20,8 +20,8 @@ public class MonsterTile : TileBase
     private Vector2 startPos = new Vector2();
     private Vector2 endPos = new Vector2();
     
-    private Define.MonsterTile_Direction directionFlag = Define.MonsterTile_Direction.NONE;
     private Table_Monster.Param monsterData;
+    private Define.TileType_Sub bossFunc = Define.TileType_Sub.Default;
     
     private CancellationTokenSource moveCts;
     private CancellationTokenSource actCts;
@@ -55,8 +55,14 @@ public class MonsterTile : TileBase
         }
         
         this.monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(
-            this.info.SubType, (int)this.info.SubTypeIndex);
+            this.info.SubType, this.info.SubTypeIndex);
 
+        if (this.monsterData.Func != string.Empty)
+        {
+            this.bossFunc = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), this.monsterData.Func);
+        }
+        
+        
         TileFuncStart().Forget();
     }
 
@@ -96,11 +102,19 @@ public class MonsterTile : TileBase
                 this.tileActor = new TileActor_Fade();
             }
                 break;
+            case Define.TileType_Sub.Boss:
+            {
+                if (bossFunc == Define.TileType_Sub.Moving)
+                {
+                    this.tileActor = new TileActor_Moving();
+                }
+            }
+                break;
         }
         
         if (this.tileActor != null)
         {
-            if (this.subType == Define.TileType_Sub.Moving)
+            if (this.subType == Define.TileType_Sub.Moving || this.bossFunc == Define.TileType_Sub.Moving)
             {
                 return;
             }
@@ -140,7 +154,8 @@ public class MonsterTile : TileBase
                     {
                         timer = 0f;
                         
-                        if (this.subType == Define.TileType_Sub.Moving)
+                        if (this.subType == Define.TileType_Sub.Moving ||
+                            this.bossFunc == Define.TileType_Sub.Moving)
                         {
                             // 타일이 끝으로 완전히 간 다음 Position을 바꿔주고 싶어서 이렇게 구현
                             if (this.tileActor != null)
@@ -192,9 +207,35 @@ public class MonsterTile : TileBase
 
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.info.SeedValue} 먹음");
+        Debug.Log($"SeedType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
 
         this.tileCollider.enabled = false;
+        
+        if (this.tileActor == null)
+        {
+            // Default 등 Func가 따로 없는 타일들을 위한
+            this.isFuncStart = false;
+        }
+        else
+        {
+            this.actCts.Cancel();
+            this.moveCts.Cancel();
+        }
+        
+        await UniTask.WaitUntil(() => this.isFuncStart == false);
+        
+        // TODO : 닿은 효과 await
+        this.spriteRenderer.color = Color.blue;
+        
+        // LimitTry Stage인 경우 Try 횟수 1 감소
+        if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
+        {
+            GameManager.Instance.StageManager.ChangeStageValue(-1);
+        }
+
+        // 되돌리는 애니메이션 Play await
+
+        // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
 
     }
 

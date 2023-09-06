@@ -13,8 +13,6 @@ public abstract class TileBase : MonoBehaviour
         public string SubType;
         public int SubTypeIndex;
         public float ActiveTime;
-        public string Func;
-        public int SeedValue;
     }
 
     // Builder 패턴
@@ -29,8 +27,6 @@ public abstract class TileBase : MonoBehaviour
             // 추가 정보 기본값으로 초기화
             _tileInfo.SubType = "";
             _tileInfo.ActiveTime = 0f;
-            _tileInfo.SeedValue = 0;
-            _tileInfo.Func = "";
         }
 
         /// <summary>
@@ -62,23 +58,6 @@ public abstract class TileBase : MonoBehaviour
         public TileBuilder WithActiveTime(float _Time)
         {
             _tileInfo.ActiveTime = _Time;
-            return this;
-        }
-
-        public TileBuilder WithSeedValue(int _Value)
-        {
-            _tileInfo.SeedValue = _Value;
-            return this;
-        }
-
-        /// <summary>
-        /// MonsterTile에 부여되는 Func 세팅 (For Boss)
-        /// </summary>
-        /// <param name="_Func"></param>
-        /// <returns></returns>
-        public TileBuilder WithFunc(string _Func)
-        {
-            _tileInfo.Func = _Func;
             return this;
         }
 
