@@ -78,8 +78,8 @@ public abstract class TileBase : MonoBehaviour
 
     protected Sprite tileSprite;
 
-    protected BoxCollider2D tileCollider;
-    public BoxCollider2D TileCollider => this.tileCollider;
+    protected CircleCollider2D tileCollider;
+    public CircleCollider2D TileCollider => this.tileCollider;
 
     protected Animator animator;
     
@@ -92,7 +92,7 @@ public abstract class TileBase : MonoBehaviour
     {
         this.spriteRenderer = this.GetComponent<SpriteRenderer>();
 
-        this.tileCollider = this.GetComponent<BoxCollider2D>();
+        this.tileCollider = this.GetComponent<CircleCollider2D>();
 
     }
 

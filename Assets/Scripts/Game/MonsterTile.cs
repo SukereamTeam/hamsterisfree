@@ -202,6 +202,8 @@ public class MonsterTile : TileBase
                 Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
             }
         }
+
+        this.isFuncStart = false;
     }
 
 
