@@ -108,14 +108,12 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
         try
         {
             // Forest_Map 이라는 Sprite 한 장을 Multiple로 Slice해서, 각각 잘린 스프라이트들을 사용할것임
-            
+            var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
 
             for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
                 if (spriteIndex <= (int)Define.TileSpriteName.BottomRight)
                 {
-                    var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
-                    
                     var sliceName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
 
                     if (sliceName == Define.TileSpriteName.Top.ToString() ||

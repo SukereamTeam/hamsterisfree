@@ -8,6 +8,7 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
 
     //TODO : DELETE (Test용...  나중엔 저장된 json 으로 읽어올 함수 작성할 것)
     public int CurStageIndex { get; private set; }
+    
 
     private bool isInit = false;
     public void Initialize()
@@ -20,6 +21,7 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
         // TODO : Delete (유저 정보 로드 구현 후 삭제)
         CurStageIndex = 0;
 
+        // TODO : json 으로 저장된 유저 정보 로드하여 DataContainer에 저장?
     }
 
     public void OnDisable()

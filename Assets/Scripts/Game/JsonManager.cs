@@ -28,19 +28,30 @@ public class StageData
     public int exitDataRootIdx;
 }
 
+[Serializable]
+public class UserData
+{
+    public int curStage;
+    public int rewardCount;
+}
+
 
 
 
 
 public class JsonManager : Singleton<JsonManager>
 {
-    private readonly string StageData_Path = Path.Combine(Application.persistentDataPath, "positionData.json");
+    private readonly string StageData_Path = "StageData.json";
+
+    private Dictionary<int, StageData> stageDatas = new Dictionary<int, StageData>();
+
     
     
     
-    
-    public void SaveStageData(List<TileData> _Seed, List<TileData> _Monster, int _Exit)
+    public void SaveStageData(int _StageIndex, List<TileData> _Seed, List<TileData> _Monster, int _Exit)
     {
+        string path = Path.Combine(Application.persistentDataPath, "StageData.json");
+        
         StageData stageData = new StageData
         {
             seedDatas = _Seed,
@@ -48,32 +59,29 @@ public class JsonManager : Singleton<JsonManager>
             exitDataRootIdx = _Exit
         };
         
-        string[] jsonLines = new string[]
-        {
-            JsonConvert.SerializeObject(stageData.seedDatas),
-            JsonConvert.SerializeObject(stageData.monsterDatas),
-            JsonConvert.SerializeObject(stageData.exitDataRootIdx)
-        };
+        stageDatas.Add(_StageIndex, stageData);
         
-        File.WriteAllLines(StageData_Path, jsonLines);
-        Debug.Log("### StageData Saved ###");
+        string json = JsonConvert.SerializeObject(stageDatas, Formatting.Indented);
+        File.WriteAllText(path, json);
     }
     
     
-    public StageData LoadStageData()
+    public StageData LoadStageData(int _StageIndex)
     {
-        if (File.Exists(StageData_Path))
+        string path = Path.Combine(Application.persistentDataPath, "StageData.json");
+        
+        if (File.Exists(path))
         {
-            string jsonData = File.ReadAllText(StageData_Path);
-            StageData loadedData = JsonConvert.DeserializeObject<StageData>(jsonData);
+            string jsonData = File.ReadAllText(path);
             
-            Debug.Log("### StageData loaded ###");
-            return loadedData;
+            this.stageDatas = JsonConvert.DeserializeObject<Dictionary<int, StageData>>(jsonData);
+
+            if (this.stageDatas.TryGetValue(_StageIndex, out StageData data))
+            {
+                return data;
+            }
         }
-        else
-        {
-            Debug.LogError("No saved data found.");
-            return null;
-        }
+
+        return null;
     }
 }

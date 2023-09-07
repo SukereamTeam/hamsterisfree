@@ -121,33 +121,57 @@ public class MapManager : MonoBehaviour
         SetOutlineTiles(_StageSprites);
         SetMask(_StageSprites);
 
-        for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
+        // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
+        var stageData = JsonManager.Instance.LoadStageData(0);
+
+        if (stageData == null)
         {
-            if (i == (int)Define.TileType.Exit)
+            for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
             {
-                CreateExitTile(Define.TileType.Exit);
+                if (i == (int)Define.TileType.Exit)
+                {
+                    CreateExitTile(Define.TileType.Exit);
+                }
+                else if (i == (int)Define.TileType.Seed)
+                {
+                    CreateSeedTile(_CurStage, Define.TileType.Seed);
+                }
+                else if (i == (int)Define.TileType.Monster)
+                {
+                    CreateMonsterTile(_CurStage, Define.TileType.Monster);
+                }
             }
-            else if (i == (int)Define.TileType.Seed)
+
+            // Save Setting StageData
+            SaveStageToJson();
+        }
+        else
+        {
+            // TODO : Load 한 데이터대로 생성
+            
+            for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
             {
-                CreateSeedTile(_CurStage, Define.TileType.Seed);
-            }
-            else if (i == (int)Define.TileType.Monster)
-            {
-                CreateMonsterTile(_CurStage, Define.TileType.Monster);
+                if (i == (int)Define.TileType.Exit)
+                {
+                    CreateExitTile(Define.TileType.Exit, stageData.exitDataRootIdx);
+                }
+                else if (i == (int)Define.TileType.Seed)
+                {
+                    CreateSeedTile(_CurStage, Define.TileType.Seed, stageData.seedDatas);
+                }
+                else if (i == (int)Define.TileType.Monster)
+                {
+                    CreateMonsterTile(_CurStage, Define.TileType.Monster, stageData.monsterDatas);
+                }
             }
         }
-
-        // Save Setting StageData
-        SaveStageToJson();
-        
-        // TODO : 입장해서 로드할 땐, 입장한 스테이지가 현재 진행중인 스테이지인지 파악하고, 맞으면 Json 로드, 아니면 그냥 랜덤 생성
     }
 
     //------------------ Create Tiles
 
-    private void CreateExitTile(Define.TileType _TileType)
+    private void CreateExitTile(Define.TileType _TileType, int _RootIdx = -1)
     {
-        var random = UnityEngine.Random.Range(0, outlineTiles.Length);
+        var random = _RootIdx == -1 ? UnityEngine.Random.Range(0, outlineTiles.Length) : _RootIdx;
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
         var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
@@ -170,10 +194,49 @@ public class MapManager : MonoBehaviour
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
     }
 
-    private void CreateSeedTile(int _CurStage, Define.TileType _TileType)
+    private void CreateSeedTile(int _CurStage, Define.TileType _TileType, List<TileData> _saveData = null)
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
+        // TODO : Refactoring
+        if (_saveData != null)
+        {
+            for (int i = 0; i < _saveData.Count; i++)
+            {
+                // 추가 정보 넣어서 빌드 하는 건 같음
+                // rootIdx 로 backTiles 에서 찾아서 포지션 넣어줘야 함
+
+                var seed = _saveData[i];
+                var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
+                var seedScript = seedTile.GetComponent<SeedTile>();
+
+                var seedData = DataContainer.Instance.SeedTable.GetParamFromType(seed.SubType, seed.SubTypeIndex);
+                
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                {
+                    Type = _TileType,
+                    RootIdx = seed.RootIdx
+                };
+
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(seedData.Type)
+                    .WithSubTypeIndex(seedData.TypeIndex)
+                    .WithActiveTime(seedData.ActiveTime)
+                    .Build();
+
+                var pos = new Vector2(this.backTiles[seed.RootIdx].position.x, this.backTiles[seed.RootIdx].position.y);
+                
+                seedScript.Initialize(tileInfo, pos);
+
+                this.seedTiles.Add(seedScript);
+            }
+
+            return;
+        }
+        
+        
         var posList = GetRandomPosList(Define.TileType.Seed, stageTable.SeedData);
         int posIdx = 0;
 
@@ -212,7 +275,7 @@ public class MapManager : MonoBehaviour
         }
     }
     
-    private void CreateMonsterTile(int _CurStage, Define.TileType _TileType)
+    private void CreateMonsterTile(int _CurStage, Define.TileType _TileType, List<TileData> _saveData = null)
     {
         // MonsterTile은 위아래 혹은 양 옆으로 왔다갔다 한다.
         // 그러므로 위아래로 움직이게 될 경우 x좌표만 필요하고, 양 옆으로 움직일 경우 y좌표만 필요하다.
@@ -220,6 +283,45 @@ public class MapManager : MonoBehaviour
         // 각 필요한 좌표를 랜덤으로 지정한다.
         
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+        
+        if (_saveData != null)
+        {
+            for (int i = 0; i < _saveData.Count; i++)
+            {
+                // 추가 정보 넣어서 빌드 하는 건 같음
+                // rootIdx 로 backTiles 에서 찾아서 포지션 넣어줘야 함
+
+                var monster = _saveData[i];
+                var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
+                var monsterScript = monsterTile.GetComponent<MonsterTile>();
+
+                var monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(monster.SubType, monster.SubTypeIndex);
+                
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                {
+                    Type = _TileType,
+                    RootIdx = monster.RootIdx
+                };
+
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(monsterData.Type)
+                    .WithSubTypeIndex(monsterData.TypeIndex)
+                    .WithActiveTime(monsterData.ActiveTime)
+                    .Build();
+
+                var pos = new Vector2(this.backTiles[monster.RootIdx].position.x, this.backTiles[monster.RootIdx].position.y);
+                
+                monsterScript.Initialize(tileInfo, pos);
+
+                this.monsterTiles.Add(monsterScript);
+            }
+
+            return;
+        }
+        
+        
 
         var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
         int posIdx = 0;
@@ -403,7 +505,8 @@ public class MapManager : MonoBehaviour
 
         exitData = this.exitTile.Info.RootIdx;
 
-        JsonManager.Instance.SaveStageData(seedDatas, monsterDatas, exitData);
+        // TODO : 0말고 현재 스테이지 인덱스 넣어줘야 함
+        JsonManager.Instance.SaveStageData(0, seedDatas, monsterDatas, exitData);
     }
 
     
