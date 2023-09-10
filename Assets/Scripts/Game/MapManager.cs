@@ -34,6 +34,8 @@ public class MapManager : MonoBehaviour
     [SerializeField]
     private Image backgroundImage;
 
+    [SerializeField] private Image background;
+
     [SerializeField]
     private float fadeTime = 0f;
     public float FadeTime => this.fadeTime;
@@ -118,7 +120,7 @@ public class MapManager : MonoBehaviour
         }
 
         SetBackground(_StageSprites);
-        SetOutlineTiles(_StageSprites);
+        //SetOutlineTiles(_StageSprites);
         SetMask(_StageSprites);
 
         // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
@@ -587,11 +589,11 @@ public class MapManager : MonoBehaviour
 
     private void SetMask(IReadOnlyList<Sprite> _StageSprites)
     {
-        Debug.Log("SetMask 시작");
         var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
         
         this.blockRenderer.sprite = sprite;
-        Debug.Log("SetMask 끝");
+        // TODO : const 숫자로 변경
+        this.blockRenderer.size = new Vector2(9f, 11f);
     }
 
 
