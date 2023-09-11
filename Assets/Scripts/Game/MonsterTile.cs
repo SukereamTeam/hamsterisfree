@@ -81,10 +81,7 @@ public class MonsterTile : TileBase
             this.isFuncStart = true;
         }
         
-        if (this.tileActor != null)
-        {
-            this.tileActor = null;
-        }
+        this.tileActor = null;
         
         switch (this.subType)
         {
