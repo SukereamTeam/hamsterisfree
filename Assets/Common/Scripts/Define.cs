@@ -58,5 +58,17 @@ public class Define
         Background,
     }
 
+    public enum MapSize
+    {
+        Width = 8,
+        Height = 11,
+        
+        In_XStart = 1,
+        In_XEnd = 6,
+        In_YStart = 0,
+        In_YEnd = 8,
+        Out_YStart = -1,
+        Out_YEnd = 9
+    }
     
 }

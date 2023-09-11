@@ -27,6 +27,7 @@ public class MonsterTile : TileBase
     private CancellationTokenSource actCts;
     private IDisposable disposable = null;
 
+
     private new void Start()
     {
         base.Start();
@@ -246,15 +247,32 @@ public class MonsterTile : TileBase
         Vector2 startPosition = Vector2.zero;
         Vector2 endPosition = Vector2.zero;
 
-        if (Mathf.Approximately(_Pos.x, 1f) || Mathf.Approximately(_Pos.x, 6f))
+        
+        if (Mathf.Approximately(_Pos.x, (float)Define.MapSize.In_XStart) || Mathf.Approximately(_Pos.x, (float)Define.MapSize.In_XEnd))
         {
-            startPosition = new Vector2(Mathf.Approximately(_Pos.x, 1f) ? 7f : 0f, _Pos.y);
-            endPosition = new Vector2(Mathf.Approximately(_Pos.x, 1f) ? 0f : 7f, _Pos.y);
+            if (Mathf.Approximately(_Pos.x, (float)Define.MapSize.In_XStart))
+            {
+                startPosition = new Vector2((float)Define.MapSize.In_XEnd + 1f, _Pos.y);    // 원래 In 안에서만 움직이게 하려고 했는데 (맵 내부), 너무 어려워서 내부를 넘어서 맵 outline까지 움직이도록 +1 더해줌
+                endPosition = new Vector2(0f, _Pos.y);
+            }
+            else
+            {
+                startPosition = new Vector2(0f, _Pos.y);
+                endPosition = new Vector2((float)Define.MapSize.In_XEnd + 1f, _Pos.y);
+            }
         }
-        else if (Mathf.Approximately(_Pos.y, 0f) || Mathf.Approximately(_Pos.y, 8f))
+        else if (Mathf.Approximately(_Pos.y, (float)Define.MapSize.In_YStart) || Mathf.Approximately(_Pos.y, (float)Define.MapSize.In_YEnd))
         {
-            startPosition = new Vector2(_Pos.x, Mathf.Approximately(_Pos.y, 0f) ? 9f : -1f);
-            endPosition = new Vector2(_Pos.x, Mathf.Approximately(_Pos.y, 0f) ? -1f : 9f);
+            if (Mathf.Approximately(_Pos.y, (float)Define.MapSize.In_YStart))
+            {
+                startPosition = new Vector2(_Pos.x, (float)Define.MapSize.Out_YEnd);
+                endPosition = new Vector2(_Pos.x, (float)Define.MapSize.Out_YStart);
+            }
+            else
+            {
+                startPosition = new Vector2(_Pos.x, (float)Define.MapSize.Out_YStart);
+                endPosition = new Vector2(_Pos.x, (float)Define.MapSize.Out_YEnd);
+            }
         }
 
         return (startPosition, endPosition);
