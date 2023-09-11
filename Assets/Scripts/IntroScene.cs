@@ -22,8 +22,6 @@ public class IntroScene : MonoBehaviour
     {
         // 싱글톤 객체 생성 및 초기화
         CommonManager.Instance.Initialize();
-        //SceneController.Instance.Initialize();
-        //DataContainer.Instance.Initialize();
     }
 
     private void Start()
@@ -38,8 +36,11 @@ public class IntroScene : MonoBehaviour
         try
         {
             await SceneController.Instance.Fade(true, fadeDuration, true, cancellationToken);
-
-            this.logo.transform.DOShakeScale(0.5f, Vector3.one);
+            
+            Sequence shakeSequence = DOTween.Sequence();
+            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
+            shakeSequence.Play().SetLoops(2, LoopType.Restart);
             
             await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
 
@@ -81,6 +82,7 @@ public class IntroScene : MonoBehaviour
 
     private void OnDestroy()
     {
+        DOTween.KillAll(true);
         this.cancellationToken.Cancel();
     }
 }

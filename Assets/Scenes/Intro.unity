@@ -350,7 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 672a027599dfa8b49bc1a1a6834494e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeDuration: 1.5
+  fadeDuration: 1
   logo: {fileID: 677358845}
 --- !u!1 &677358843
 GameObject:
