@@ -510,9 +510,7 @@ public class MapManager : MonoBehaviour
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
 
-        // TODO : 0말고 현재 스테이지 인덱스 넣어줘야 함
-        JsonManager.Instance.SaveData(newData);
-        //JsonManager.Instance.SaveStageData(0, seedDatas, monsterDatas, exitData);
+        var result = JsonManager.Instance.SaveData(newData);
     }
 
     

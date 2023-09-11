@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 
-
+// Stage 데이터 저장 --------------------
 [Serializable]
 public struct TileData
 {
@@ -39,6 +39,8 @@ public class StageData
     }
 }
 
+
+// User Data 저장 --------------------
 [Serializable]
 public class UserData
 {
@@ -46,56 +48,50 @@ public class UserData
     public int rewardCount;
 }
 
+
+
 public class JsonManager : Singleton<JsonManager>
 {
-    private const string KEY = "fwZjmNoOBDfDoqwL6uCa1YTtdMrJ022oVG7hB0gEp/I=";
-    private const string IV = "k+BF9dKWC8U24dji9lcpKA==";
-    
+    private const string KEYPATH = "aes.key";
     
     public bool SaveData<T>(T _Data)
     {
-        var relativePath = GetJsonFileName<T>();
+        var fileName = GetJsonFileName<T>();
 
-        if (relativePath == string.Empty)
+        if (fileName == string.Empty)
         {
-            Debug.Log($"Not Found {nameof(T)} match name");
+            Debug.Log($"Not Found {typeof(T).Name} match json file.");
             return false;
         }
         
-        string path = Path.Combine(Application.persistentDataPath, relativePath);
+        string path = Path.Combine(Application.persistentDataPath, fileName);
         
         try
         {
             if (File.Exists(path) == true)
             {
-                Debug.Log("이미 파일이 있음! 여기에 저장 ㄱㄱ");
+                Debug.Log("Exist json File!");
                 
-                // TODO : 기존 데이터 로드(암호화된 JSON 파일을 읽어서 파일 내용을 복호화하여 기존 데이터를 로드)
-                // 필요한 데이터를 기존 데이터에다가 새로 추가합니다.
-                // 다시 암호화: 모든 데이터를 다시 암호화하고, 암호화된 JSON 파일을 업데이트
-                
-                var data = ReadEncryptedData<List<T>>(path);
+                var dataList = ReadEncryptedData<List<T>>(path);
 
-                if (data != null)
+                if (dataList != null)
                 {
-                    data.Add(_Data);
-                    
-                    using (FileStream stream = File.Open(path, FileMode.Open))
-                    {
-                        WriteEncryptedData(data, stream);
-                    }
-                
+                    dataList.Add(_Data);
+
+                    using FileStream stream = File.Open(path, FileMode.Open);
+                    WriteEncryptedData(dataList, stream);
+                    stream.Close();
                     return true;
                 }
                 else
                 {
-                    Debug.Log($"SaveData Error ---> data is null. ");
+                    Debug.Log($"SaveData Error ---> dataList is null. ");
                     return false;
                 }
             }
             else
             {
-                Debug.Log("파일이 없었음. 새로 만들기 시작!");
+                Debug.Log("json 파일이 없었음. 새로 만들기 시작!");
 
                 var dataList = new List<T> { _Data };
                 
@@ -103,7 +99,6 @@ public class JsonManager : Singleton<JsonManager>
                 using FileStream stream = File.Create(path);
                 WriteEncryptedData(dataList, stream);
                 stream.Close();
-
                 return true;
             }
         }
@@ -118,14 +113,24 @@ public class JsonManager : Singleton<JsonManager>
     private void WriteEncryptedData<T>(T _Data, FileStream _Stream)
     {
         using Aes aesProvider = Aes.Create();
-        aesProvider.Key = Convert.FromBase64String(KEY);
-        aesProvider.IV = Convert.FromBase64String(IV);
+
+        var keyValue = GetKey();
+
+        aesProvider.Key = keyValue;
+        
+        // 새로 암호화 하기 위해 IV 새로 생성
+        aesProvider.GenerateIV();
+        
+        byte[] iv = aesProvider.IV;
 
         using ICryptoTransform cryptoTransform = aesProvider.CreateEncryptor();
         using CryptoStream cryptoStream = new CryptoStream(
             _Stream,
             cryptoTransform,
             CryptoStreamMode.Write);
+        
+        // IV를 먼저 파일에 저장 (데이터를 새로 저장할 때 마다 iv값 덮어 씌움)
+        _Stream.Write(iv, 0, iv.Length);
 
         var jsonData = JsonConvert.SerializeObject(_Data);
         cryptoStream.Write(Encoding.ASCII.GetBytes(jsonData));
@@ -134,14 +139,14 @@ public class JsonManager : Singleton<JsonManager>
     
     public T LoadData<T>(int _Index = 0)
     {
-        var relativePath = GetJsonFileName<T>();
+        var fileName = GetJsonFileName<T>();
 
-        if (relativePath == string.Empty)
+        if (fileName == string.Empty)
         {
             throw new NullReferenceException();
         }
         
-        string path = Path.Combine(Application.persistentDataPath, relativePath);
+        string path = Path.Combine(Application.persistentDataPath, fileName);
 
         if (File.Exists(path) == false)
         {
@@ -152,9 +157,9 @@ public class JsonManager : Singleton<JsonManager>
 
         try
         {
-            var data = ReadEncryptedData<List<T>>(path);
+            var dataList = ReadEncryptedData<List<T>>(path);
             
-            return data[_Index];
+            return dataList[_Index];
         }
         catch (Exception e)
         {
@@ -168,14 +173,24 @@ public class JsonManager : Singleton<JsonManager>
         byte[] fileBytes = File.ReadAllBytes(_Path);
 
         using Aes aesProvider = Aes.Create();
-        aesProvider.Key = Convert.FromBase64String(KEY);
-        aesProvider.IV = Convert.FromBase64String(IV);
+
+        // key 파일 로드해서 읽어오기
+        var keyValue = GetKey();
+
+        aesProvider.Key = keyValue;
+        
+        // IV를 파일에서 읽어옴
+        byte[] iv = new byte[aesProvider.BlockSize / 8];
+        Array.Copy(fileBytes, 0, iv, 0, iv.Length);
+        aesProvider.IV = iv;
 
         using ICryptoTransform cryptoTransform = aesProvider.CreateDecryptor(
             aesProvider.Key,
             aesProvider.IV);
 
-        using MemoryStream decryptionStream = new MemoryStream(fileBytes);
+        // iv값이 먼저 있고, 그 다음 값이 데이터 부분임. 그래서 iv의 length만큼 뛰어넘고 그 다음 값부터 읽어들이기
+        using MemoryStream decryptionStream = new MemoryStream(fileBytes, iv.Length, fileBytes.Length - iv.Length);
+        
         using CryptoStream cryptoStream = new CryptoStream(
             decryptionStream,
             cryptoTransform,
@@ -190,12 +205,36 @@ public class JsonManager : Singleton<JsonManager>
         return JsonConvert.DeserializeObject<T>(result);
     }
 
+    private byte[] GetKey()
+    {
+        string path = Path.Combine(Application.persistentDataPath, KEYPATH);
+
+        byte[] key = null;
+        
+        if (File.Exists(path) == true)
+        {
+            key = File.ReadAllBytes(path);
+        }
+        else
+        {
+            using Aes aesProvider = Aes.Create();
+            aesProvider.GenerateKey();
+                
+            key = aesProvider.Key;
+                
+            File.WriteAllBytes(path, key);
+        }
+
+        return key;
+    }
+
     private string GetJsonFileName<T>()
     {
         string name = String.Empty;
         if (typeof(T) == typeof(StageData))
         {
-            name = "StageData.json";
+            name = $"StageData.json";
+            //name = $"{typeof(T).Name}"; //원래 이렇게 하려고 했는데, Reflection 을 사용하는거라 성능 문제가 있을까봐 못썼습니다.
         }
 
         return name;
