@@ -3794,8 +3794,8 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_DrawMode: 1
+  m_Size: {x: 7, y: 10}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -3811,7 +3811,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.5, y: 4, z: -0.1}
-  m_LocalScale: {x: 6, y: 9, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 837762397}
@@ -3853,9 +3853,9 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 7, y: 10}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
@@ -10694,6 +10694,7 @@ MonoBehaviour:
   mask: {fileID: 1162894042}
   blockRenderer: {fileID: 1983302965}
   backgroundImage: {fileID: 857869363}
+  background: {fileID: 0}
   fadeTime: 1.5
   tileRoot: {fileID: 783463873}
   exitPrefab: {fileID: 1242813034118986203, guid: 5b4701f9c0486f44e9edae527c15c5be, type: 3}

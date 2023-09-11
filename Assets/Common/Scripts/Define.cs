@@ -56,6 +56,7 @@ public class Define
         BottomRight,
         Mask,
         Background,
+        Map
     }
 
     

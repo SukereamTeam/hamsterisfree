@@ -124,7 +124,7 @@ public class MapManager : MonoBehaviour
         SetMask(_StageSprites);
 
         // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
-        var stageData = JsonManager.Instance.LoadStageData(0);
+        var stageData = JsonManager.Instance.LoadData<StageData>(0);//JsonManager.Instance.LoadStageData(0);
 
         if (stageData == null)
         {
@@ -507,8 +507,12 @@ public class MapManager : MonoBehaviour
 
         exitData = this.exitTile.Info.RootIdx;
 
+        StageData newData = new StageData(seedDatas, monsterDatas, exitData);
+        
+
         // TODO : 0말고 현재 스테이지 인덱스 넣어줘야 함
-        JsonManager.Instance.SaveStageData(0, seedDatas, monsterDatas, exitData);
+        JsonManager.Instance.SaveData(newData);
+        //JsonManager.Instance.SaveStageData(0, seedDatas, monsterDatas, exitData);
     }
 
     
@@ -537,13 +541,11 @@ public class MapManager : MonoBehaviour
 
     private void SetBackground(IReadOnlyList<Sprite> _StageSprites)
     {
-        var index = (int)Define.TileSpriteName.Center;
+        // TODO : Modify (Background Sprite... Forest_Background)
+        this.backgroundImage.sprite = _StageSprites[1];
 
-        this.tileBackRenderer.sprite = _StageSprites[index];
-
-        index = (int)Define.TileSpriteName.Background;
-
-        this.backgroundImage.sprite = _StageSprites[index];
+        // TODO : Modify (Background sprite.. Forest_Map)
+        this.tileBackRenderer.sprite = _StageSprites[2];
     }
 
     private void SetOutlineTiles(IReadOnlyList<Sprite> _StageSprites)
@@ -589,11 +591,15 @@ public class MapManager : MonoBehaviour
 
     private void SetMask(IReadOnlyList<Sprite> _StageSprites)
     {
-        var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
+        // var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
+        //
+        // this.blockRenderer.sprite = sprite;
         
-        this.blockRenderer.sprite = sprite;
+        // TODO : Modify (mask sprite)
+        this.blockRenderer.sprite = _StageSprites[0];
+        
         // TODO : const 숫자로 변경
-        this.blockRenderer.size = new Vector2(9f, 11f);
+        this.blockRenderer.size = new Vector2(8f, 11f);
     }
 
 
