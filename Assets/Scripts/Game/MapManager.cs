@@ -264,10 +264,23 @@ public class MapManager : MonoBehaviour
         if (_TileType == Define.TileType.Monster)
         {
             targetArray = this.backTiles
-                .Where(tile => 
-                    (tile.position.x >= 1 && tile.position.x <= 6 && (tile.position.y == 0 || tile.position.y == 8)) ||
-                    ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                )
+                .Where(tile =>
+                {
+                    // X와 Y가 특정 범위에 있는 타일
+                    bool isXInRange = (tile.position.x >= (float)Define.MapSize.In_XStart && tile.position.x <= (float)Define.MapSize.In_XEnd);
+                    bool isYInRange = (tile.position.y >= (float)Define.MapSize.In_YStart && tile.position.y <= (float)Define.MapSize.In_YEnd);
+
+                    // X 또는 Y가 경계(특정 숫자)에 있는 타일
+                    bool isOnBoundaryX = (Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XStart) ||  // 1f
+                                          Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XEnd));     // 6f
+                    
+                    bool isOnBoundaryY = (Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YStart) ||  // 0f
+                                          Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YEnd));     // 8f
+
+                    bool checkCondition = (isOnBoundaryX && isYInRange) || (isXInRange && isOnBoundaryY);
+
+                    return checkCondition;
+                })
                 .ToArray();
         }
         else if (_TileType == Define.TileType.Seed)
