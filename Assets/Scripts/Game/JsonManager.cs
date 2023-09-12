@@ -53,6 +53,7 @@ public class UserData
 public class JsonManager : Singleton<JsonManager>
 {
     private const string KEYPATH = "aes.key";
+    private const string FILE_FORMAT = ".json";
     
     public bool SaveData<T>(T _Data)
     {
@@ -230,12 +231,7 @@ public class JsonManager : Singleton<JsonManager>
 
     private string GetJsonFileName<T>()
     {
-        string name = String.Empty;
-        if (typeof(T) == typeof(StageData))
-        {
-            name = $"StageData.json";
-            //name = $"{typeof(T).Name}"; //원래 이렇게 하려고 했는데, Reflection 을 사용하는거라 성능 문제가 있을까봐 못썼습니다.
-        }
+        string name = $"{(typeof(T).ToString())}{FILE_FORMAT}";
 
         return name;
     }

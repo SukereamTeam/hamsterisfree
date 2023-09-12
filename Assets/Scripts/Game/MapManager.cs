@@ -597,7 +597,7 @@ public class MapManager : MonoBehaviour
         this.blockRenderer.sprite = _StageSprites[0];
         
         // TODO : const 숫자로 변경
-        this.blockRenderer.size = new Vector2(8f, 11f);
+        this.blockRenderer.size = new Vector2(9.5f, 11.5f);
     }
 
 
