@@ -137,7 +137,10 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                 Debug.Log("Cancel CanvasFade");
                 tweener.Kill();
 
-                this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
+                if (this.fade != null)
+                {
+                    this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
+                }
 
                 if (_Action != null)
                     _Action();
@@ -150,7 +153,10 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                     {
                         Debug.Log("Fade was OnKill.");
 
-                        this.fade.raycastTarget = false;
+                        if (this.fade != null)
+                        {
+                            this.fade.raycastTarget = false;
+                        }
                     })
                     .OnComplete(() =>
                     {

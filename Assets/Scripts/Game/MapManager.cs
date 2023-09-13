@@ -124,23 +124,24 @@ public class MapManager : MonoBehaviour
         SetMask(_StageSprites);
 
         // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
-        var stageData = JsonManager.Instance.LoadData<StageData>(0);//JsonManager.Instance.LoadStageData(0);
+        var stageData = JsonManager.Instance.LoadData<StageData>(0);
 
         if (stageData == null)
         {
             for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
             {
+
                 if (i == (int)Define.TileType.Exit)
                 {
-                    CreateExitTile(Define.TileType.Exit);
+                    CreateExitTile();
                 }
                 else if (i == (int)Define.TileType.Seed)
                 {
-                    CreateSeedTile(_CurStage, Define.TileType.Seed);
+                    CreateSeedTile(_CurStage);
                 }
                 else if (i == (int)Define.TileType.Monster)
                 {
-                    CreateMonsterTile(_CurStage, Define.TileType.Monster);
+                    CreateMonsterTile(_CurStage);
                 }
             }
 
@@ -155,23 +156,22 @@ public class MapManager : MonoBehaviour
             {
                 if (i == (int)Define.TileType.Exit)
                 {
-                    CreateExitTile(Define.TileType.Exit, stageData.exitDataRootIdx);
+                    CreateExitTile(stageData.exitDataRootIdx);
                 }
                 else if (i == (int)Define.TileType.Seed)
                 {
-                    CreateSeedTile(_CurStage, Define.TileType.Seed, stageData.seedDatas);
+                    CreateSeedTile(_CurStage, stageData.seedDatas);
                 }
                 else if (i == (int)Define.TileType.Monster)
                 {
-                    CreateMonsterTile(_CurStage, Define.TileType.Monster, stageData.monsterDatas);
+                    CreateMonsterTile(_CurStage, stageData.monsterDatas);
                 }
             }
         }
     }
 
     //------------------ Create Tiles
-
-    private void CreateExitTile(Define.TileType _TileType, int _RootIdx = -1)
+    private void CreateExitTile(int _RootIdx = -1)
     {
         var random = _RootIdx == -1 ? UnityEngine.Random.Range(0, outlineTiles.Length) : _RootIdx;
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
@@ -181,7 +181,7 @@ public class MapManager : MonoBehaviour
 
         TileBase.TileInfo baseInfo = new TileBase.TileInfo
         {
-            Type = _TileType,
+            Type = Define.TileType.Exit,
             RootIdx = random
         };
 
@@ -196,7 +196,7 @@ public class MapManager : MonoBehaviour
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
     }
 
-    private void CreateSeedTile(int _CurStage, Define.TileType _TileType, List<TileData> _saveData = null)
+    private void CreateSeedTile(int _CurStage, List<TileData> _saveData = null)
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
@@ -217,7 +217,7 @@ public class MapManager : MonoBehaviour
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
-                    Type = _TileType,
+                    Type = Define.TileType.Seed,
                     RootIdx = seed.RootIdx
                 };
 
@@ -257,7 +257,7 @@ public class MapManager : MonoBehaviour
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
-                    Type = _TileType,
+                    Type = Define.TileType.Seed,
                     RootIdx = posList[posIdx].root
                 };
 
@@ -277,12 +277,9 @@ public class MapManager : MonoBehaviour
         }
     }
     
-    private void CreateMonsterTile(int _CurStage, Define.TileType _TileType, List<TileData> _saveData = null)
+    private void CreateMonsterTile(int _CurStage, List<TileData> _saveData = null)
     {
-        // MonsterTile은 위아래 혹은 양 옆으로 왔다갔다 한다.
-        // 그러므로 위아래로 움직이게 될 경우 x좌표만 필요하고, 양 옆으로 움직일 경우 y좌표만 필요하다.
-        // 위아래가 될지 양 옆이 될지 랜덤으로 정한 뒤
-        // 각 필요한 좌표를 랜덤으로 지정한다.
+        // MonsterTile은 기본적으로 위아래 혹은 양 옆으로 반복해서 움직인다.
         
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
         
@@ -302,7 +299,7 @@ public class MapManager : MonoBehaviour
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
-                    Type = _TileType,
+                    Type = Define.TileType.Monster,
                     RootIdx = monster.RootIdx
                 };
 
@@ -343,7 +340,7 @@ public class MapManager : MonoBehaviour
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
-                    Type = _TileType,
+                    Type = Define.TileType.Monster,
                     RootIdx = posList[posIdx].root
                 };
 
@@ -379,11 +376,24 @@ public class MapManager : MonoBehaviour
         
         if (_TileType == Define.TileType.Monster)
         {
-            targetArray = this.backTiles
-                .Where(tile => 
-                    ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
-                    ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                ).ToArray();
+            targetArray = this.backTiles.Where(tile =>
+                {
+                    // X와 Y가 특정 범위에 있는 타일
+                    bool isXInRange = (tile.position.x >= (float)Define.MapSize.In_XStart && tile.position.x <= (float)Define.MapSize.In_XEnd);
+                    bool isYInRange = (tile.position.y >= (float)Define.MapSize.In_YStart && tile.position.y <= (float)Define.MapSize.In_YEnd);
+
+                    // X 또는 Y가 경계(특정 숫자)에 있는 타일
+                    bool isOnBoundaryX = (Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XStart) ||  // 1f
+                                          Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XEnd));     // 6f
+                    
+                    bool isOnBoundaryY = (Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YStart) ||  // 0f
+                                          Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YEnd));     // 8f
+
+                    bool checkCondition = (isOnBoundaryX && isYInRange) || (isXInRange && isOnBoundaryY);
+
+                    return checkCondition;
+                })
+                .ToArray();
         }
         else if (_TileType == Define.TileType.Seed)
         {
@@ -401,9 +411,7 @@ public class MapManager : MonoBehaviour
             var random = UnityEngine.Random.Range(0, targetTiles.Count);
 
             // 참조한 타일이 어느 타일인지
-            int index = 0;
-
-            index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+            int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
             
             resultTile.Add((transform: targetTiles[random], root: index));
 
