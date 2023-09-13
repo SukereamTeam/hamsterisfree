@@ -51,10 +51,10 @@ public class MapManager : MonoBehaviour
     
     [SerializeField]
     private GameObject monsterPrefab;
+
+    [SerializeField]
+    private Vector2 mapSize;
     
-
-
-
     private const int Left_End = 9;
     private const int Bottom_End = 15;
     private const int Right_End = 24;
@@ -544,6 +544,10 @@ public class MapManager : MonoBehaviour
 
         // TODO : Modify (Background sprite.. Forest_Map)
         this.tileBackRenderer.sprite = _StageSprites[2];
+
+        this.tileBackRenderer.size = this.mapSize;
+        var collider = this.tileBackRenderer.GetComponent<BoxCollider2D>();
+        collider.size = this.mapSize;
     }
 
     private void SetOutlineTiles(IReadOnlyList<Sprite> _StageSprites)
@@ -595,9 +599,9 @@ public class MapManager : MonoBehaviour
         
         // TODO : Modify (mask sprite)
         this.blockRenderer.sprite = _StageSprites[0];
-        
-        // TODO : const 숫자로 변경
-        this.blockRenderer.size = new Vector2(9.5f, 11.5f);
+
+        float offset = 0.5f;
+        this.blockRenderer.size = new Vector2(this.mapSize.x + offset, this.mapSize.y + offset);
     }
 
 

@@ -61,6 +61,8 @@ public class GameManager : MonoSingleton<GameManager>
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
         var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
+        
+        // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
         var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Item3)).Sum();
 
         StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, maxSeedCount);
@@ -68,8 +70,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
-        // TODO : Delete (테스트용으로 5초 대기 걸어놓음)
-        await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
+        // TODO : Delete (테스트용으로 5초 대기 걸어놓음), 추후 첫 게임일 경우 Tutorial 구현
+        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
 
         // 게임 시작 할 수 있는 상태로 전환
         this.isGame.Value = true;

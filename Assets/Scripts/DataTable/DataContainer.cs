@@ -136,6 +136,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
                 }
                 else
                 {
+                    // 바뀐 버전 2 : TileBack 도 한 장을 늘려서 사용. 근데 이러면 안될 것 같음..
                     var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
                     var spritePath = $"{path}{spriteName}";
                     var resource = await Resources.LoadAsync<Sprite>(spritePath);

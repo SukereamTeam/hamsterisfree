@@ -52,7 +52,7 @@ public class UserData
 
 public class JsonManager : Singleton<JsonManager>
 {
-    private const string KEYPATH = "aes.key";
+    private const string KEY_PATH = "aes.key";
     private const string FILE_FORMAT = ".json";
     
     public bool SaveData<T>(T _Data)
@@ -208,7 +208,7 @@ public class JsonManager : Singleton<JsonManager>
 
     private byte[] GetKey()
     {
-        string path = Path.Combine(Application.persistentDataPath, KEYPATH);
+        string path = Path.Combine(Application.persistentDataPath, KEY_PATH);
 
         byte[] key = null;
         
