@@ -123,7 +123,7 @@ public class MapManager : MonoBehaviour
         SetMask(_StageSprites);
 
         // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
-        var stageData = JsonManager.Instance.LoadData<StageData>(0);
+        var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);
 
         if (stageData == null)
         {
@@ -532,7 +532,7 @@ public class MapManager : MonoBehaviour
 
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
-        var result = JsonManager.Instance.SaveData(newData);
+        var result = JsonManager.Instance.SaveData(newData, CommonManager.Instance.CurStageIndex);
         Debug.Log($"### SaveData result : {result} ###");
     }
 

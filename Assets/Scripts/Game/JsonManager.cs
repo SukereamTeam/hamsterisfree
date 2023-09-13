@@ -55,7 +55,7 @@ public class JsonManager : Singleton<JsonManager>
     private const string KEY_PATH = "aes.key";
     private const string FILE_FORMAT = ".json";
     
-    public bool SaveData<T>(T _Data)
+    public bool SaveData<T>(T _Data, int _Index = 0)
     {
         var fileName = GetJsonFileName<T>();
 
@@ -73,11 +73,11 @@ public class JsonManager : Singleton<JsonManager>
             {
                 Debug.Log("Exist json File!");
                 
-                var dataList = ReadEncryptedData<List<T>>(path);
+                var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
 
                 if (dataList != null)
                 {
-                    dataList.Add(_Data);
+                    dataList.Add(_Index, _Data);
 
                     using FileStream stream = File.Open(path, FileMode.Open);
                     WriteEncryptedData(dataList, stream);
@@ -94,7 +94,10 @@ public class JsonManager : Singleton<JsonManager>
             {
                 Debug.Log("json 파일이 없었음. 새로 만들기 시작!");
 
-                var dataList = new List<T> { _Data };
+                var dataList = new Dictionary<int, T>
+                {
+                    { _Index, _Data }
+                };
                 
                 // 암호화하여 저장
                 using FileStream stream = File.Create(path);
@@ -158,14 +161,16 @@ public class JsonManager : Singleton<JsonManager>
 
         try
         {
-            var dataList = ReadEncryptedData<List<T>>(path);
+            var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
 
-            if (_Index >= dataList.Count)
-            {
-                Debug.Log("새로운 스테이지(Next Stage). 저장 필요");
+            // if (_Index >= dataList.Count)
+            // {
+            //     Debug.Log("새로운 스테이지(Next Stage). 저장 필요");
+            //     return default(T);
+            // }
+            if (dataList.ContainsKey(_Index) == false)
                 return default(T);
-            }
-            
+
             return dataList[_Index];
         }
         catch (Exception e)
