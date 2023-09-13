@@ -50,7 +50,7 @@ public class GameManager : MonoSingleton<GameManager>
             .Where(x => x == false)
             .Subscribe(_ =>
             {
-                GameEndFlow();
+                GameEndFlow().Forget();
             }).AddTo(this);
 
 
@@ -78,13 +78,17 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-    private void GameEndFlow()
+    private async UniTaskVoid GameEndFlow()
     {
         Debug.Log("### Game End ###");
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
         MapManager.IsFade.Value = false;
+
+        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+        
+        // TODO :END 팝업 표시
     }
 
     public async void OnClick_Back()

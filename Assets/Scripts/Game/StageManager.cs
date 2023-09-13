@@ -121,7 +121,13 @@ public class StageManager : MonoBehaviour
 
         if (this.stageInfo.Type == Define.StageType.LimitTime)
         {
+            // SeedValue * 1000을 곱해서 초 단위로 깎기
             _Value *= 1000;
+        }
+        else if (this.stageInfo.Type == Define.StageType.LimitTry)
+        {
+            // 도전 기회는 SeedValue가 어떻든 1씩 깎이게 하고 싶어서
+            _Value = (_Value > 0 ? _Value / _Value : _Value / (_Value * -1));
         }
         
         this.curValue.Value += _Value;

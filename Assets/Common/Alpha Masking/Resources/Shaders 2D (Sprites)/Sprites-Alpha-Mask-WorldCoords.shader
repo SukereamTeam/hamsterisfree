@@ -1,6 +1,6 @@
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Alpha Masked/Sprites Alpha Masked"
+Shader "Alpha Masked/Sprites Alpha Masked - World Coords"
 {
 	Properties
 	{
@@ -60,7 +60,7 @@ Shader "Alpha Masked/Sprites Alpha Masked"
 		{
 		CGPROGRAM
 			#include "UnityCG.cginc"
-			#include "../ToJAlphaMasking.cginc"
+			#include "../../ToJAlphaMasking.cginc"
 			
 			#pragma vertex vert
 			#pragma fragment frag

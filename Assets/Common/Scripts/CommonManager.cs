@@ -18,7 +18,7 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
         this.isInit = true;
 
         // TODO : Delete (유저 정보 로드 구현 후 삭제)
-        CurStageIndex = 1;
+        CurStageIndex = 0;
 
     }
 

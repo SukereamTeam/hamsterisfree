@@ -7,6 +7,7 @@ using DG.Tweening;
 using DataTable;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MapManager : MonoBehaviour
 {
@@ -45,6 +46,10 @@ public class MapManager : MonoBehaviour
 
     [SerializeField]
     private GameObject seedPrefab;
+    
+    [SerializeField]
+    private GameObject monsterPrefab;
+    
 
 
 
@@ -60,7 +65,11 @@ public class MapManager : MonoBehaviour
         set => this.isFade = value;
     }
 
+    private object lockSeed = new object();
     private List<SeedTile> seedTiles;
+    
+    private object lockMonster = new object();
+    private List<MonsterTile> monsterTiles;
     public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
 
     private int randomSeed = 0;
@@ -79,6 +88,7 @@ public class MapManager : MonoBehaviour
             .ToArray();
 
         this.seedTiles = new List<SeedTile>();
+        this.monsterTiles = new List<MonsterTile>();
 
         this.randomSeed = (int)DateTime.Now.Ticks;
         UnityEngine.Random.InitState(this.randomSeed);
@@ -113,18 +123,22 @@ public class MapManager : MonoBehaviour
         {
             if (i == (int)Define.TileType.Exit)
             {
-                CreateExitTile(Define.TileType.Exit);
+                CreateExitTile();
             }
             else if (i == (int)Define.TileType.Seed)
             {
-                CreateSeedTile(_CurStage, Define.TileType.Seed);
+                CreateSeedTile(_CurStage);
+            }
+            else if (i == (int)Define.TileType.Monster)
+            {
+                CreateMonsterTile(_CurStage);
             }
         }
     }
 
     //------------------ Create Tiles
 
-    private void CreateExitTile(Define.TileType _TileType)
+    private void CreateExitTile()
     {
         var random = UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
@@ -134,7 +148,7 @@ public class MapManager : MonoBehaviour
 
         TileBase.TileInfo baseInfo = new TileBase.TileInfo
         {
-            Type = _TileType,
+            Type = Define.TileType.Exit,
             RootIdx = random
         };
 
@@ -147,11 +161,11 @@ public class MapManager : MonoBehaviour
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
     }
 
-    private void CreateSeedTile(int _CurStage, Define.TileType _TileType)
+    private void CreateSeedTile(int _CurStage)
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
-        var posList = GetRandomPosList(stageTable.SeedData);
+        var posList = GetRandomPosList(Define.TileType.Seed, stageTable.SeedData);
         int posIdx = 0;
 
         for (int i = 0; i < stageTable.SeedData.Count; i++)
@@ -169,20 +183,64 @@ public class MapManager : MonoBehaviour
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
-                    Type = _TileType,
+                    Type = Define.TileType.Seed,
                     RootIdx = posList[posIdx].root
                 };
 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
                     .WithSubType(targetSeedData.Type)
+                    .WithSubTypeIndex(targetSeedData.TypeIndex)
                     .WithActiveTime(targetSeedData.ActiveTime)
-                    .WithSeedValue(targetSeedData.SeedValue)
                     .Build();
 
                 seedScript.Initialize(tileInfo, randomPos);
 
                 this.seedTiles.Add(seedScript);
+
+                posIdx++;
+            }
+        }
+    }
+    
+    private void CreateMonsterTile(int _CurStage)
+    {
+        // MonsterTile은 기본적으로 위아래 혹은 양 옆으로 반복해서 움직인다.
+        
+        var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+
+        var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
+        int posIdx = 0;
+
+        for (int i = 0; i < stageTable.MonsterData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
+            {
+                var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
+                
+                var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
+                var monsterScript = monsterTile.GetComponent<MonsterTile>();
+
+                // eg. MonsterTile 의 타입들 중 Default_0 타입에 대한 데이터를 MonsterTable에서 가져오기
+                var targetMonsterData = DataContainer.Instance.MonsterTable.GetParamFromType(stageTable.MonsterData[i].Item1, stageTable.MonsterData[i].Item2);
+
+                // 기본 정보 초기화
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                {
+                    Type = Define.TileType.Monster,
+                    RootIdx = posList[posIdx].root
+                };
+
+                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
+                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+                    .WithSubType(targetMonsterData.Type)
+                    .WithActiveTime(targetMonsterData.ActiveTime)
+                    .WithSubTypeIndex(targetMonsterData.TypeIndex)
+                    .Build();
+
+                monsterScript.Initialize(tileInfo, randomPos);
+
+                this.monsterTiles.Add(monsterScript);
 
                 posIdx++;
             }
@@ -194,24 +252,55 @@ public class MapManager : MonoBehaviour
     /// 리스트의 타일들 갯수만큼 랜덤Pos 생성하여 List에 담아 반환
     /// </summary>
     /// <returns>Transform은 Pos값을 위해, int는 backTiles중 어느 타일을 참조했는지 파악하려고</returns>
-    private List<(Transform transform, int root)> GetRandomPosList(List<Table_Base.SerializableTuple<string, int, int>> _List)
+    private List<(Transform transform, int root)> GetRandomPosList(Define.TileType _TileType, List<Table_Base.SerializableTuple<string, int, int>> _List)
     {
         // 랜덤 포지션이 필요한 타일 갯수 구하기 (타일 타입별로 Count 더해주기)
         var randomCount = _List.Select(x => x.Item3).Sum();
-
-        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
-        var targetTiles = new List<Transform>(this.backTiles);
-
+        
         var resultTile = new List<(Transform transform, int root)>();
 
+        Transform[] targetArray = new Transform[] { };
+        
+        if (_TileType == Define.TileType.Monster)
+        {
+            targetArray = this.backTiles
+                .Where(tile =>
+                {
+                    // X와 Y가 특정 범위에 있는 타일
+                    bool isXInRange = (tile.position.x >= (float)Define.MapSize.In_XStart && tile.position.x <= (float)Define.MapSize.In_XEnd);
+                    bool isYInRange = (tile.position.y >= (float)Define.MapSize.In_YStart && tile.position.y <= (float)Define.MapSize.In_YEnd);
 
+                    // X 또는 Y가 경계(특정 숫자)에 있는 타일
+                    bool isOnBoundaryX = (Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XStart) ||  // 1f
+                                          Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XEnd));     // 6f
+                    
+                    bool isOnBoundaryY = (Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YStart) ||  // 0f
+                                          Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YEnd));     // 8f
+
+                    bool checkCondition = (isOnBoundaryX && isYInRange) || (isXInRange && isOnBoundaryY);
+
+                    return checkCondition;
+                })
+                .ToArray();
+        }
+        else if (_TileType == Define.TileType.Seed)
+        {
+            targetArray = this.backTiles;
+        }
+        
+        
+        // 기존에 멤버변수로 갖고있던 backTiles 참조해서 포지션 List 만듦
+        var targetTiles = new List<Transform>(targetArray);
+
+        
+        
         for (int i = 0; i < randomCount; i++)
         {
             var random = UnityEngine.Random.Range(0, targetTiles.Count);
 
             // 참조한 타일이 어느 타일인지
             int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
-
+            
             resultTile.Add((transform: targetTiles[random], root: index));
 
             targetTiles.RemoveAt(random);
@@ -226,39 +315,61 @@ public class MapManager : MonoBehaviour
         Vector2 pos = Vector2.zero;
 
 
-        switch(_TileType)
+        switch (_TileType)
         {
             case Define.TileType.Seed:
-            case Define.TileType.Monster:
+            {
+                lock (lockSeed)
                 {
                     // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
                     var targetTiles = new List<Transform>(this.backTiles);
 
-                    if (_TileType == Define.TileType.Seed)
-                    {
-                        var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+                    var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
 
-                        // targetTiles 리스트를 순회하면서
-                        // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
-                        // 다음 RandomPos를 뽑을 Pool이 될 것임
-                        var tilePool = targetTiles
-                            .Where((x, index) => seedTilesRoot.Contains(index) == false)
-                            .ToList();
+                    // targetTiles 리스트를 순회하면서
+                    // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
+                    // 다음 RandomPos를 뽑을 Pool이 될 것임
+                    var tilePool = targetTiles
+                        .Where((x, index) => seedTilesRoot.Contains(index) == false)
+                        .ToList();
 
-                        var random = UnityEngine.Random.Range(0, tilePool.Count);
-                        var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
+                    var random = UnityEngine.Random.Range(0, tilePool.Count);
+                    var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
 
-                        // 참조한 타일이 어느 타일인지
-                        int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+                    // 참조한 타일이 어느 타일인지
+                    int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
 
-                        rootIdx = index;
-                        pos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
-                    }
-                    //else if (_Tile.Info.Type == Define.TileType.Monster)
-                    //{
-                    //    ...
-                    //}
+                    rootIdx = index;
+                    pos = randomPos;
                 }
+            }
+                break;
+            
+            case Define.TileType.Monster:
+            {
+                lock (lockMonster)
+                {
+                    var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
+
+                    var exceptContainTiles = this.backTiles
+                        .Where((x, index) => monsterTilesRoot.Contains(index) == false)
+                        .ToList();
+
+                    var targetTiles = exceptContainTiles.Where(tile =>
+                            ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
+                            ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                        ).ToList();
+
+                    var random = UnityEngine.Random.Range(0, targetTiles.Count);
+                    var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
+
+                    // 참조한 타일이 어느 타일인지
+                    int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+
+                    rootIdx = index;
+                    pos = randomPos;
+                }
+            }
                 break;
         }
 
@@ -313,17 +424,14 @@ public class MapManager : MonoBehaviour
             }
             else if (i < Bottom_End)
             {
-                //bottom
                 index = (int)Define.TileSpriteName.Bottom;
             }
             else if (i < Right_End)
             {
-                //right
                 index = (int)Define.TileSpriteName.Right;
             }
             else
             {
-                //top
                 index = (int)Define.TileSpriteName.Top;
             }
             

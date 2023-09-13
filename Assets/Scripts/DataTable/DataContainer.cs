@@ -35,7 +35,9 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 
     private Dictionary<string, Sprite> seedSprites;
     public Dictionary<string, Sprite> SeedSprites => this.seedSprites;
-
+    
+    private Dictionary<string, Sprite> monsterSprites;
+    public Dictionary<string, Sprite> MonsterSprites => this.monsterSprites;
 
 
 
@@ -79,6 +81,8 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
                     Debug.Log("### ERROR ---> ExitSprite is Null ###");
 
                 await LoadSeedSprites(item);
+
+                await LoadMonsterSprites(item);
             }
             else
             {
@@ -226,6 +230,27 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             }
             else
                 Debug.Log($"### ERROR LoadSeedSprites ---> {seedData.Type} ###");
+        }
+    }
+    
+    private async UniTask LoadMonsterSprites(Table_Stage.Param item)
+    {
+        var monsterCount = item.MonsterData.Count;
+
+        this.monsterSprites = new Dictionary<string, Sprite>(monsterCount);
+
+        for (int i = 0; i < monsterCount; i++)
+        {
+            var monsterData = this.monsterTable.GetParamFromType(item.MonsterData[i].Item1, item.MonsterData[i].Item2);
+
+            var sprite = await Resources.LoadAsync<Sprite>(monsterData.SpritePath) as Sprite;
+
+            if (sprite != null)
+            {
+                this.monsterSprites.Add(item.MonsterData[i].Item1, sprite);
+            }
+            else
+                Debug.Log($"### ERROR LoadMonsterSprites ---> {monsterData.Type} ###");
         }
     }
 }

@@ -18,7 +18,7 @@ MonoBehaviour:
     TypeIndex: 0
     ActiveTime: 1
     SeedValue: 1
-    SpritePath: Images/Map/Forest/Forest_TopLeft
+    SpritePath: Images/Seed/Seed_Default
   - UID: 1
     Type: Fade
     TypeIndex: 0

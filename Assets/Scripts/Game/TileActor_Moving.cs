@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TileActor_Moving : ITileActor
 {
-    public async UniTask<bool> Act(TileBase _Tile, float _ActiveTime = 0, CancellationTokenSource _Cts = default)
+    public async UniTask<bool> Act(TileBase _Tile, CancellationTokenSource _Cts, float _ActiveTime = 0f)
     {
         try
         {
@@ -14,17 +14,21 @@ public class TileActor_Moving : ITileActor
                 // 다음 좌표 가져오기
                 var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile.Info.Type);
 
-                await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
-
+                if (_ActiveTime > 0f)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
+                }
+                
                 // TODO : 이동 Effect
 
                 // 다음 좌표로 이동, 다음 좌표를 _Tile의 TileInfo.Pos로 넣어주기(RootIdx도)
                 _Tile.SetPosition(nextData.rootIdx, nextData.pos);
-
-
-                // TODO : 이동 완료 대기
+                
+                if (_Tile.Info.Type == Define.TileType.Monster)
+                {
+                    return true;
+                }
             }
-
         }
         catch (Exception ex)
         {

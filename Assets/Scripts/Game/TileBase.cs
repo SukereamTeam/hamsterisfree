@@ -11,8 +11,8 @@ public abstract class TileBase : MonoBehaviour
         public int RootIdx;
 
         public string SubType;
+        public int SubTypeIndex;
         public float ActiveTime;
-        public int SeedValue;
     }
 
     // Builder 패턴
@@ -27,7 +27,6 @@ public abstract class TileBase : MonoBehaviour
             // 추가 정보 기본값으로 초기화
             _tileInfo.SubType = "";
             _tileInfo.ActiveTime = 0f;
-            _tileInfo.SeedValue = 0;
         }
 
         /// <summary>
@@ -39,6 +38,17 @@ public abstract class TileBase : MonoBehaviour
             _tileInfo.SubType = _Type;
             return this;
         }
+        
+        /// <summary>
+        /// 서브 타입의 Index 지정
+        /// </summary>
+        /// <param name="_Index">Fade0, Fade1 이런식임</param>
+        /// <returns></returns>
+        public TileBuilder WithSubTypeIndex(int _Index)
+        {
+            _tileInfo.SubTypeIndex = _Index;
+            return this;
+        }
 
 
         /// <summary>
@@ -48,12 +58,6 @@ public abstract class TileBase : MonoBehaviour
         public TileBuilder WithActiveTime(float _Time)
         {
             _tileInfo.ActiveTime = _Time;
-            return this;
-        }
-
-        public TileBuilder WithSeedValue(int _Value)
-        {
-            _tileInfo.SeedValue = _Value;
             return this;
         }
 
@@ -74,13 +78,13 @@ public abstract class TileBase : MonoBehaviour
 
     protected Sprite tileSprite;
 
-    protected BoxCollider2D tileCollider;
-    public BoxCollider2D TileCollider => this.tileCollider;
+    protected CircleCollider2D tileCollider;
+    public CircleCollider2D TileCollider => this.tileCollider;
 
     protected Animator animator;
     
 
-    public const float FADE_TIME = 0.3f;
+    public const float TILE_FADE_TIME = 0.3f;
 
 
 
@@ -88,7 +92,7 @@ public abstract class TileBase : MonoBehaviour
     {
         this.spriteRenderer = this.GetComponent<SpriteRenderer>();
 
-        this.tileCollider = this.GetComponent<BoxCollider2D>();
+        this.tileCollider = this.GetComponent<CircleCollider2D>();
 
     }
 

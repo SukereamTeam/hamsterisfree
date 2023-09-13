@@ -3,6 +3,7 @@ using UniRx;
 using System;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using DataTable;
 using UnityEngine.Serialization;
 
 public class SeedTile : TileBase
@@ -13,9 +14,10 @@ public class SeedTile : TileBase
         set => this.isTouch = value;
     }
 
-    [FormerlySerializedAs("tileType")] [SerializeField]
-    private Define.TileType_Sub seedType = Define.TileType_Sub.Default;
+    [SerializeField]
+    private Define.TileType_Sub subType = Define.TileType_Sub.Default;
 
+    private Table_Seed.Param seedData;
     
     private ITileActor tileActor;
 
@@ -37,13 +39,16 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info, _Pos);
 
-        this.seedType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
+        this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
         {
             this.spriteRenderer.sprite = sprite;
         }
+
+        this.seedData = DataContainer.Instance.SeedTable.GetParamFromType(
+            this.info.SubType, this.info.SubTypeIndex);
 
         TileFuncStart().Forget();
     }
@@ -65,7 +70,7 @@ public class SeedTile : TileBase
             this.tileActor = null;
         }
 
-        switch (this.seedType)
+        switch (this.subType)
         {
             case Define.TileType_Sub.Disappear:
             {
@@ -86,7 +91,7 @@ public class SeedTile : TileBase
 
         if (this.tileActor != null)
         {
-            var task = this.tileActor.Act(this, this.info.ActiveTime, this.cts);
+            var task = this.tileActor.Act(this, this.cts, this.info.ActiveTime);
             this.disposable = task.ToObservable().Subscribe(x =>
             {
                 this.isFuncStart = x;
@@ -97,11 +102,11 @@ public class SeedTile : TileBase
     
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.info.SeedValue} 먹음");
+        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.seedData.SeedValue} 먹음");
 
         this.tileCollider.enabled = false;
         
-        TriggerEvent(this.seedType);
+        TriggerEvent(this.subType);
 
         if (this.tileActor == null)
         {
@@ -128,7 +133,7 @@ public class SeedTile : TileBase
     {
         if (_type == Define.TileType_Sub.Heart || _type == Define.TileType_Sub.Fake)
         {
-            GameManager.Instance.StageManager.ChangeStageValue(this.info.SeedValue);
+            GameManager.Instance.StageManager.ChangeStageValue(this.seedData.SeedValue);
         }
         else
         {

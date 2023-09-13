@@ -281,7 +281,7 @@ namespace ToJ
 			{
 				if (IsSupported2DShader(spriteRenderer.sharedMaterial.shader))
 				{
-					materialToReplace = maskTarget.SpritesAlphaMask;
+					materialToReplace = maskTarget.SpritesAlphaMaskWorldCoords;
 				}
 				spriteRenderer.sharedMaterial = materialToReplace;
 			}
@@ -370,7 +370,7 @@ namespace ToJ
 
 				if (!maskeeMaterialUsed)
 				{
-					mGraphic.material = maskTarget.SpritesAlphaMask;
+					mGraphic.material = maskTarget.SpritesAlphaMaskWorldCoords;
 				}
 			}
 		}

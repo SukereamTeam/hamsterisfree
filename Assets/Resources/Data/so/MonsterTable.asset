@@ -17,6 +17,7 @@ MonoBehaviour:
     Type: Default
     TypeIndex: 0
     ActiveTime: 1
+    MoveSpeed: 0.5
     Size:
       Item1: 1
       Item2: 1
@@ -26,6 +27,7 @@ MonoBehaviour:
     Type: Fade
     TypeIndex: 0
     ActiveTime: 1
+    MoveSpeed: 0.5
     Size:
       Item1: 1
       Item2: 1
@@ -35,6 +37,7 @@ MonoBehaviour:
     Type: Moving
     TypeIndex: 0
     ActiveTime: 10
+    MoveSpeed: 0.5
     Size:
       Item1: 1
       Item2: 1
@@ -44,6 +47,7 @@ MonoBehaviour:
     Type: Boss
     TypeIndex: 0
     ActiveTime: 1
+    MoveSpeed: 1
     Size:
       Item1: 2
       Item2: 2

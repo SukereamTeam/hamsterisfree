@@ -22,13 +22,10 @@ MonoBehaviour:
     - Item1: Default
       Item2: 0
       Item3: 3
-    - Item1: Fade
-      Item2: 0
-      Item3: 3
+    MonsterData:
     - Item1: Moving
       Item2: 0
       Item3: 1
-    MonsterData: []
   - Index: 1
     StageType:
       Item1: LimitTime
@@ -44,4 +41,7 @@ MonoBehaviour:
     - Item1: Moving
       Item2: 0
       Item3: 1
-    MonsterData: []
+    MonsterData:
+    - Item1: Moving
+      Item2: 0
+      Item3: 1

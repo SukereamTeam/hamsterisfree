@@ -1,5 +1,5 @@
 UID,Type,TypeIndex,ActiveTime,SeedValue,SpritePath
-0,Default,0,1,1,Images/Map/Forest/Forest_TopLeft
+0,Default,0,1,1,Images/Seed/Seed_Default
 1,Fade,0,0.5,1,Images/Map/Forest/Forest_BottomRight
 2,Moving,0,2,1,Images/Map/Forest/Forest_Left
 3,Disappear,0,5,1,Images/Map/Forest/Forest_Right
