@@ -36,6 +36,8 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.seedScore = value;
     }
 
+    private int maxSeedCount = -1;
+
 
 
 
@@ -63,9 +65,20 @@ public class GameManager : MonoSingleton<GameManager>
         var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
         
         // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
-        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Item3)).Sum();
+        this.maxSeedCount = stageTable.SeedData.SelectMany(data =>
+        {
+            var subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), data.Item1);
+            if (subType != Define.TileType_Sub.Heart && subType != Define.TileType_Sub.Fake)
+            {
+                return Enumerable.Repeat(1, data.Item3);
+            }
+            else
+            {
+                return Enumerable.Empty<int>();
+            }
+        }).Sum();
 
-        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, maxSeedCount);
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, this.maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
@@ -86,11 +99,16 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-        MapManager.IsFade.Value = false;
+        
 
         await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
         
         // TODO :END 팝업 표시
+    }
+
+    private void CalculateReward()
+    {
+        
     }
 
     public async void OnClick_Back()

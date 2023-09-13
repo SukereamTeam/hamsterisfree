@@ -159,6 +159,12 @@ public class JsonManager : Singleton<JsonManager>
         try
         {
             var dataList = ReadEncryptedData<List<T>>(path);
+
+            if (_Index >= dataList.Count)
+            {
+                Debug.Log("새로운 스테이지(Next Stage). 저장 필요");
+                return default(T);
+            }
             
             return dataList[_Index];
         }

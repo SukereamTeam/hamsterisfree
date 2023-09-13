@@ -34,6 +34,14 @@ public class MonsterTile : TileBase
 
         this.actCts = new CancellationTokenSource();
         this.moveCts = new CancellationTokenSource();
+        
+        GameManager.Instance.IsGame
+            .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
+            .Where(x => x == false)
+            .Subscribe(_ =>
+            {
+                ActClear();
+            }).AddTo(this);
     }
 
     public override void Initialize(TileInfo _Info, Vector2 _Pos)
@@ -218,14 +226,15 @@ public class MonsterTile : TileBase
         }
         else
         {
-            this.actCts.Cancel();
-            this.moveCts.Cancel();
+            ActClear();
         }
         
         await UniTask.WaitUntil(() => this.isFuncStart == false);
         
         // TODO : 닿은 효과 await
         this.spriteRenderer.color = Color.blue;
+        
+        GameManager.Instance.MapManager.IsFade.Value = false;
         
         // LimitTry Stage인 경우 Try 횟수 1 감소
         if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
@@ -234,7 +243,6 @@ public class MonsterTile : TileBase
         }
 
         // 되돌리는 애니메이션 Play await
-
         // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
 
     }
@@ -249,7 +257,8 @@ public class MonsterTile : TileBase
         {
             if (Mathf.Approximately(_Pos.x, (float)Define.MapSize.In_XStart))
             {
-                startPosition = new Vector2((float)Define.MapSize.In_XEnd + 1f, _Pos.y);    // 원래 In 안에서만 움직이게 하려고 했는데 (맵 내부), 너무 어려워서 내부를 넘어서 맵 outline까지 움직이도록 +1 더해줌
+                // 원래 In 안에서만 움직이게 하려고 했는데 (맵 내부), 너무 어려워서 내부를 넘어서 맵 outline까지 움직이도록 +1 더해줌
+                startPosition = new Vector2((float)Define.MapSize.In_XEnd + 1f, _Pos.y);    
                 endPosition = new Vector2(0f, _Pos.y);
             }
             else
@@ -274,16 +283,21 @@ public class MonsterTile : TileBase
 
         return (startPosition, endPosition);
     }
-    
-    private void OnDestroy()
+
+    private void ActClear()
     {
         this.actCts.Cancel();
         this.moveCts.Cancel();
         
         if (this.disposable != null)
         {
-            Debug.Log("Dispose!!!");
+            Debug.Log($"MonsterTile Act Dispose!");
             this.disposable.Dispose();
         }
+    }
+    
+    private void OnDestroy()
+    {
+        ActClear();
     }
 }

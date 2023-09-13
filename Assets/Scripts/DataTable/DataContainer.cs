@@ -108,33 +108,34 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
         try
         {
             // Forest_Map 이라는 Sprite 한 장을 Multiple로 Slice해서, 각각 잘린 스프라이트들을 사용할것임
-            var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
+            // var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
 
-            for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
+            // TODO : Define.TileSpriteName의 Mask부터 시작하게 해놨는데, 추후 변경 필요
+            for (int spriteIndex = 9; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
-                if (spriteIndex <= (int)Define.TileSpriteName.BottomRight)
-                {
-                    var sliceName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
-
-                    if (sliceName == Define.TileSpriteName.Top.ToString() ||
-                        sliceName == Define.TileSpriteName.Bottom.ToString() ||
-                        sliceName == Define.TileSpriteName.Left.ToString() ||
-                        sliceName == Define.TileSpriteName.Right.ToString())
-                    {
-                        var random = UnityEngine.Random.Range(1, 3);
-                        sliceName = $"{sliceName}_{random}";
-                    }
-                
-                    var spriteName = $"{_MapName}_{sliceName}";
-
-                    var sprite = Array.Find(mapSprites, x => x.name == spriteName);
-
-                    if (sprite != null)
-                    {
-                        this.stageSprites.Add(sprite);
-                    }
-                }
-                else
+                // if (spriteIndex <= (int)Define.TileSpriteName.BottomRight)
+                // {
+                //     var sliceName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+                //
+                //     if (sliceName == Define.TileSpriteName.Top.ToString() ||
+                //         sliceName == Define.TileSpriteName.Bottom.ToString() ||
+                //         sliceName == Define.TileSpriteName.Left.ToString() ||
+                //         sliceName == Define.TileSpriteName.Right.ToString())
+                //     {
+                //         var random = UnityEngine.Random.Range(1, 3);
+                //         sliceName = $"{sliceName}_{random}";
+                //     }
+                //
+                //     var spriteName = $"{_MapName}_{sliceName}";
+                //
+                //     var sprite = Array.Find(mapSprites, x => x.name == spriteName);
+                //
+                //     if (sprite != null)
+                //     {
+                //         this.stageSprites.Add(sprite);
+                //     }
+                // }
+                // else
                 {
                     // 바뀐 버전 2 : TileBack 도 한 장을 늘려서 사용. 근데 이러면 안될 것 같음..
                     var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);

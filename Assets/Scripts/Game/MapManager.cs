@@ -60,6 +60,7 @@ public class MapManager : MonoBehaviour
     private const int Right_End = 24;
 
 
+    // Mask 이미지 FadeIn되어 보여질 수 있는지 체크 (true : Mask 보여짐 / False : 화면 눌러도 Mask 이미지 안보임)
     private IReactiveProperty<bool> isFade = new ReactiveProperty<bool>(false);
     public IReactiveProperty<bool> IsFade
     {
@@ -107,8 +108,6 @@ public class MapManager : MonoBehaviour
                 FadeMap();
             }).AddTo(this);
 
-
-        
     }
 
     public void SetMap(int _CurStage, IReadOnlyList<Sprite> _StageSprites)
@@ -150,8 +149,6 @@ public class MapManager : MonoBehaviour
         }
         else
         {
-            // TODO : Load 한 데이터대로 생성
-            
             for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
             {
                 if (i == (int)Define.TileType.Exit)
@@ -194,6 +191,9 @@ public class MapManager : MonoBehaviour
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
         // 타일 좌표에 따라 메테리얼 오브젝트 방향 바꿔줘야 함 (x > 0 ? shader 오른쪽에서 뻗어나오고 : 왼쪽에서 뻗어나오고 y > 0 ? 위에서 뻗어나오고 : 아래에서 뻗어나오고)
+        
+        // TODO
+        // 굳이 Exit가 외곽에 있어야 할까? 맵 내부에 있어도 괜찮을 것 같다.
     }
 
     private void CreateSeedTile(int _CurStage, List<TileData> _saveData = null)
@@ -321,7 +321,6 @@ public class MapManager : MonoBehaviour
         }
         
         
-
         var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
         int posIdx = 0;
 
@@ -468,9 +467,25 @@ public class MapManager : MonoBehaviour
                         .ToList();
 
                     var targetTiles = exceptContainTiles.Where(tile =>
-                            ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
-                            ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
-                        ).ToList();
+                    {
+                        // ((tile.position.y == 0 || tile.position.y == 8) && tile.position.x >= 1 && tile.position.x <= 6) ||
+                        //     ((tile.position.x == 1 || tile.position.x == 6) && (tile.position.y >= 0 && tile.position.y <= 8))
+                        
+                        // X와 Y가 특정 범위에 있는 타일
+                        bool isXInRange = (tile.position.x >= (float)Define.MapSize.In_XStart && tile.position.x <= (float)Define.MapSize.In_XEnd);
+                        bool isYInRange = (tile.position.y >= (float)Define.MapSize.In_YStart && tile.position.y <= (float)Define.MapSize.In_YEnd);
+
+                        // X 또는 Y가 경계(특정 숫자)에 있는 타일
+                        bool isOnBoundaryX = (Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XStart) ||  // 1f
+                                              Mathf.Approximately(tile.position.x, (float)Define.MapSize.In_XEnd));     // 6f
+                    
+                        bool isOnBoundaryY = (Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YStart) ||  // 0f
+                                              Mathf.Approximately(tile.position.y, (float)Define.MapSize.In_YEnd));     // 8f
+
+                        bool checkCondition = (isOnBoundaryX && isYInRange) || (isXInRange && isOnBoundaryY);
+
+                        return checkCondition;
+                    }).ToList();
 
                     var random = UnityEngine.Random.Range(0, targetTiles.Count);
                     var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
@@ -517,8 +532,8 @@ public class MapManager : MonoBehaviour
 
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
-
         var result = JsonManager.Instance.SaveData(newData);
+        Debug.Log($"### SaveData result : {result} ###");
     }
 
     
@@ -527,8 +542,6 @@ public class MapManager : MonoBehaviour
 
     private void FadeMap()
     {
-        Debug.Log($"FadeMap / isFade : {this.isFade.Value}");
-
         if (this.isFade.Value == true)
         {
             this.blockRenderer.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));

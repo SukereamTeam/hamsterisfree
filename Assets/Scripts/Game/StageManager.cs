@@ -69,7 +69,7 @@ public class StageManager : MonoBehaviour
                 .Where(x => x <= 0f)
                 .Subscribe(_ =>
                 {
-                    // 시간이 다 되었거나, 기회를 다 잃었다면
+                    // 시간이 다 되었거나, 기회를 다 잃었다면 게임 종료
                     GameManager.Instance.IsGame.Value = false;
                 }).AddTo(this);
         }
