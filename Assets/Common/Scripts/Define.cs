@@ -15,12 +15,6 @@ public class Define
         Monster
     }
 
-    public enum MonsterTile_Direction
-    {
-        NONE = 0,
-        LeftToRight,
-        TopToBottom
-    }
     
     public enum TileType_Sub
     {

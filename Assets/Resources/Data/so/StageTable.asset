@@ -15,18 +15,143 @@ MonoBehaviour:
   list:
   - Index: 0
     StageType:
-      Item1: LimitTime
-      Item2: 60
+      Item1: Default
+      Item2: 0
+    MapName: Forest
+    SeedData:
+    - Item1: Default
+      Item2: 0
+      Item3: 1
+    MonsterData: []
+  - Index: 1
+    StageType:
+      Item1: Default
+      Item2: 0
     MapName: Forest
     SeedData:
     - Item1: Default
       Item2: 0
       Item3: 3
     MonsterData:
+    - Item1: Default
+      Item2: 0
+      Item3: 1
+  - Index: 2
+    StageType:
+      Item1: Default
+      Item2: 0
+    MapName: Forest
+    SeedData:
+    - Item1: Default
+      Item2: 0
+      Item3: 5
+    MonsterData: []
+  - Index: 3
+    StageType:
+      Item1: Default
+      Item2: 0
+    MapName: Forest
+    SeedData:
+    - Item1: Default
+      Item2: 0
+      Item3: 1
+    MonsterData:
+    - Item1: Default
+      Item2: 0
+      Item3: 1
+  - Index: 4
+    StageType:
+      Item1: Default
+      Item2: 0
+    MapName: Forest
+    SeedData:
+    - Item1: Default
+      Item2: 0
+      Item3: 3
+    MonsterData:
+    - Item1: Default
+      Item2: 0
+      Item3: 1
+    - Item1: Fade
+      Item2: 0
+      Item3: 1
+  - Index: 5
+    StageType:
+      Item1: LimitTry
+      Item2: 5
+    MapName: Forest
+    SeedData:
+    - Item1: Fake
+      Item2: 0
+      Item3: 3
+    - Item1: Heart
+      Item2: 0
+      Item3: 3
     - Item1: Moving
       Item2: 0
       Item3: 1
-  - Index: 1
+    MonsterData:
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+  - Index: 6
+    StageType:
+      Item1: LimitTime
+      Item2: 60
+    MapName: Forest
+    SeedData:
+    - Item1: Fake
+      Item2: 0
+      Item3: 3
+    - Item1: Heart
+      Item2: 0
+      Item3: 3
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+    MonsterData:
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+  - Index: 7
+    StageType:
+      Item1: LimitTry
+      Item2: 5
+    MapName: Forest
+    SeedData:
+    - Item1: Fake
+      Item2: 0
+      Item3: 3
+    - Item1: Heart
+      Item2: 0
+      Item3: 3
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+    MonsterData:
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+  - Index: 8
+    StageType:
+      Item1: LimitTime
+      Item2: 60
+    MapName: Forest
+    SeedData:
+    - Item1: Fake
+      Item2: 0
+      Item3: 3
+    - Item1: Heart
+      Item2: 0
+      Item3: 3
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+    MonsterData:
+    - Item1: Moving
+      Item2: 0
+      Item3: 1
+  - Index: 9
     StageType:
       Item1: LimitTime
       Item2: 60

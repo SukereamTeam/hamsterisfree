@@ -58,12 +58,6 @@ public class JsonManager : Singleton<JsonManager>
     public bool SaveData<T>(T _Data, int _Index = 0)
     {
         var fileName = GetJsonFileName<T>();
-
-        if (fileName == string.Empty)
-        {
-            Debug.Log($"Not Found {typeof(T).Name} match json file.");
-            return false;
-        }
         
         string path = Path.Combine(Application.persistentDataPath, fileName);
         
@@ -71,14 +65,14 @@ public class JsonManager : Singleton<JsonManager>
         {
             if (File.Exists(path) == true)
             {
-                Debug.Log("Exist json File!");
+                Debug.Log($"Load {fileName} File!");
                 
                 var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
 
                 if (dataList != null)
                 {
-                    dataList.Add(_Index, _Data);
-
+                    dataList[_Index] = _Data;
+                    
                     using FileStream stream = File.Open(path, FileMode.Open);
                     WriteEncryptedData(dataList, stream);
                     stream.Close();
@@ -144,11 +138,6 @@ public class JsonManager : Singleton<JsonManager>
     public T LoadData<T>(int _Index = 0)
     {
         var fileName = GetJsonFileName<T>();
-
-        if (fileName == string.Empty)
-        {
-            throw new NullReferenceException();
-        }
         
         string path = Path.Combine(Application.persistentDataPath, fileName);
 
@@ -163,11 +152,6 @@ public class JsonManager : Singleton<JsonManager>
         {
             var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
 
-            // if (_Index >= dataList.Count)
-            // {
-            //     Debug.Log("새로운 스테이지(Next Stage). 저장 필요");
-            //     return default(T);
-            // }
             if (dataList.ContainsKey(_Index) == false)
                 return default(T);
 
@@ -242,7 +226,7 @@ public class JsonManager : Singleton<JsonManager>
 
     private string GetJsonFileName<T>()
     {
-        string name = $"{(typeof(T).ToString())}{FILE_FORMAT}";
+        string name = $"{(typeof(T).ToString())}";
 
         return name;
     }

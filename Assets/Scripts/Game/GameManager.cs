@@ -99,11 +99,21 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-        
 
-        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+        await UniTask.Yield();
         
         // TODO :END 팝업 표시
+        
+        if (this.seedScore.Value > 0)
+        {
+            // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
+            CommonManager.Instance.CurUserData.curStage++;
+            
+            // TODO : Reward
+
+            // TODO : Refactoring (구조가 이게 맞는가?)
+            JsonManager.Instance.SaveData(CommonManager.Instance.CurUserData);
+        }
     }
 
     private void CalculateReward()

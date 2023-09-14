@@ -17,14 +17,20 @@ public class LobbyManager : MonoBehaviour
         this.cancellationToken = new CancellationTokenSource();
     }
 
-    public async void OnClick_Next()
+    public async void OnClick_Next(int _Index)
     {
+        if (CommonManager.Instance.CurUserData.curStage < _Index)
+        {
+            Debug.Log("아직 이전 스테이지 클리어 안 함!");
+            
+            return;
+        }
+
+        CommonManager.Instance.CurStageIndex = _Index;
+        
         await SceneController.Instance.Fade(false, this.fadeDuration, false, cancellationToken);
 
-        // TODO : Test용
-        var curStageIndex = CommonManager.Instance.CurStageIndex;
-        
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(curStageIndex)));
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(_Index)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }

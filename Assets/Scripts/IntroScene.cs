@@ -20,7 +20,7 @@ public class IntroScene : MonoBehaviour
 
     private void Awake()
     {
-        // 싱글톤 객체 생성 및 초기화
+        // CommonManager 싱글톤 객체 생성 및 초기화
         CommonManager.Instance.Initialize();
     }
 

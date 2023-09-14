@@ -31,7 +31,7 @@ public class StageManager : MonoBehaviour
     }
     
     #if UNITY_EDITOR
-    [ReadOnlyCustom]
+    //[ReadOnlyCustom]
     #endif
     [SerializeField]
     private StageInfoData stageInfo = new StageInfoData();

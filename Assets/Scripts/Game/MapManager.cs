@@ -122,14 +122,12 @@ public class MapManager : MonoBehaviour
         //SetOutlineTiles(_StageSprites);
         SetMask(_StageSprites);
 
-        // TODO : 0 이 아니라 스테이지 번호 넣어줘야 함
         var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);
 
         if (stageData == null)
         {
             for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
             {
-
                 if (i == (int)Define.TileType.Exit)
                 {
                     CreateExitTile();
