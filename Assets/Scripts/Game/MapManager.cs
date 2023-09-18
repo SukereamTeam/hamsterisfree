@@ -504,29 +504,9 @@ public class MapManager : MonoBehaviour
 
     private void SaveStageToJson()
     {
-        List<TileData> seedDatas = new List<TileData>(this.seedTiles.Count);
-        List<TileData> monsterDatas = new List<TileData>(this.monsterTiles.Count);
-        int exitData = -1;
-        
-        foreach (var tile in seedTiles)
-        {
-            TileData data = new TileData(tile.Info.SubType,
-                tile.Info.SubTypeIndex,
-                tile.Info.RootIdx);
-            
-            seedDatas.Add(data);
-        }
-        
-        foreach (var tile in monsterTiles)
-        {
-            TileData data = new TileData(tile.Info.SubType,
-                tile.Info.SubTypeIndex,
-                tile.Info.RootIdx);
-            
-            monsterDatas.Add(data);
-        }
-
-        exitData = this.exitTile.Info.RootIdx;
+        List<TileData> seedDatas = seedTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
+        List<TileData> monsterDatas = monsterTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
+        int exitData = this.exitTile.Info.RootIdx;
 
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
