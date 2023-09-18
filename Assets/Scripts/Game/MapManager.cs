@@ -124,51 +124,35 @@ public class MapManager : MonoBehaviour
 
         var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);
 
+        // stageData 가 있으면 그걸 토대로 로드
+        // 없으면 랜덤 생성 후 생성된 타일 정보들 Save
+        for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
+        {
+            if (i == (int)Define.TileType.Exit)
+            {
+                CreateExitTile(stageData?.exitDataRootIdx);
+            }
+            else if (i == (int)Define.TileType.Seed)
+            {
+                CreateSeedTile(_CurStage, stageData?.seedDatas);
+            }
+            else if (i == (int)Define.TileType.Monster)
+            {
+                CreateMonsterTile(_CurStage, stageData?.monsterDatas);
+            }
+        }
+
+        // Save StageData 
         if (stageData == null)
         {
-            for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
-            {
-                if (i == (int)Define.TileType.Exit)
-                {
-                    CreateExitTile();
-                }
-                else if (i == (int)Define.TileType.Seed)
-                {
-                    CreateSeedTile(_CurStage);
-                }
-                else if (i == (int)Define.TileType.Monster)
-                {
-                    CreateMonsterTile(_CurStage);
-                }
-            }
-
-            // Save Setting StageData
             SaveStageToJson();
-        }
-        else
-        {
-            for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
-            {
-                if (i == (int)Define.TileType.Exit)
-                {
-                    CreateExitTile(stageData.exitDataRootIdx);
-                }
-                else if (i == (int)Define.TileType.Seed)
-                {
-                    CreateSeedTile(_CurStage, stageData.seedDatas);
-                }
-                else if (i == (int)Define.TileType.Monster)
-                {
-                    CreateMonsterTile(_CurStage, stageData.monsterDatas);
-                }
-            }
         }
     }
 
     //------------------ Create Tiles
-    private void CreateExitTile(int _RootIdx = -1)
+    private void CreateExitTile(int? _RootIdx)
     {
-        var random = _RootIdx == -1 ? UnityEngine.Random.Range(0, outlineTiles.Length) : _RootIdx;
+        var random = _RootIdx ?? UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
         var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
@@ -194,7 +178,7 @@ public class MapManager : MonoBehaviour
         // 굳이 Exit가 외곽에 있어야 할까? 맵 내부에 있어도 괜찮을 것 같다.
     }
 
-    private void CreateSeedTile(int _CurStage, List<TileData> _saveData = null)
+    private void CreateSeedTile(int _CurStage, List<TileData> _saveData)
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
 
@@ -275,7 +259,7 @@ public class MapManager : MonoBehaviour
         }
     }
     
-    private void CreateMonsterTile(int _CurStage, List<TileData> _saveData = null)
+    private void CreateMonsterTile(int _CurStage, List<TileData> _saveData)
     {
         // MonsterTile은 기본적으로 위아래 혹은 양 옆으로 반복해서 움직인다.
         
