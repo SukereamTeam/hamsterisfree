@@ -15,7 +15,6 @@ public class GameManager : MonoSingleton<GameManager>
     private MapManager mapManager;
     public MapManager MapManager => this.mapManager;
 
-
     [SerializeField]
     private float fadeDuration = 0f;
 
@@ -38,6 +37,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private int maxSeedCount = -1;
 
+    private const int REWARD_MAX = 3;
 
 
 
@@ -106,19 +106,57 @@ public class GameManager : MonoSingleton<GameManager>
         
         if (this.seedScore.Value > 0)
         {
+            // TODO : Clear 연출
+            
             // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
             CommonManager.Instance.CurUserData.curStage++;
             
-            // TODO : Reward
+            // TODO : Reward 얻는 연출 넣기
+            CommonManager.Instance.CurUserData.rewardCount += CalculateReward();
 
             // TODO : Refactoring (구조가 이게 맞는가?)
             JsonManager.Instance.SaveData(CommonManager.Instance.CurUserData);
         }
+        else
+        {
+            // TODO : Fail 연출
+            Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
+        }
     }
 
-    private void CalculateReward()
+    private int CalculateReward()
     {
-        
+        // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산
+        if (this.maxSeedCount > REWARD_MAX)
+        {
+            // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
+            var oneReward = maxSeedCount / REWARD_MAX;
+
+            if (oneReward * 2 < this.seedScore.Value)
+            {
+                return REWARD_MAX;
+            }
+            else if (oneReward < this.seedScore.Value)
+            {
+                return 2;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            // maxSeedCount 가 3보다 작을 때는 3으로 나눠지지 않기 때문에, 다른 계산 필요
+            if (this.seedScore.Value < this.maxSeedCount)
+            {
+                return this.seedScore.Value;
+            }
+            else
+            {
+                return REWARD_MAX;
+            }
+        }
     }
 
     public async void OnClick_Back()

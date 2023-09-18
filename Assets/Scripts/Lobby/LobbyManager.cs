@@ -1,11 +1,15 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Threading;
+using TMPro;
 
 public class LobbyManager : MonoBehaviour
 {
     [SerializeField]
     private float fadeDuration = 0f;
+
+    [SerializeField]
+    private TextMeshProUGUI rewardText = null;
 
 
     private CancellationTokenSource cancellationToken;
@@ -15,6 +19,8 @@ public class LobbyManager : MonoBehaviour
     private void Start()
     {
         this.cancellationToken = new CancellationTokenSource();
+
+        this.rewardText.text = $"Reward : {CommonManager.Instance.CurUserData.rewardCount.ToString()}";
     }
 
     public async void OnClick_Next(int _Index)
