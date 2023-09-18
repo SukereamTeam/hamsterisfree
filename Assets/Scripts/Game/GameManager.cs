@@ -128,37 +128,18 @@ public class GameManager : MonoSingleton<GameManager>
 
     private int CalculateReward()
     {
+        if (this.maxSeedCount <= REWARD_MAX)
+        {
+            return Math.Min(this.seedScore.Value, REWARD_MAX);
+        }
+        
         // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산
-        if (this.maxSeedCount > REWARD_MAX)
+        var oneReward = maxSeedCount / REWARD_MAX; // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
+        if (this.seedScore.Value > oneReward * 2)
         {
-            // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
-            var oneReward = maxSeedCount / REWARD_MAX;
-
-            if (oneReward * 2 < this.seedScore.Value)
-            {
-                return REWARD_MAX;
-            }
-            else if (oneReward < this.seedScore.Value)
-            {
-                return 2;
-            }
-            else
-            {
-                return 1;
-            }
+            return REWARD_MAX;
         }
-        else
-        {
-            // maxSeedCount 가 3보다 작을 때는 3으로 나눠지지 않기 때문에, 다른 계산 필요
-            if (this.seedScore.Value < this.maxSeedCount)
-            {
-                return this.seedScore.Value;
-            }
-            else
-            {
-                return REWARD_MAX;
-            }
-        }
+        return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
     public async void OnClick_Back()
