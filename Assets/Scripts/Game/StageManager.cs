@@ -37,9 +37,14 @@ public class StageManager : MonoBehaviour
     private StageInfoData stageInfo = new StageInfoData();
     public StageInfoData StageInfo => this.stageInfo;
 
-    [SerializeField] private TextMeshProUGUI stageLimitText;
-    [SerializeField] private TextMeshProUGUI stageNumberText;
-    [SerializeField] private TextMeshProUGUI seedInfoText;
+    [SerializeField]
+    private TextMeshProUGUI stageLimitText;
+    
+    [SerializeField]
+    private TextMeshProUGUI stageNumberText;
+    
+    [SerializeField]
+    private TextMeshProUGUI seedInfoText;
     
     // LimitTime타입의 스테이지 일 때의 time값 혹은 LimitTry타입의 스테이지 일 때의 try값
     // default 일 땐 표시하지 않는다.

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CommonManager : GlobalMonoSingleton<CommonManager>
 {
-    // Lobby 씬에서 선택한 스테이지 Index 저장
+    // Lobby 씬에서 선택한 스테이지 Index를 저장
     private int curStageIndex = -1;
     public int CurStageIndex
     {
@@ -23,7 +23,6 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
 
         this.isInit = true;
 
-        // TODO : Delete (유저 정보 로드 구현 후 삭제)
         CurStageIndex = 0;
         
         // TODO : UserData 를 CommonManager 가 아니라 DataContainer 에 넣어두고 쓰기?
