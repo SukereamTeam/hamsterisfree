@@ -54,7 +54,7 @@ public class MonsterTile : TileBase
         
         base.Initialize(_Info, this.startPos);
         
-        this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
+        this.subType = Enum.Parse<Define.TileType_Sub>(_Info.SubType);
 
         var sprite = DataContainer.Instance.MonsterSprites[this.info.SubType];
         if (sprite != null)
@@ -68,7 +68,7 @@ public class MonsterTile : TileBase
 
         if (this.monsterData.Func != string.Empty)
         {
-            this.bossFunc = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), this.monsterData.Func);
+            this.bossFunc = Enum.Parse<Define.TileType_Sub>(this.monsterData.Func);
         }
         
         

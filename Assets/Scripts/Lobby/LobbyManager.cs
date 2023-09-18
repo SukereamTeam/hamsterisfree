@@ -20,12 +20,12 @@ public class LobbyManager : MonoBehaviour
     {
         this.cancellationToken = new CancellationTokenSource();
 
-        this.rewardText.text = $"Reward : {CommonManager.Instance.CurUserData.rewardCount.ToString()}";
+        this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
     }
 
     public async void OnClick_Next(int _Index)
     {
-        if (CommonManager.Instance.CurUserData.curStage < _Index)
+        if (UserDataManager.Instance.CurUserData.curStage < _Index)
         {
             Debug.Log("아직 이전 스테이지 클리어 안 함!");
             

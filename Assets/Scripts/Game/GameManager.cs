@@ -62,15 +62,21 @@ public class GameManager : MonoSingleton<GameManager>
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
+        var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
         
         // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
         this.maxSeedCount = stageTable.SeedData.SelectMany(data =>
         {
-            var subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), data.Item1);
+            var targetSubType = data.Item1;     // eg. Default
+            var targetSubTypeIndex = data.Item2;  // eg. Default_01 <- '01'
+            var targetCount = data.Item3;         // 해당 타입 타일의 갯수
+            
+            var subType = Enum.Parse<Define.TileType_Sub>(targetSubType);
             if (subType != Define.TileType_Sub.Heart && subType != Define.TileType_Sub.Fake)
             {
-                return Enumerable.Repeat(1, data.Item3);
+                // targetCount 값 만큼의 1로 이루어진 시퀀스를 반환
+                // eg. Default Type의 Tile이 3개 있을 경우 : 3 x 1 = 3
+                return Enumerable.Repeat(1, targetCount);
             }
             else
             {
@@ -109,13 +115,9 @@ public class GameManager : MonoSingleton<GameManager>
             // TODO : Clear 연출
             
             // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
-            CommonManager.Instance.CurUserData.curStage++;
             
-            // TODO : Reward 얻는 연출 넣기
-            CommonManager.Instance.CurUserData.rewardCount += CalculateReward();
-
-            // TODO : Refactoring (구조가 이게 맞는가?)
-            JsonManager.Instance.SaveData(CommonManager.Instance.CurUserData);
+            var rewardCount = CalculateReward();
+            UserDataManager.Instance.ClearStage(rewardCount);
         }
         else
         {

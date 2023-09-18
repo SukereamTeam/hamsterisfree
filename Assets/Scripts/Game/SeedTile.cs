@@ -47,7 +47,7 @@ public class SeedTile : TileBase
     {
         base.Initialize(_Info, _Pos);
 
-        this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
+        this.subType = Enum.Parse<Define.TileType_Sub>(_Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)

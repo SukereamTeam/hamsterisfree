@@ -13,7 +13,6 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
         set => this.curStageIndex = value;
     }
 
-    public UserData CurUserData { get; private set; }
 
     private bool isInit = false;
     public void Initialize()
@@ -25,24 +24,7 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
 
         CurStageIndex = 0;
         
-        // TODO : UserData 를 CommonManager 가 아니라 DataContainer 에 넣어두고 쓰기?
-        var userData = JsonManager.Instance.LoadData<UserData>();
-        if (userData == null)
-        {
-            UserData newData = new UserData()
-            {
-                curStage = 0,
-                rewardCount = 0
-            };
-
-            JsonManager.Instance.SaveData(newData);
-
-            CurUserData = newData;
-        }
-        else
-        {
-            CurUserData = userData;
-        }
+        UserDataManager.Instance.LoadUserData();
     }
 
     public void OnDisable()
