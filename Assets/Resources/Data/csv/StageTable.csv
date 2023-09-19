@@ -1,3 +1,11 @@
 Index,StageType,MapName,SeedData,MonsterData
-0,"(LimitTime, 60)",Forest,"((Default, 0, 3))","((Moving, 0, 1))"
-1,"(LimitTime, 60)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"
+0,"(Default, 0)",Forest,"((Default, 0, 1))",NULL
+1,"(Default, 0)",Forest,"((Default, 0, 3))","((Default, 0, 1))"
+2,"(Default, 0)",Forest,"((Default, 0, 5))",NULL
+3,"(Default, 0)",Forest,"((Default, 0, 1))","((Default, 0, 1))"
+4,"(Default, 0)",Forest,"((Default, 0, 3))","((Default, 0, 1), (Fade, 0, 1))"
+5,"(LimitTry, 5)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"
+6,"(LimitTime, 60)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"
+7,"(LimitTry, 5)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"
+8,"(LimitTime, 60)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"
+9,"(LimitTime, 60)",Forest,"((Fake, 0, 3), (Heart, 0, 3), (Moving, 0, 1))","((Moving, 0, 1))"

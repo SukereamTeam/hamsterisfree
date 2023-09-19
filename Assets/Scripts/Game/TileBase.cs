@@ -26,6 +26,7 @@ public abstract class TileBase : MonoBehaviour
 
             // 추가 정보 기본값으로 초기화
             _tileInfo.SubType = "";
+            _tileInfo.SubTypeIndex = -1;
             _tileInfo.ActiveTime = 0f;
         }
 

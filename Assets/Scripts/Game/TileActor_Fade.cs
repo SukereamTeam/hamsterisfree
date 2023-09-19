@@ -33,16 +33,24 @@ public class TileActor_Fade : ITileActor
 
                 await this.tweener;
             }
+
+            if (_Cts.IsCancellationRequested == true)
+            {
+                Debug.Log("토큰으로 취소함!");
+                tweener.Kill(true);
+                _Tile.SpriteRenderer.color = Color.white;
+            }
         }
         catch (Exception ex)
         {
             // Cancel 토큰으로 종료되었을 때
             if (ex is OperationCanceledException)
             {
-                Debug.Log("### Tile Fade ---> Cancel " + ex.Message + " ###");
+                Debug.Log("### Tile Fade ---> 토큰으로 취소 " + ex.Message + " ###");
 
                 // 트윈 삭제
                 tweener.Kill(true);
+                _Tile.SpriteRenderer.color = Color.white;
             }
             else
             {

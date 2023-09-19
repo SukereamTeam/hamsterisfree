@@ -15,7 +15,6 @@ public class GameManager : MonoSingleton<GameManager>
     private MapManager mapManager;
     public MapManager MapManager => this.mapManager;
 
-
     [SerializeField]
     private float fadeDuration = 0f;
 
@@ -36,6 +35,9 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.seedScore = value;
     }
 
+    private int maxSeedCount = -1;
+
+    private const int REWARD_MAX = 3;
 
 
 
@@ -60,16 +62,35 @@ public class GameManager : MonoSingleton<GameManager>
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        var stageType = (Define.StageType)Enum.Parse(typeof(Define.StageType), stageTable.StageType.Item1);
-        var maxSeedCount = stageTable.SeedData.SelectMany(data => Enumerable.Repeat(1, data.Item3)).Sum();
+        var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
+        
+        // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
+        this.maxSeedCount = stageTable.SeedData.SelectMany(data =>
+        {
+            var targetSubType = data.Item1;     // eg. Default
+            var targetSubTypeIndex = data.Item2;  // eg. Default_01 <- '01'
+            var targetCount = data.Item3;         // 해당 타입 타일의 갯수
+            
+            var subType = Enum.Parse<Define.TileType_Sub>(targetSubType);
+            if (subType != Define.TileType_Sub.Heart && subType != Define.TileType_Sub.Fake)
+            {
+                // targetCount 값 만큼의 1로 이루어진 시퀀스를 반환
+                // eg. Default Type의 Tile이 3개 있을 경우 : 3 x 1 = 3
+                return Enumerable.Repeat(1, targetCount);
+            }
+            else
+            {
+                return Enumerable.Empty<int>();
+            }
+        }).Sum();
 
-        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, maxSeedCount);
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, this.maxSeedCount);
         MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
-        // TODO : Delete (테스트용으로 5초 대기 걸어놓음)
-        await UniTask.Delay(TimeSpan.FromMilliseconds(5000));
+        // TODO : Delete (테스트용으로 5초 대기 걸어놓음), 추후 첫 게임일 경우 Tutorial 구현
+        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
 
         // 게임 시작 할 수 있는 상태로 전환
         this.isGame.Value = true;
@@ -84,11 +105,41 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-        MapManager.IsFade.Value = false;
 
-        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+        await UniTask.Yield();
         
         // TODO :END 팝업 표시
+        
+        if (this.seedScore.Value > 0)
+        {
+            // TODO : Clear 연출
+            
+            // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
+            
+            var rewardCount = CalculateReward();
+            UserDataManager.Instance.ClearStage(rewardCount);
+        }
+        else
+        {
+            // TODO : Fail 연출
+            Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
+        }
+    }
+
+    private int CalculateReward()
+    {
+        if (this.maxSeedCount <= REWARD_MAX)
+        {
+            return Math.Min(this.seedScore.Value, REWARD_MAX);
+        }
+        
+        // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산
+        var oneReward = maxSeedCount / REWARD_MAX; // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
+        if (this.seedScore.Value > oneReward * 2)
+        {
+            return REWARD_MAX;
+        }
+        return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
     public async void OnClick_Back()

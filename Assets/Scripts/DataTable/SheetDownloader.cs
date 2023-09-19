@@ -46,7 +46,7 @@ public class SheetDownloader : MonoBehaviour
     [SerializeField]
     private DataContainer dataContainer;
 
-    [ReadOnlyCustom]
+    //[ReadOnlyCustom]
     [SerializeField]
     private SheetData[] sheetDatas;
 
@@ -145,7 +145,6 @@ public class SheetDownloader : MonoBehaviour
 
         // 인스펙터에서 수정 못하게
         data.hideFlags = HideFlags.NotEditable;
-
 
 
         // foundType 이 가지고 있는 필드 긁어오기

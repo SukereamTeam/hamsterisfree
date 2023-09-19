@@ -4,11 +4,15 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class IntroScene : MonoBehaviour
 {
     [SerializeField]
     private float fadeDuration = 0f;
+
+    [SerializeField] private Image logo = null;
 
     private CancellationTokenSource cancellationToken;
 
@@ -16,10 +20,8 @@ public class IntroScene : MonoBehaviour
 
     private void Awake()
     {
-        // 싱글톤 객체 생성 및 초기화
+        // CommonManager 싱글톤 객체 생성 및 초기화
         CommonManager.Instance.Initialize();
-        //SceneController.Instance.Initialize();
-        //DataContainer.Instance.Initialize();
     }
 
     private void Start()
@@ -34,8 +36,13 @@ public class IntroScene : MonoBehaviour
         try
         {
             await SceneController.Instance.Fade(true, fadeDuration, true, cancellationToken);
-
-            await UniTask.Delay(TimeSpan.FromSeconds(1f));
+            
+            Sequence shakeSequence = DOTween.Sequence();
+            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
+            shakeSequence.Play().SetLoops(2, LoopType.Restart);
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
 
             await SceneController.Instance.Fade(false, fadeDuration, true, cancellationToken);
 
@@ -71,5 +78,11 @@ public class IntroScene : MonoBehaviour
         {
             this.cancellationToken.Cancel();
         }
+    }
+
+    private void OnDestroy()
+    {
+        DOTween.KillAll(true);
+        this.cancellationToken.Cancel();
     }
 }

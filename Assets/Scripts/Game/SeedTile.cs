@@ -33,13 +33,21 @@ public class SeedTile : TileBase
         base.Start();
 
         this.cts = new CancellationTokenSource();
+        
+        GameManager.Instance.IsGame
+            .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
+            .Where(x => x == false)
+            .Subscribe(_ =>
+            {
+                ActClear();
+            }).AddTo(this);
     }
 
     public override void Initialize(TileInfo _Info, Vector2 _Pos)
     {
         base.Initialize(_Info, _Pos);
 
-        this.subType = (Define.TileType_Sub)Enum.Parse(typeof(Define.TileType_Sub), _Info.SubType);
+        this.subType = Enum.Parse<Define.TileType_Sub>(_Info.SubType);
 
         var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
         if (sprite != null)
@@ -115,7 +123,7 @@ public class SeedTile : TileBase
         }
         else
         {
-            this.cts.Cancel();
+            ActClear();
         }
 
         await UniTask.WaitUntil(() => this.isFuncStart == false);
@@ -141,14 +149,19 @@ public class SeedTile : TileBase
         }
     }
 
-    private void OnDestroy()
+    private void ActClear()
     {
         this.cts.Cancel();
         
         if (this.disposable != null)
         {
-            Debug.Log("Dispose!!!");
+            Debug.Log($"SeedTile Act Dispose!");
             this.disposable.Dispose();
         }
+    }
+
+    private void OnDestroy()
+    {
+        ActClear();
     }
 }
