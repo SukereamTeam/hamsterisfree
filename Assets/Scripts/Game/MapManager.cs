@@ -155,8 +155,8 @@ public class MapManager : MonoBehaviour
         var random = _RootIdx ?? UnityEngine.Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
-        var exitTile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
-        var exitScript = exitTile.GetComponent<ExitTile>();
+        var tile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
+        var exitScript = tile.GetComponent<ExitTile>();
 
         TileBase.TileInfo baseInfo = new TileBase.TileInfo
         {
@@ -210,11 +210,9 @@ public class MapManager : MonoBehaviour
                 };
                 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
-                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(seedDataParam.Type)
-                    .WithSubTypeIndex(seedDataParam.TypeIndex)
-                    .WithActiveTime(seedDataParam.ActiveTime)
-                    .Build();
+                var tileInfo = GetTileInfo(baseInfo, seedDataParam.Type,
+                    seedDataParam.TypeIndex,
+                    seedDataParam.ActiveTime);
 
                 var posX = _SaveData != null
                     ? this.backTiles[_SaveData[i].RootIdx].position.x
@@ -265,11 +263,9 @@ public class MapManager : MonoBehaviour
                     RootIdx = _SaveData != null ? _SaveData[i].RootIdx : posList[posIdx].root
                 };
 
-                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(monsterDataParam.Type)
-                    .WithSubTypeIndex(monsterDataParam.TypeIndex)
-                    .WithActiveTime(monsterDataParam.ActiveTime)
-                    .Build();
+                var tileInfo = GetTileInfo(baseInfo, monsterDataParam.Type,
+                    monsterDataParam.TypeIndex,
+                    monsterDataParam.ActiveTime);
                 
                 var posX = _SaveData != null
                     ? this.backTiles[_SaveData[i].RootIdx].position.x
@@ -288,6 +284,18 @@ public class MapManager : MonoBehaviour
                 posIdx++;
             }
         }
+    }
+
+    private TileBase.TileInfo GetTileInfo(TileBase.TileInfo _BaseInfo, string _SubType, int _SubTypeIndex, float _ActiveTime)
+    {
+        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(_BaseInfo)
+            .WithSubType(_SubType)
+            .WithSubTypeIndex(_SubTypeIndex)
+            .WithActiveTime(_ActiveTime)
+            .Build();
+        
+        
+        return tileInfo;
     }
 
     /// <summary>
