@@ -10,6 +10,10 @@ using Random = System.Random;
 public class DataContainer : GlobalMonoSingleton<DataContainer>
 {
     [SerializeField]
+    private Table_Lobby lobbyTable;
+    public Table_Lobby LobbyTable => this.lobbyTable;
+    
+    [SerializeField]
     private Table_Stage stageTable;
     public Table_Stage StageTable => this.stageTable;
 
@@ -20,6 +24,8 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     [SerializeField]
     private Table_Monster monsterTable;
     public Table_Monster MonsterTable => this.monsterTable;
+
+    
 
 
 
