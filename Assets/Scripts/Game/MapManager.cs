@@ -178,79 +178,55 @@ public class MapManager : MonoBehaviour
         // 굳이 Exit가 외곽에 있어야 할까? 맵 내부에 있어도 괜찮을 것 같다.
     }
 
-    private void CreateSeedTile(int _CurStage, List<TileData> _saveData)
+    private void CreateSeedTile(int _CurStage, List<TileData> _SaveData)
     {
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
-
-        // TODO : Refactoring
-        if (_saveData != null)
-        {
-            for (int i = 0; i < _saveData.Count; i++)
-            {
-                // 추가 정보 넣어서 빌드 하는 건 같음
-                // rootIdx 로 backTiles 에서 찾아서 포지션 넣어줘야 함
-
-                var seed = _saveData[i];
-                var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
-                var seedScript = seedTile.GetComponent<SeedTile>();
-
-                var seedData = DataContainer.Instance.SeedTable.GetParamFromType(seed.SubType, seed.SubTypeIndex);
-                
-                // 기본 정보 초기화
-                TileBase.TileInfo baseInfo = new TileBase.TileInfo
-                {
-                    Type = Define.TileType.Seed,
-                    RootIdx = seed.RootIdx
-                };
-
-                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
-                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(seedData.Type)
-                    .WithSubTypeIndex(seedData.TypeIndex)
-                    .WithActiveTime(seedData.ActiveTime)
-                    .Build();
-
-                var pos = new Vector2(this.backTiles[seed.RootIdx].position.x, this.backTiles[seed.RootIdx].position.y);
-                
-                seedScript.Initialize(tileInfo, pos);
-
-                this.seedTiles.Add(seedScript);
-            }
-
-            return;
-        }
         
+        var allSeedCount = _SaveData?.Count ?? stageTable.SeedData.Count;
         
         var posList = GetRandomPosList(Define.TileType.Seed, stageTable.SeedData);
         int posIdx = 0;
-
-        for (int i = 0; i < stageTable.SeedData.Count; i++)
+        
+        for (int i = 0; i < allSeedCount; i++)
         {
-            for (int j = 0; j < stageTable.SeedData[i].Item3; j++)
+            var subType = _SaveData != null ? _SaveData[i].SubType : stageTable.SeedData[i].Item1;
+            var subTypeIndex = _SaveData != null ? _SaveData[i].SubTypeIndex : stageTable.SeedData[i].Item2;
+            var subTypeCount = _SaveData != null ? 1 : stageTable.SeedData[i].Item3;
+            
+            for (int j = 0; j < subTypeCount; j++)
             {
-                var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
-                
                 var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
-
-                // eg. SeedTile 의 타입들 중 Default_0 타입에 대한 데이터를 SeedTable에서 가져오기
-                var targetSeedData = DataContainer.Instance.SeedTable.GetParamFromType(stageTable.SeedData[i].Item1, stageTable.SeedData[i].Item2);
+                
+                // eg. SeedTile 의 타입들 중 'Default0' 타입에 대한 데이터를 SeedTable에서 가져오기 (subType : Default, subTypeIndex : 0)
+                // + saveData가 있는 경우 그걸 참조
+                var seedDataParam = DataContainer.Instance.SeedTable.GetParamFromType(subType, subTypeIndex);
 
                 // 기본 정보 초기화
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
                     Type = Define.TileType.Seed,
-                    RootIdx = posList[posIdx].root
+                    RootIdx =  _SaveData != null ? _SaveData[i].RootIdx : posList[posIdx].root
                 };
-
+                
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(targetSeedData.Type)
-                    .WithSubTypeIndex(targetSeedData.TypeIndex)
-                    .WithActiveTime(targetSeedData.ActiveTime)
+                    .WithSubType(seedDataParam.Type)
+                    .WithSubTypeIndex(seedDataParam.TypeIndex)
+                    .WithActiveTime(seedDataParam.ActiveTime)
                     .Build();
 
-                seedScript.Initialize(tileInfo, randomPos);
+                var posX = _SaveData != null
+                    ? this.backTiles[_SaveData[i].RootIdx].position.x
+                    : posList[posIdx].transform.position.x;
+                
+                var posY = _SaveData != null
+                    ? this.backTiles[_SaveData[i].RootIdx].position.y
+                    : posList[posIdx].transform.position.y;
+
+                var pos = new Vector2(posX, posY);
+                
+                seedScript.Initialize(tileInfo, pos);
 
                 this.seedTiles.Add(seedScript);
 
@@ -259,80 +235,53 @@ public class MapManager : MonoBehaviour
         }
     }
     
-    private void CreateMonsterTile(int _CurStage, List<TileData> _saveData)
+    private void CreateMonsterTile(int _CurStage, List<TileData> _SaveData)
     {
         // MonsterTile은 기본적으로 위아래 혹은 양 옆으로 반복해서 움직인다.
         
         var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
         
-        if (_saveData != null)
-        {
-            for (int i = 0; i < _saveData.Count; i++)
-            {
-                // 추가 정보 넣어서 빌드 하는 건 같음
-                // rootIdx 로 backTiles 에서 찾아서 포지션 넣어줘야 함
-
-                var monster = _saveData[i];
-                var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
-                var monsterScript = monsterTile.GetComponent<MonsterTile>();
-
-                var monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(monster.SubType, monster.SubTypeIndex);
-                
-                // 기본 정보 초기화
-                TileBase.TileInfo baseInfo = new TileBase.TileInfo
-                {
-                    Type = Define.TileType.Monster,
-                    RootIdx = monster.RootIdx
-                };
-
-                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
-                TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(monsterData.Type)
-                    .WithSubTypeIndex(monsterData.TypeIndex)
-                    .WithActiveTime(monsterData.ActiveTime)
-                    .Build();
-
-                var pos = new Vector2(this.backTiles[monster.RootIdx].position.x, this.backTiles[monster.RootIdx].position.y);
-                
-                monsterScript.Initialize(tileInfo, pos);
-
-                this.monsterTiles.Add(monsterScript);
-            }
-
-            return;
-        }
-        
+        var allMonsterCount = _SaveData?.Count ?? stageTable.MonsterData.Count;
         
         var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
         int posIdx = 0;
 
-        for (int i = 0; i < stageTable.MonsterData.Count; i++)
+        for (int i = 0; i < allMonsterCount; i++)
         {
-            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
+            var subType = _SaveData != null ? _SaveData[i].SubType : stageTable.MonsterData[i].Item1;
+            var subTypeIndex = _SaveData != null ? _SaveData[i].SubTypeIndex : stageTable.MonsterData[i].Item2;
+            var subTypeCount = _SaveData != null ? 1 : stageTable.MonsterData[i].Item3;
+
+            for (int j = 0; j < subTypeCount; j++)
             {
-                var randomPos = new Vector2(posList[posIdx].transform.position.x, posList[posIdx].transform.position.y);
-                
-                var monsterTile = Instantiate<GameObject>(monsterPrefab, this.tileRoot);
+                var monsterTile = Instantiate<GameObject>(this.monsterPrefab, this.tileRoot);
                 var monsterScript = monsterTile.GetComponent<MonsterTile>();
 
-                // eg. MonsterTile 의 타입들 중 Default_0 타입에 대한 데이터를 MonsterTable에서 가져오기
-                var targetMonsterData = DataContainer.Instance.MonsterTable.GetParamFromType(stageTable.MonsterData[i].Item1, stageTable.MonsterData[i].Item2);
+                var monsterDataParam = DataContainer.Instance.MonsterTable.GetParamFromType(subType, subTypeIndex);
 
-                // 기본 정보 초기화
-                TileBase.TileInfo baseInfo = new TileBase.TileInfo
+                TileBase.TileInfo baseInfo = new TileBase.TileInfo()
                 {
                     Type = Define.TileType.Monster,
-                    RootIdx = posList[posIdx].root
+                    RootIdx = _SaveData != null ? _SaveData[i].RootIdx : posList[posIdx].root
                 };
 
-                // 추가 정보 더해서 초기화 (SubType, ActiveTime)
                 TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
-                    .WithSubType(targetMonsterData.Type)
-                    .WithActiveTime(targetMonsterData.ActiveTime)
-                    .WithSubTypeIndex(targetMonsterData.TypeIndex)
+                    .WithSubType(monsterDataParam.Type)
+                    .WithSubTypeIndex(monsterDataParam.TypeIndex)
+                    .WithActiveTime(monsterDataParam.ActiveTime)
                     .Build();
+                
+                var posX = _SaveData != null
+                    ? this.backTiles[_SaveData[i].RootIdx].position.x
+                    : posList[posIdx].transform.position.x;
+                
+                var posY = _SaveData != null
+                    ? this.backTiles[_SaveData[i].RootIdx].position.y
+                    : posList[posIdx].transform.position.y;
 
-                monsterScript.Initialize(tileInfo, randomPos);
+                var pos = new Vector2(posX, posY);
+                
+                monsterScript.Initialize(tileInfo, pos);
 
                 this.monsterTiles.Add(monsterScript);
 
