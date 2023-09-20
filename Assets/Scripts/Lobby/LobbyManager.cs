@@ -1,43 +1,36 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Threading;
 using TMPro;
 
-public class LobbyManager : MonoBehaviour
+public class LobbyManager : MonoSingleton<LobbyManager>
 {
     [SerializeField]
     private float fadeDuration = 0f;
 
+    public float FadeDuration => this.fadeDuration;
+
     [SerializeField]
     private TextMeshProUGUI rewardText = null;
 
+    [SerializeField]
+    private GameObject stagePrefab = null;
+
 
     private CancellationTokenSource cancellationToken;
+    public CancellationTokenSource Cts => this.cancellationToken;
 
 
-
-    private void Start()
+    private void Awake()
     {
         this.cancellationToken = new CancellationTokenSource();
-
-        this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
+        
+        Initialize();
     }
 
-    public async void OnClick_Next(int _Index)
+    private void Initialize()
     {
-        if (UserDataManager.Instance.CurUserData.curStage < _Index)
-        {
-            Debug.Log("아직 이전 스테이지 클리어 안 함!");
-            
-            return;
-        }
-
-        CommonManager.Instance.CurStageIndex = _Index;
-        
-        await SceneController.Instance.Fade(false, this.fadeDuration, false, cancellationToken);
-
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(_Index)));
-
-        SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
+        this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
     }
 }
