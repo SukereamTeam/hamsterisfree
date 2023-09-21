@@ -80,3 +80,6 @@ crashlytics-build.properties
 # End of https://www.toptal.com/developers/gitignore/api/unity
 
 .idea/.idea.hamsterisfree/.idea/workspace.xml
+
+# macOS finder indexing file
+.DS_Store
