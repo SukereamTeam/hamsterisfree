@@ -371,6 +371,7 @@ MonoBehaviour:
   fadeDuration: 0.5
   rewardText: {fileID: 766157716}
   stagePrefab: {fileID: 0}
+  scrollInit: {fileID: 114060074}
 --- !u!4 &185753363
 Transform:
   m_ObjectHideFlags: 0

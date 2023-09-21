@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Threading;
+using Demo;
 using TMPro;
 
 public class LobbyManager : MonoSingleton<LobbyManager>
@@ -17,12 +18,15 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     [SerializeField]
     private GameObject stagePrefab = null;
 
+    [SerializeField]
+    private InitOnStart scrollInit = null;
+
 
     private CancellationTokenSource cancellationToken;
     public CancellationTokenSource Cts => this.cancellationToken;
 
 
-    private void Awake()
+    private void Start()
     {
         this.cancellationToken = new CancellationTokenSource();
         
@@ -31,6 +35,10 @@ public class LobbyManager : MonoSingleton<LobbyManager>
 
     private void Initialize()
     {
+        Debug.Log("# Lobby Initialize #");
+        
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
+        
+        this.scrollInit.Initialize(DataContainer.Instance.StageTable.list.Count);
     }
 }

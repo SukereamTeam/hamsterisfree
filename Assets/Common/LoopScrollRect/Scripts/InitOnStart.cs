@@ -38,13 +38,23 @@ namespace Demo
             transform.SendMessage("ScrollCellIndex", idx);
         }
 
-        void Start()
+        public void Initialize(int _StageCount)
         {
-            var ls = GetComponent<LoopScrollRect>();
-            ls.prefabSource = this;
-            ls.dataSource = this;
-            ls.totalCount = totalCount;
-            ls.RefillCells();
+            Debug.Log("# InitOnStart Start #");
+            
+            var loopScrollRect = this.GetComponent<LoopScrollRect>();
+
+            if (loopScrollRect != null)
+            {
+                loopScrollRect.prefabSource = this;
+                loopScrollRect.dataSource = this;
+                loopScrollRect.totalCount = _StageCount;
+                loopScrollRect.RefillCells();
+            }
+            else
+            {
+                Debug.Log("# LoopScrollRect is Null. #");
+            }
         }
     }
 }
