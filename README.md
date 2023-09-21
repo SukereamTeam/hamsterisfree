@@ -46,6 +46,8 @@
   - Tile
     - 게임에 등장하는 Tile들을 `TileBase` 클래스를 상속 받게 하여 구현
     - 각 Tile들의 기능들은 `ITileActor` 인터페이스를 사용하여 구현
+  - Stage
+    - StageTable 데이터에 따라 시간 제한, 도전기회 제한 Type 구현
   - Player
     - 화면 터치 시 Block Image가 FadeIn 으로 출력되도록 구현
     - 드래그 입력에 따른 Line Draw 구현
