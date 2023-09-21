@@ -69,7 +69,13 @@ jobs:
         with:
           name: build-Android
           path: build/Android
-          
+
+      - name: Download the artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-Android
+          path: ./
+            
       - name: Create GitHub release
         id: create-new-release
         uses: actions/create-release@v1
@@ -85,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-new-release.outputs.upload_url }}
-          asset_path: ./build/Android
+          asset_path: build-Android
           asset_name: build-Android-v${{ github.run_number }}
           asset_content_type: application/zip
 
