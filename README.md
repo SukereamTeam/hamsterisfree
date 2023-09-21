@@ -38,7 +38,7 @@
 
 - Firebase
 	- 앱 푸시
-	- Ouath
+	- Oauth
   
 
 <p align="center">
