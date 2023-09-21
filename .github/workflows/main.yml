@@ -74,7 +74,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-Android
-            
+
       - name: Create GitHub release
         id: create-new-release
         uses: actions/create-release@v1
@@ -83,14 +83,14 @@ jobs:
         with:
           tag_name: ${{ github.run_number }}
           release_name: Release ${{ github.run_number }}
-      
+
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-new-release.outputs.upload_url }}
-          asset_path: ./build-Android
+          asset_path: /home/runner/work/hamsterisfree/hamsterisfree/build-Android
           asset_name: build-Android-v${{ github.run_number }}
           asset_content_type: application/zip
 
