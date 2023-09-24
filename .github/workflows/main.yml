@@ -70,11 +70,6 @@ jobs:
           name: build-Android
           path: build/Android
 
-      - name: Download the artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: build-Android
-
       - name: Create GitHub release
         id: create-new-release
         uses: actions/create-release@v1
