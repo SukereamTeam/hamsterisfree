@@ -14,8 +14,10 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
     private LayoutElement layoutElement;
 
     private LobbyManager lobbyManager;
-    
-    private float[] itemWidths = new float[3] { 150f, 200f, 150f };
+
+    //private float[] itemWidths = new float[3] { 150f, 200f, 150f };
+    private const float STAGE_ITEM_SIZE = 150f;
+    private const float STAGE_ITEM_SIZE_CUR = 200f;
     
     private int index = -1;
     
@@ -28,8 +30,8 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             this.lobbyManager = LobbyManager.Instance;
         }
         
-        this.layoutElement.preferredWidth = 150f;//itemWidths[Mathf.Abs(_Index) % 3];
-        this.layoutElement.preferredHeight = 150f;//itemWidths[Mathf.Abs(_Index) % 3];
+        this.layoutElement.preferredWidth = STAGE_ITEM_SIZE;//itemWidths[Mathf.Abs(_Index) % 3];
+        this.layoutElement.preferredHeight = STAGE_ITEM_SIZE;//itemWidths[Mathf.Abs(_Index) % 3];
         
         this.index = _Index;
 
@@ -43,8 +45,8 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         {
             this.gameObject.GetComponent<Image>().color = Color.white;
             
-            this.layoutElement.preferredWidth = 200f;
-            this.layoutElement.preferredHeight = 200f;
+            this.layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
+            this.layoutElement.preferredHeight = STAGE_ITEM_SIZE_CUR;
         }
         else
         {
