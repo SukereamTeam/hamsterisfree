@@ -22,6 +22,8 @@ public class IntroScene : MonoBehaviour
     {
         // CommonManager 싱글톤 객체 생성 및 초기화
         CommonManager.Instance.Initialize();
+
+        SoundManager.Instance.Initialize();
     }
 
     private void Start()

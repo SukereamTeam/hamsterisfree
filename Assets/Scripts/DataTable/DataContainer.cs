@@ -21,6 +21,10 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     private Table_Monster monsterTable;
     public Table_Monster MonsterTable => this.monsterTable;
 
+    [SerializeField]
+    private SoundDataList soundTable;
+    public SoundDataList SoundTable => this.soundTable;
+
 
 
     private const string RootPath_Stage = "Images/Map";

@@ -12,6 +12,7 @@ public class LobbyManager : MonoBehaviour
     private TextMeshProUGUI rewardText = null;
 
 
+    private const string LOBBY_BGM = "Lobby_BGM";
     private CancellationTokenSource cancellationToken;
 
 
@@ -21,6 +22,18 @@ public class LobbyManager : MonoBehaviour
         this.cancellationToken = new CancellationTokenSource();
 
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
+
+        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(LOBBY_BGM);
+
+        if (bgm != null)
+        {
+            SoundManager.Instance.Play(bgm, true, true).Forget();
+        }
+        else
+        {
+            Debug.Log($"### Not Found {LOBBY_BGM} ###");
+        }
+        
     }
 
     public async void OnClick_Next(int _Index)
