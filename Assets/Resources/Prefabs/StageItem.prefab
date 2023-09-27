@@ -125,7 +125,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 51078954992809040}
         m_TargetAssemblyTypeName: ScrollIndexCallback_StageItem, Assembly-CSharp
-        m_MethodName: OnClick_Item
+        m_MethodName: OnClick_ItemAsync
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

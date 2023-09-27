@@ -2,7 +2,6 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Threading;
-using Demo;
 using TMPro;
 
 public class LobbyManager : MonoSingleton<LobbyManager>
@@ -16,10 +15,7 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     private TextMeshProUGUI rewardText = null;
 
     [SerializeField]
-    private GameObject stagePrefab = null;
-
-    [SerializeField]
-    private InitOnStart scrollInit = null;
+    private InitScrollLobby initScroll = null;
 
 
     private CancellationTokenSource cancellationToken;
@@ -39,6 +35,6 @@ public class LobbyManager : MonoSingleton<LobbyManager>
         
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
         
-        this.scrollInit.Initialize(DataContainer.Instance.StageTable.list.Count);
+        this.initScroll.Initialize(DataContainer.Instance.StageTable.list.Count);
     }
 }

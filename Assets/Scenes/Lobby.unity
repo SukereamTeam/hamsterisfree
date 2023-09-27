@@ -134,9 +134,9 @@ GameObject:
   - component: {fileID: 114060071}
   - component: {fileID: 114060076}
   - component: {fileID: 114060075}
-  - component: {fileID: 114060074}
   - component: {fileID: 114060073}
   - component: {fileID: 114060072}
+  - component: {fileID: 114060077}
   m_Layer: 5
   m_Name: Loop Horizontal Scroll Rect
   m_TagString: Untagged
@@ -202,20 +202,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114060070}
   m_CullTransparentMesh: 1
---- !u!114 &114060074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 114060070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c41ca759a5d70b448b991ca2699766ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item: {fileID: 402562145892810777, guid: 2661741edbda36242b0da4f2eb3f8607, type: 3}
-  totalCount: 30
 --- !u!114 &114060075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -262,6 +248,20 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &114060077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114060070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d004a916a1017d48a6d36adb4afb4d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 402562145892810777, guid: 2661741edbda36242b0da4f2eb3f8607, type: 3}
+  totalCount: 30
 --- !u!1 &124708725
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,8 +370,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeDuration: 0.5
   rewardText: {fileID: 766157716}
-  stagePrefab: {fileID: 0}
-  scrollInit: {fileID: 114060074}
+  initScroll: {fileID: 114060077}
 --- !u!4 &185753363
 Transform:
   m_ObjectHideFlags: 0
