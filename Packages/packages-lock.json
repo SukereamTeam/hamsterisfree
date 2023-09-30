@@ -183,6 +183,13 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.unity.uiextensions": {
+      "version": "https://github.com/Unity-UI-Extensions/com.unity.uiextensions.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "90fd22498fb4b81195a13d270a666c736e24f2dd"
+    },
     "com.unity.visualscripting": {
       "version": "1.8.0",
       "depth": 0,
@@ -192,6 +199,15 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "me.qiankanglai.loopscrollrect": {
+      "version": "https://github.com/qiankanglai/LoopScrollRect.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "hash": "b637acab5942ae4ba5229daacd1721898c5f6c2b"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

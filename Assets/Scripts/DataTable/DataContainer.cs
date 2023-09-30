@@ -10,6 +10,10 @@ using Random = System.Random;
 public class DataContainer : GlobalMonoSingleton<DataContainer>
 {
     [SerializeField]
+    private Table_Lobby lobbyTable;
+    public Table_Lobby LobbyTable => this.lobbyTable;
+    
+    [SerializeField]
     private Table_Stage stageTable;
     public Table_Stage StageTable => this.stageTable;
 
@@ -20,6 +24,8 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     [SerializeField]
     private Table_Monster monsterTable;
     public Table_Monster MonsterTable => this.monsterTable;
+
+    
 
 
 
@@ -52,15 +58,6 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 
         this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
     }
-
-
-
-    // TODO
-    // Json 으로 진행상황 저장하는 함수 만들기
-    // 진행해야하는 스테이지 넘버 (첫 시작이면 0이란 소리)
-    // 탈출문 좌표
-    // 스테이지 선택해서 게임 시작할 때 여기 저장된 스테이지 넘버로 스테이지 데이터테이블 참조하여 불러옴
-
 
 
     public async UniTask LoadStageDatas(int _StageIndex)

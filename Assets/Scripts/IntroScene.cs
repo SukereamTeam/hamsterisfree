@@ -46,13 +46,10 @@ public class IntroScene : MonoBehaviour
 
             await SceneController.Instance.Fade(false, fadeDuration, true, cancellationToken);
 
-            // TODO : 유저 데이터 로드 ?
-            //SceneController.LoadingTask.Add();
-
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
                 Debug.Log("1차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+                await UniTask.Delay(TimeSpan.FromMilliseconds(2000));
                 Debug.Log("1차 태스크 끝");
             }));
 
