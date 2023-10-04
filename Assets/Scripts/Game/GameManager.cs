@@ -39,6 +39,13 @@ public class GameManager : MonoSingleton<GameManager>
 
     private const int REWARD_MAX = 3;
 
+    private const string GAME_BGM = "_BGM";
+    private const string GAME_DRAG_SFX = "_DRAG_SFX";
+    private const string GAME_SEED_SFX = "_SEED_SFX";
+
+    private const int DRAG_SFX_IDX = 2;
+    private const int SEED_SFX_IDX = 3;
+
 
 
 
@@ -61,6 +68,19 @@ public class GameManager : MonoSingleton<GameManager>
         
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
+
+        // Map 별로 다른 BGM 재생
+        var bgmPath = $"{stageTable.MapName}{GAME_BGM}";
+        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(bgmPath);
+
+        if (bgm != null)
+        {
+            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, this.fadeDuration, _Volume: 0.3f).Forget();
+        }
+        else
+        {
+            Debug.Log($"### Not Found {bgmPath} ###");
+        }
 
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
         
@@ -94,6 +114,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         // 게임 시작 할 수 있는 상태로 전환
         this.isGame.Value = true;
+
+        
     }
 
 
@@ -144,6 +166,15 @@ public class GameManager : MonoSingleton<GameManager>
 
     public async void OnClick_Back()
     {
+        SoundManager.Instance.FadeVolumeStart(false,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm],
+                this.fadeDuration, () =>
+                {
+                    SoundManager.Instance.Stop((int)Define.SoundIndex.Common_Bgm);
+                }
+            );
+
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();

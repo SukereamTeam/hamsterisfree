@@ -11,15 +11,15 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 {
     private bool isInit = false;
 
-    private CancellationTokenSource cts;
-
-    //private List<AudioSource> audioSourcePool;
+    private CancellationTokenSource soundCts;
 
     private Dictionary<int, AudioSource> audioSourceDic = new Dictionary<int, AudioSource>();
     public List<AudioSource> AudioSourceList
     {
         get => this.audioSourceDic.Values.ToList();
     }
+
+    private Coroutine fadeCoroutine;
 
     private const float FADE_TIME = 5f;
 
@@ -32,17 +32,9 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
         this.isInit = true;
 
-        this.cts = new CancellationTokenSource();
+        this.fadeCoroutine = null;
 
-        //this.audioSourcePool = new List<AudioSource>();
-
-        //var source = this.GetComponent<AudioSource>();
-        //source.playOnAwake = false;
-
-        //if (source != null)
-        //{
-        //    this.audioSourcePool.Add(source);
-        //}
+        this.soundCts = new CancellationTokenSource();
 
         this.audioSourceDic = this.GetComponents<AudioSource>()?
             .Select((audioSource, index) =>
@@ -53,108 +45,129 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             .ToDictionary(item => item.Index, item => item.AudioSource);
     }
 
-    //private AudioSource CreateAudioSource()
-    //{
-    //    var source = this.gameObject.AddComponent<AudioSource>();
-    //    source.playOnAwake = false;
-
-    //    this.audioSourcePool.Add(source);
-
-    //    return source;
-    //}
-
-    //private AudioSource GetPoolingAudioSource()
-    //{
-    //    foreach (var source in this.audioSourcePool)
-    //    {
-    //        if (source.isPlaying == false && source.loop == false)
-    //        {
-    //            return source;
-    //        }
-    //    }
-
-    //    return null;
-    //}
-
-    //private AudioSource GetAudioSource()
-    //{
-    //    var source = GetPoolingAudioSource();
-
-    //    return source ?? CreateAudioSource();
-    //}
-
-
-    public async UniTask PlayOneShot(AudioClip _Clip, float _Volume = 1, System.Action _OnComplete = null)
+    private void CreateAudioSource(int _Index)
     {
-        //var source = GetAudioSource();
-
-        //source.PlayOneShot(_Clip, _Volume);
-
-        //await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length));
-
-        //if (_OnComplete != null)
-        //{
-        //    _OnComplete();
-        //}
+        this.audioSourceDic[_Index] = this.gameObject.AddComponent<AudioSource>();
+        this.audioSourceDic[_Index].playOnAwake = false;
     }
 
-    public async UniTask Play(AudioClip _Clip, bool _Loop = false, bool _IsVolumeFade = false, float _Volume = 1, System.Action onComplete = null)
+    public async UniTask PlayOneShot(AudioClip _Clip, int _Index,  float _Volume = 1, System.Action _OnComplete = null)
     {
-        //var source = GetAudioSource();
-        //source.clip = _Clip;
-        //source.loop = _Loop;
+        if (this.audioSourceDic.ContainsKey(_Index) == false)
+        {
+            CreateAudioSource(_Index);
+        }
 
-        //source.Play();
+        this.audioSourceDic[_Index].PlayOneShot(_Clip, _Volume);
 
-        //if (_IsVolumeFade == true)
-        //{
-        //    FadeVolume(true, _Volume, source, this.cts).Forget();
-        //}
-        //else
-        //{
-        //    source.volume = _Volume;
-        //}
+        await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length), cancellationToken: this.soundCts.Token);
 
-        //await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length));
-
-        //if (onComplete != null)
-        //{
-        //    onComplete();
-        //}
+        if (_OnComplete != null)
+        {
+            _OnComplete();
+        }
     }
 
-    public void Stop()
+    public async UniTask Play(AudioClip _Clip, int _Index, bool _Loop = false, bool _IsVolumeFade = false, float _FadeTIme = FADE_TIME, float _Volume = 1f, System.Action _OnComplete = null)
     {
+        if (this.audioSourceDic.ContainsKey(_Index) == false)
+        {
+            CreateAudioSource(_Index);
+        }
 
+        this.audioSourceDic[_Index].clip = _Clip;
+        this.audioSourceDic[_Index].loop = _Loop;
+        this.audioSourceDic[_Index].Stop();
+        this.audioSourceDic[_Index].Play();
+
+
+        if (_IsVolumeFade == true)
+        {
+            FadeVolumeStart(true, _Volume, this.audioSourceDic[_Index], _FadeTIme);
+        }
+        else
+        {
+            this.audioSourceDic[_Index].volume = _Volume;
+        }
+
+        await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length));
+
+        if (_OnComplete != null)
+        {
+            _OnComplete();
+        }
     }
 
     public void StopAll()
     {
-        this.cts.Cancel();
+        if (this.fadeCoroutine != null)
+        {
+            StopCoroutine(this.fadeCoroutine);
+            this.fadeCoroutine = null;
+        }
 
-        //foreach (var source in this.audioSourcePool)
-        //{
-        //    source.Stop();
-        //    source.volume = 1f;
-        //}
+        foreach (var source in this.audioSourceDic)
+        {
+            source.Value.Stop();
+        }
     }
 
-    private async UniTaskVoid FadeVolume(bool _IsFadeIn, float _Volume, AudioSource _AudioSource, CancellationTokenSource _Cts)
+    public void Stop(int _Index)
     {
+        if (this.fadeCoroutine != null)
+        {
+            StopCoroutine(this.fadeCoroutine);
+            this.fadeCoroutine = null;
+        }
 
+        if (this.audioSourceDic.ContainsKey(_Index) == true)
+        {
+            this.audioSourceDic[_Index].Stop();
+        }
+    }
 
+    public void FadeVolumeStart(bool _IsFadeIn, float _Volume, AudioSource _AudioSource, float _FadeTime, System.Action _OnComplete = null)
+    {
+        if (this.fadeCoroutine != null)
+        {
+            StopCoroutine(this.fadeCoroutine);
+            this.fadeCoroutine = null;
+        }
+
+        this.fadeCoroutine = StartCoroutine(FadeVolume(_IsFadeIn, _Volume, _AudioSource, _FadeTime, _OnComplete));
+    }
+
+    public IEnumerator FadeVolume(bool _IsFadeIn, float _Volume, AudioSource _AudioSource, float _FadeTime, System.Action _OnComplete)
+    {
         float initVolume = _IsFadeIn ? 0f : _Volume;
         float targetVolume = _IsFadeIn ? _Volume : 0f;
 
         float timer = 0;
-        while (timer < FADE_TIME && _Cts.IsCancellationRequested == false)
+
+        while (timer < _FadeTime)
         {
-            _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / FADE_TIME);
+            _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
             timer += Time.deltaTime;
 
-            await UniTask.Yield();
+            yield return null;
         }
 
         _AudioSource.volume = targetVolume;
+
+        if (_OnComplete != null)
+        {
+            _OnComplete();
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if (this.fadeCoroutine != null)
+        {
+            StopCoroutine(this.fadeCoroutine);
+            this.fadeCoroutine = null;
+        }
     }
 }

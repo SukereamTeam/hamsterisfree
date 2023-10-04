@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: SoundTable
   m_EditorClassIdentifier: 
   soundList:
+  - Name: Stage_Enter_SFX
+    Clip: {fileID: 8300000, guid: d4afdc63f6d9618469f288dc2b04a497, type: 3}
   - Name: Lobby_BGM
     Clip: {fileID: 8300000, guid: c2044fdf56120644c9d4a5de7f65edfc, type: 3}
   - Name: Forest_BGM

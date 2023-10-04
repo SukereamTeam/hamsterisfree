@@ -12,7 +12,12 @@ public class LobbyManager : MonoBehaviour
     private TextMeshProUGUI rewardText = null;
 
 
+    
+
     private const string LOBBY_BGM = "Lobby_BGM";
+    private const string LOBBY_SFX = "Stage_Enter_SFX";
+    private const int ENTER_SFX_IDX = 2;
+
     private CancellationTokenSource cancellationToken;
 
 
@@ -27,7 +32,7 @@ public class LobbyManager : MonoBehaviour
 
         if (bgm != null)
         {
-            SoundManager.Instance.Play(bgm, true, true).Forget();
+            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, _Volume: 0.3f).Forget();
         }
         else
         {
@@ -41,13 +46,33 @@ public class LobbyManager : MonoBehaviour
         if (UserDataManager.Instance.CurUserData.curStage < _Index)
         {
             Debug.Log("아직 이전 스테이지 클리어 안 함!");
-            
+
             return;
         }
 
+        var sfx = DataContainer.Instance.SoundTable.FindAudioClipWithName(LOBBY_SFX);
+
+        if (sfx != null)
+        {
+            SoundManager.Instance.PlayOneShot(sfx, ENTER_SFX_IDX).Forget();
+        }
+        else
+        {
+            Debug.Log($"### Not Found {LOBBY_SFX} ###");
+        }
+
+        SoundManager.Instance.FadeVolumeStart(false,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm],
+                this.fadeDuration, () =>
+                {
+                    SoundManager.Instance.Stop((int)Define.SoundIndex.Common_Bgm);
+                }
+            );
+
         CommonManager.Instance.CurStageIndex = _Index;
         
-        await SceneController.Instance.Fade(false, this.fadeDuration, false, cancellationToken);
+        await SceneController.Instance.Fade(false, this.fadeDuration, false, this.cancellationToken);
 
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(_Index)));
 

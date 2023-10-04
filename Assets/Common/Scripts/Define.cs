@@ -7,6 +7,13 @@ public class Define
         Game,
     }
 
+    public enum SoundIndex
+    {
+        Common_Bgm = 0,
+        Common_UI_Sfx,
+    }
+
+
     public enum TileType
     {
         None,
