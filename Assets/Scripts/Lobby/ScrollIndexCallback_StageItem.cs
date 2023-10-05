@@ -74,6 +74,8 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             return;
         }
 
+        PlaySoundEnterStage();
+
         CommonManager.Instance.CurStageIndex = this.stageIndex;
         
         await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false, this.lobbyManager.Cts);
@@ -81,5 +83,28 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(this.stageIndex)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
+    }
+
+    private void PlaySoundEnterStage()
+    {
+        var sfx = DataContainer.Instance.SoundTable.FindAudioClipWithName(LobbyManager.LOBBY_SFX);
+
+        if (sfx != null)
+        {
+            SoundManager.Instance.PlayOneShot(sfx, LobbyManager.ENTER_SFX_IDX).Forget();
+        }
+        else
+        {
+            Debug.Log($"### Not Found {LobbyManager.LOBBY_SFX} ###");
+        }
+
+        SoundManager.Instance.FadeVolumeStart(false,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
+                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm],
+                this.lobbyManager.FadeDuration, () =>
+                {
+                    SoundManager.Instance.Stop((int)Define.SoundIndex.Common_Bgm);
+                }
+            );
     }
 }
