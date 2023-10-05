@@ -87,16 +87,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
     private void PlaySoundEnterStage()
     {
-        var sfx = DataContainer.Instance.SoundTable.FindAudioClipWithName(LobbyManager.LOBBY_SFX);
-
-        if (sfx != null)
-        {
-            SoundManager.Instance.PlayOneShot(sfx, LobbyManager.ENTER_SFX_IDX).Forget();
-        }
-        else
-        {
-            Debug.Log($"### Not Found {LobbyManager.LOBBY_SFX} ###");
-        }
+        SoundManager.Instance.PlayOneShot(this.lobbyManager.UiSound, LobbyManager.ENTER_SFX_IDX).Forget();
 
         SoundManager.Instance.FadeVolumeStart(false,
                 SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,

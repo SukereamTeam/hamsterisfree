@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: SoundTable
   m_EditorClassIdentifier: 
   soundList:
-  - Name: Stage_Enter_SFX
+  - Name: STAGE_ENTER_SFX
     Clip: {fileID: 8300000, guid: d4afdc63f6d9618469f288dc2b04a497, type: 3}
+  - Name: COMMON_UI_SFX
+    Clip: {fileID: 8300000, guid: af4f34a7a147437438cd9cc812b098f0, type: 3}
   - Name: Lobby_BGM
     Clip: {fileID: 8300000, guid: c2044fdf56120644c9d4a5de7f65edfc, type: 3}
   - Name: Forest_BGM
     Clip: {fileID: 8300000, guid: 558c41ea90887434ba99db5bcadea67d, type: 3}
-  - Name: Forest_Drag
+  - Name: Forest_DRAG_SFX
     Clip: {fileID: 8300000, guid: ea3c98abf1daf14439b6386c6ea0fb26, type: 3}

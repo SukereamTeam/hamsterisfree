@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -53,6 +54,8 @@ public class Player : MonoBehaviour
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
+                PlayDragSound(false);
+
                 return;
             }
 
@@ -62,6 +65,8 @@ public class Player : MonoBehaviour
             this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);//Input.mousePosition;
 
             this.lineManager.BeginDraw();
+
+            PlayDragSound(true);
         }
 
         if (Input.GetMouseButton(0))
@@ -75,6 +80,8 @@ public class Player : MonoBehaviour
                 Debug.Log("### GameScreen 영역을 벗어나면 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
+
+                PlayDragSound(false);
 
                 return;
             }
@@ -112,6 +119,8 @@ public class Player : MonoBehaviour
             GameManager.Instance.MapManager.IsFade.Value = false;
 
             this.lineManager.EndDraw();
+
+            PlayDragSound(false);
         }
     }
 
@@ -140,5 +149,17 @@ public class Player : MonoBehaviour
         var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
 
         return (raycastResult, mousePosition);
+    }
+
+    private void PlayDragSound(bool _IsPlay)
+    {
+        if (_IsPlay == false)
+        {
+            SoundManager.Instance.Stop(GameManager.DRAG_SFX_IDX);
+        }
+        else
+        {
+            SoundManager.Instance.Play(GameManager.Instance.DragSound, GameManager.DRAG_SFX_IDX, _Loop: true).Forget();
+        }
     }
 }

@@ -35,15 +35,19 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.seedScore = value;
     }
 
+    public AudioClip UiSound { get; private set; }
+    public AudioClip DragSound { get; private set; }
+
     private int maxSeedCount = -1;
 
     private const int REWARD_MAX = 3;
 
+    private const string UI_SFX = "COMMON_UI_SFX";
     private const string GAME_BGM = "_BGM";
     private const string GAME_DRAG_SFX = "_DRAG_SFX";
     private const string GAME_SEED_SFX = "_SEED_SFX";
 
-    private const int DRAG_SFX_IDX = 2;
+    public const int DRAG_SFX_IDX = 2;
     private const int SEED_SFX_IDX = 3;
 
 
@@ -69,18 +73,7 @@ public class GameManager : MonoSingleton<GameManager>
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        // Map 별로 다른 BGM 재생
-        var bgmPath = $"{stageTable.MapName}{GAME_BGM}";
-        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(bgmPath);
-
-        if (bgm != null)
-        {
-            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, this.fadeDuration, _Volume: 0.3f).Forget();
-        }
-        else
-        {
-            Debug.Log($"### Not Found {bgmPath} ###");
-        }
+        GameSoundInit(stageTable.MapName);
 
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
         
@@ -164,8 +157,40 @@ public class GameManager : MonoSingleton<GameManager>
         return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
+    private void GameSoundInit(string _MapName)
+    {
+        // Map 별로 다른 BGM 재생
+        var bgmPath = $"{_MapName}{GAME_BGM}";
+        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(bgmPath);
+
+        if (bgm != null)
+        {
+            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, this.fadeDuration, _Volume: 0.3f).Forget();
+        }
+        else
+        {
+            Debug.LogError($"### Not Found {bgmPath} ###");
+        }
+
+        var uiPath = $"{UI_SFX}";
+        UiSound = DataContainer.Instance.SoundTable.FindAudioClipWithName(uiPath);
+        if (UiSound == null)
+        {
+            Debug.LogError($"### Not Found {uiPath} ###");
+        }
+
+        var dragPath = $"{_MapName}{GAME_DRAG_SFX}";
+        DragSound = DataContainer.Instance.SoundTable.FindAudioClipWithName(dragPath);
+        if (DragSound == null)
+        {
+            Debug.LogError($"### Not Found {dragPath} ###");
+        }
+    }
+
     public async void OnClick_BackAsync()
     {
+        SoundManager.Instance.PlayOneShot(UiSound, (int)Define.SoundIndex.Common_UI_Sfx).Forget();
+
         SoundManager.Instance.FadeVolumeStart(false,
                 SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
                 SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm],
