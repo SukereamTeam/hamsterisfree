@@ -19,9 +19,6 @@ public class Player : MonoBehaviour
 
 
 
-    // TODO
-    // 몬스터타일 선택 하면 게임 오버
-
     private void Start()
     {
         this.lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));

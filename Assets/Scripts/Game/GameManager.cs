@@ -164,7 +164,7 @@ public class GameManager : MonoSingleton<GameManager>
         return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
-    public async void OnClick_Back()
+    public async void OnClick_BackAsync()
     {
         SoundManager.Instance.FadeVolumeStart(false,
                 SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
