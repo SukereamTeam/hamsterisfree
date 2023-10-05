@@ -9,21 +9,29 @@ using System.Threading;
 [RequireComponent(typeof(AudioSource))]
 public class SoundManager : GlobalMonoSingleton<SoundManager>
 {
+    private int index = 0;
     private bool isInit = false;
-
     private CancellationTokenSource soundCts;
-
-    private Dictionary<int, AudioSource> audioSourceDic = new Dictionary<int, AudioSource>();
-    public List<AudioSource> AudioSourceList
-    {
-        get => this.audioSourceDic.Values.ToList();
-    }
-
     private Coroutine fadeCoroutine;
 
     private const float FADE_TIME = 5f;
 
-    
+    public List<AudioSource> AudioSources
+    {
+        get;
+        private set;
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if (this.fadeCoroutine != null)
+        {
+            StopCoroutine(this.fadeCoroutine);
+            this.fadeCoroutine = null;
+        }
+    }
 
     public void Initialize()
     {
@@ -36,64 +44,46 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
         this.soundCts = new CancellationTokenSource();
 
-        this.audioSourceDic = this.GetComponents<AudioSource>()?
-            .Select((audioSource, index) =>
-            {
-                audioSource.playOnAwake = false;
-                return new { Index = index, AudioSource = audioSource };
-            })
-            .ToDictionary(item => item.Index, item => item.AudioSource);
+        AudioSources = this.GetComponents<AudioSource>().ToList();
     }
 
-    private void CreateAudioSource(int _Index)
+    public async UniTask PlayOneShot(string audioPath, float _Volume = 1, Action _OnComplete = null)
     {
-        this.audioSourceDic[_Index] = this.gameObject.AddComponent<AudioSource>();
-        this.audioSourceDic[_Index].playOnAwake = false;
-    }
+        var (audioSource, audioClip) = GetAudioSouceAndClip(audioPath);
+        if (audioSource == null || audioClip == null) return;
 
-    public async UniTask PlayOneShot(AudioClip _Clip, int _Index,  float _Volume = 1, System.Action _OnComplete = null)
-    {
-        if (this.audioSourceDic.ContainsKey(_Index) == false)
-        {
-            CreateAudioSource(_Index);
-        }
-
-        this.audioSourceDic[_Index].PlayOneShot(_Clip, _Volume);
-
-        await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length), cancellationToken: this.soundCts.Token);
+        audioSource.PlayOneShot(audioClip, _Volume);
 
         if (_OnComplete != null)
         {
+            await UniTask.Delay(TimeSpan.FromSeconds(audioClip.length), cancellationToken: this.soundCts.Token);
             _OnComplete();
         }
     }
 
-    public async UniTask Play(AudioClip _Clip, int _Index, bool _Loop = false, bool _IsVolumeFade = false, float _FadeTIme = FADE_TIME, float _Volume = 1f, System.Action _OnComplete = null)
+
+    public async UniTask Play(string audioPath, bool _Loop = false, float _FadeTime = FADE_TIME, float _Volume = 1f, Action _OnComplete = null)
     {
-        if (this.audioSourceDic.ContainsKey(_Index) == false)
+        var (audioSource, audioClip) = GetAudioSouceAndClip(audioPath);
+        if (audioSource == null || audioClip == null) return;
+
+        audioSource.clip = audioClip;
+        audioSource.loop = _Loop;
+        audioSource.Stop();
+        audioSource.Play();
+
+        if (_FadeTime > 0f)
         {
-            CreateAudioSource(_Index);
-        }
-
-        this.audioSourceDic[_Index].clip = _Clip;
-        this.audioSourceDic[_Index].loop = _Loop;
-        this.audioSourceDic[_Index].Stop();
-        this.audioSourceDic[_Index].Play();
-
-
-        if (_IsVolumeFade == true)
-        {
-            FadeVolumeStart(true, _Volume, this.audioSourceDic[_Index], _FadeTIme);
+            FadeVolumeStart(true, _Volume, audioSource, _FadeTime);
         }
         else
         {
-            this.audioSourceDic[_Index].volume = _Volume;
+            audioSource.volume = _Volume;
         }
-
-        await UniTask.Delay(TimeSpan.FromSeconds(_Clip.length));
 
         if (_OnComplete != null)
         {
+            await UniTask.Delay(TimeSpan.FromSeconds(audioClip.length));
             _OnComplete();
         }
     }
@@ -106,23 +96,26 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             this.fadeCoroutine = null;
         }
 
-        foreach (var source in this.audioSourceDic)
+        foreach (var source in AudioSources)
         {
-            source.Value.Stop();
+            source.Stop();
         }
     }
 
-    public void Stop(int _Index)
+    public void Stop(string audioPath)
     {
+        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(audioPath);
+        if (audioClip == null) return;
+
+        var audioSource = AudioSources.Find((x) => x.clip != null && x.clip.name.Equals(audioClip.name));
+        if (audioSource == null ) return;
+
+        audioSource.Stop();
+
         if (this.fadeCoroutine != null)
         {
             StopCoroutine(this.fadeCoroutine);
             this.fadeCoroutine = null;
-        }
-
-        if (this.audioSourceDic.ContainsKey(_Index) == true)
-        {
-            this.audioSourceDic[_Index].Stop();
         }
     }
 
@@ -160,14 +153,31 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         }
     }
 
-    protected override void OnDestroy()
+    private AudioSource GetAudioSource()
     {
-        base.OnDestroy();
-
-        if (this.fadeCoroutine != null)
+        int loopCount = 0;
+        while (true)
         {
-            StopCoroutine(this.fadeCoroutine);
-            this.fadeCoroutine = null;
+            int nextIndex = this.index + 1 >= AudioSources.Count ? 0 : this.index + 1;
+            if (AudioSources[nextIndex].clip == null || AudioSources[nextIndex].isPlaying == false)
+                return AudioSources[nextIndex];
+
+            if (++loopCount >= AudioSources.Count)
+            {
+                var audioSource = this.gameObject.AddComponent<AudioSource>();
+                AudioSources.Add(audioSource);
+                return audioSource;
+            }
         }
+    }
+    private (AudioSource, AudioClip) GetAudioSouceAndClip(string audioPath)
+    {
+        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(audioPath);
+        if (audioClip == null) return (null, null);
+
+        var audioSource = GetAudioSource();
+        if (audioSource == null) return (null, audioClip);
+
+        return (audioSource, audioClip);
     }
 }

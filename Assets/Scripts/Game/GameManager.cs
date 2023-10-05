@@ -38,7 +38,11 @@ public class GameManager : MonoSingleton<GameManager>
     public AudioClip UiSound { get; private set; }
     public AudioClip DragSound { get; private set; }
 
+    public string BgmPath { get; private set; }
+    public string DragPath { get; private set; }
+
     private int maxSeedCount = -1;
+    
 
     private const int REWARD_MAX = 3;
 
@@ -160,43 +164,22 @@ public class GameManager : MonoSingleton<GameManager>
     private void GameSoundInit(string _MapName)
     {
         // Map 별로 다른 BGM 재생
-        var bgmPath = $"{_MapName}{GAME_BGM}";
-        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(bgmPath);
+        BgmPath = $"{_MapName}{GAME_BGM}";
+        SoundManager.Instance.Play(BgmPath, _FadeTime: this.fadeDuration, _Volume: 0.3f).Forget();
 
-        if (bgm != null)
-        {
-            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, this.fadeDuration, _Volume: 0.3f).Forget();
-        }
-        else
-        {
-            Debug.LogError($"### Not Found {bgmPath} ###");
-        }
-
-        var uiPath = $"{UI_SFX}";
-        UiSound = DataContainer.Instance.SoundTable.FindAudioClipWithName(uiPath);
-        if (UiSound == null)
-        {
-            Debug.LogError($"### Not Found {uiPath} ###");
-        }
-
-        var dragPath = $"{_MapName}{GAME_DRAG_SFX}";
-        DragSound = DataContainer.Instance.SoundTable.FindAudioClipWithName(dragPath);
-        if (DragSound == null)
-        {
-            Debug.LogError($"### Not Found {dragPath} ###");
-        }
+        DragPath = $"{_MapName}{GAME_DRAG_SFX}";
     }
 
     public async void OnClick_BackAsync()
     {
-        SoundManager.Instance.PlayOneShot(UiSound, (int)Define.SoundIndex.Common_UI_Sfx).Forget();
+        SoundManager.Instance.PlayOneShot(UI_SFX).Forget();
 
         SoundManager.Instance.FadeVolumeStart(false,
-                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm].volume,
-                SoundManager.Instance.AudioSourceList[(int)Define.SoundIndex.Common_Bgm],
+                SoundManager.Instance.AudioSources[(int)Define.SoundIndex.Common_Bgm].volume,
+                SoundManager.Instance.AudioSources[(int)Define.SoundIndex.Common_Bgm],
                 this.fadeDuration, () =>
                 {
-                    SoundManager.Instance.Stop((int)Define.SoundIndex.Common_Bgm);
+                    SoundManager.Instance.Stop(BgmPath);
                 }
             );
 

@@ -18,7 +18,6 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     private InitScrollLobby initScroll = null;
 
 
-    public AudioClip UiSound { get; private set; }
 
     public const string LOBBY_BGM = "Lobby_BGM";
     public const string LOBBY_SFX = "STAGE_ENTER_SFX";
@@ -39,24 +38,10 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     {
         Debug.Log("# Lobby Initialize #");
 
-        var bgm = DataContainer.Instance.SoundTable.FindAudioClipWithName(LOBBY_BGM);
-        if (bgm != null)
-        {
-            SoundManager.Instance.Play(bgm, (int)Define.SoundIndex.Common_Bgm, _Loop: true, _IsVolumeFade: true, _Volume: 0.3f).Forget();
-        }
-        else
-        {
-            Debug.Log($"### Not Found {LOBBY_BGM} ###");
-        }
-
-        UiSound = DataContainer.Instance.SoundTable.FindAudioClipWithName(LOBBY_SFX);
-        if (UiSound == null)
-        {
-            Debug.LogError($"### Not Found {LOBBY_SFX} ###");
-        }
+        SoundManager.Instance.Play(LOBBY_BGM, _Loop: true, _Volume: 0.3f).Forget();
 
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
-        
+
         this.initScroll.Initialize(DataContainer.Instance.StageTable.list.Count);
     }
 }

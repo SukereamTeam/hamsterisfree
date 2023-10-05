@@ -155,11 +155,11 @@ public class Player : MonoBehaviour
     {
         if (_IsPlay == false)
         {
-            SoundManager.Instance.Stop(GameManager.DRAG_SFX_IDX);
+            SoundManager.Instance.Stop(GameManager.Instance.DragPath);
         }
         else
         {
-            SoundManager.Instance.Play(GameManager.Instance.DragSound, GameManager.DRAG_SFX_IDX, _Loop: true).Forget();
+            SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
         }
     }
 }
