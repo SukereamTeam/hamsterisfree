@@ -42,7 +42,6 @@ public class GameManager : MonoSingleton<GameManager>
     public string DragPath { get; private set; }
 
     private int maxSeedCount = -1;
-    
 
     private const int REWARD_MAX = 3;
 
@@ -50,6 +49,8 @@ public class GameManager : MonoSingleton<GameManager>
     private const string GAME_BGM = "_BGM";
     private const string GAME_DRAG_SFX = "_DRAG_SFX";
     private const string GAME_SEED_SFX = "_SEED_SFX";
+
+    private const float BGM_VOLUME = 0.3f;
 
     public const int DRAG_SFX_IDX = 2;
     private const int SEED_SFX_IDX = 3;
@@ -165,7 +166,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         // Map 별로 다른 BGM 재생
         BgmPath = $"{_MapName}{GAME_BGM}";
-        SoundManager.Instance.Play(BgmPath, _FadeTime: this.fadeDuration, _Volume: 0.3f).Forget();
+        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
 
         DragPath = $"{_MapName}{GAME_DRAG_SFX}";
     }
@@ -174,14 +175,13 @@ public class GameManager : MonoSingleton<GameManager>
     {
         SoundManager.Instance.PlayOneShot(UI_SFX).Forget();
 
-        SoundManager.Instance.FadeVolumeStart(false,
-                SoundManager.Instance.AudioSources[(int)Define.SoundIndex.Common_Bgm].volume,
-                SoundManager.Instance.AudioSources[(int)Define.SoundIndex.Common_Bgm],
-                this.fadeDuration, () =>
-                {
-                    SoundManager.Instance.Stop(BgmPath);
-                }
-            );
+        SoundManager.Instance.FadeVolumeStart(BgmPath,
+            false,
+            this.fadeDuration,
+            BGM_VOLUME, () =>
+            {
+                SoundManager.Instance.Stop(BgmPath);
+            });
 
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
         

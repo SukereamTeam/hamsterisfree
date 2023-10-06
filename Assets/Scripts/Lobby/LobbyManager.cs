@@ -22,6 +22,7 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     public const string LOBBY_BGM = "Lobby_BGM";
     public const string LOBBY_SFX = "STAGE_ENTER_SFX";
     public const int ENTER_SFX_IDX = 2;
+    public const float BGM_VOLUME = 0.3f;
 
     private CancellationTokenSource cancellationToken;
     public CancellationTokenSource Cts => this.cancellationToken;
@@ -38,7 +39,7 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     {
         Debug.Log("# Lobby Initialize #");
 
-        SoundManager.Instance.Play(LOBBY_BGM, _Loop: true, _Volume: 0.3f).Forget();
+        SoundManager.Instance.Play(LOBBY_BGM, _FadeTime: this.fadeDuration, _Loop: true, _Volume: BGM_VOLUME).Forget();
 
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
 
