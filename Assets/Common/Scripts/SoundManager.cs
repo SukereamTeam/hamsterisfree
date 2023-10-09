@@ -127,7 +127,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             StopFadeCoroutine();
         }
 
-        
+
     }
 
     /// <summary>
@@ -173,15 +173,14 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         int loopCount = 0;
         while (true)
         {
-            int nextIndex = this.index + 1 >= AudioSources.Count ? 0 : this.index + 1;
-            //this.index = nextIndex;
-
-            if (AudioSources[nextIndex].clip == null || AudioSources[nextIndex].isPlaying == false)
-                return AudioSources[nextIndex];
+            this.index = this.index + 1 >= AudioSources.Count ? 0 : this.index + 1;
+            var audioSource = AudioSources[this.index];
+            if (audioSource.clip == null || audioSource.isPlaying == false)
+                return audioSource;
 
             if (++loopCount >= AudioSources.Count)
             {
-                var audioSource = this.gameObject.AddComponent<AudioSource>();
+                audioSource = this.gameObject.AddComponent<AudioSource>();
                 AudioSources.Add(audioSource);
                 return audioSource;
             }
