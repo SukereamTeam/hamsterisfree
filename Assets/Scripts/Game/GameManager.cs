@@ -166,6 +166,8 @@ public class GameManager : MonoSingleton<GameManager>
     {
         // Map 별로 다른 BGM 재생
         BgmPath = $"{_MapName}{GAME_BGM}";
+
+        Debug.Log("Game BGM 재생");
         SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
 
         DragPath = $"{_MapName}{GAME_DRAG_SFX}";
@@ -175,13 +177,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         SoundManager.Instance.PlayOneShot(UI_SFX).Forget();
 
-        SoundManager.Instance.FadeVolumeStart(BgmPath,
-            false,
-            this.fadeDuration,
-            BGM_VOLUME, () =>
-            {
-                SoundManager.Instance.Stop(BgmPath);
-            });
+        SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
 
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
         

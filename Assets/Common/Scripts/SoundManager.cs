@@ -57,9 +57,9 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     }
 
 
-    public async UniTask Play(string audioPath, bool _Loop = false, float _FadeTime = 0f, float _Volume = 1f, Action _OnComplete = null)
+    public async UniTask Play(string _AudioPath, bool _Loop = false, float _FadeTime = 0f, float _Volume = 1f, Action _OnComplete = null)
     {
-        var (audioSource, audioClip) = GetAudioSouceAndClip(audioPath);
+        var (audioSource, audioClip) = GetAudioSouceAndClip(_AudioPath);
         if (audioSource == null || audioClip == null) return;
 
         audioSource.clip = audioClip;
@@ -69,7 +69,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
         if (_FadeTime > 0f)
         {
-            FadeVolumeStart(audioPath, true, _FadeTime, _Volume);
+            FadeVolumeStart(audioSource, true, _FadeTime, _Volume);
         }
         else
         {
@@ -96,9 +96,9 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         }
     }
 
-    public void Stop(string audioPath)
+    public void Stop(string _AudioPath, float _FadeTime = 0f)
     {
-        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(audioPath);
+        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(_AudioPath);
         if (audioClip == null)
         {
             Debug.Log("clip null");
@@ -112,9 +112,22 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             return;
         }
 
-        audioSource.Stop();
+        if (_FadeTime > 0f)
+        {
+            FadeVolumeStart(audioSource, false, _FadeTime, audioSource.volume, _OnComplete: () =>
+            {
+                audioSource.clip = null;
+            });
+        }
+        else
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
 
-        StopFadeCoroutine();
+            StopFadeCoroutine();
+        }
+
+        
     }
 
     /// <summary>
@@ -125,25 +138,11 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     /// <param name="_FadeTime"></param>
     /// <param name="_Volume"></param>
     /// <param name="_OnComplete"></param>
-    public void FadeVolumeStart(string _AudioPath, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete = null)
+    public void FadeVolumeStart(AudioSource _Source, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete = null)
     {
-        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(_AudioPath);
-        if (audioClip == null)
-        {
-            Debug.Log("clip null");
-            return;
-        }
-
-        var audioSource = GetAudioSource();
-        if (audioSource == null)
-        {
-            Debug.Log("source null");
-            return;
-        }
-
         StopFadeCoroutine();
 
-        this.fadeCoroutine = StartCoroutine(FadeVolume(audioSource, _IsFadeIn, _FadeTime, _Volume, _OnComplete));
+        this.fadeCoroutine = StartCoroutine(FadeVolume(_Source, _IsFadeIn, _FadeTime, _Volume, _OnComplete));
     }
 
     public IEnumerator FadeVolume(AudioSource _AudioSource, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete)

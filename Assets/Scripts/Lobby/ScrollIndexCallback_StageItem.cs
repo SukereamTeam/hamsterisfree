@@ -89,12 +89,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
     {
         SoundManager.Instance.PlayOneShot(LobbyManager.LOBBY_SFX).Forget();
 
-        SoundManager.Instance.FadeVolumeStart(LobbyManager.LOBBY_BGM,
-            false,
-            this.lobbyManager.FadeDuration,
-            LobbyManager.BGM_VOLUME, () =>
-            {
-                SoundManager.Instance.Stop(LobbyManager.LOBBY_BGM);
-            });
+        SoundManager.Instance.Stop(LobbyManager.LOBBY_BGM,
+            this.lobbyManager.FadeDuration);
     }
 }
