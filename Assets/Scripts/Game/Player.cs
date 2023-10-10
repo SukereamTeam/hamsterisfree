@@ -50,11 +50,11 @@ public class Player : MonoBehaviour
             if (hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                //Debug.Log("### GameScreen 영역을 벗어나면 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
-                PlayDragSound(false);
+                //PlayDragSound(false);
 
                 return;
             }

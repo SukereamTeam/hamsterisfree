@@ -102,14 +102,12 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(_AudioPath);
         if (audioClip == null)
         {
-            Debug.Log("clip null");
             return;
         }
 
         var audioSource = AudioSources.Find((x) => x.clip != null && x.clip.name.Equals(audioClip.name));
         if (audioSource == null)
         {
-            Debug.Log("source null");
             return;
         }
 
