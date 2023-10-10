@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
-                //PlayDragSound(false);
+                PlayDragSound(false);
 
                 return;
             }

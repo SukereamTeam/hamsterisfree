@@ -41,6 +41,20 @@ public class LineManager : MonoBehaviour
     {
         if (CurrentLine != null)
         {
+            if (GameManager.Instance.IsGame.Value != false)
+            {
+                CurrentLine.Clear();
+
+                if (CurrentLine.PointCount < 2)
+                {
+                    Destroy(CurrentLine.gameObject, 0.5f);
+                }
+                else
+                {
+                    CurrentLine = null;
+                }
+            }
+
             //var ob = Observable.Timer(TimeSpan.FromSeconds(0.5f))
             //    .Subscribe(_ => 
             //    {
@@ -51,18 +65,6 @@ public class LineManager : MonoBehaviour
             //        CurrentLine = null;
             //    }).AddTo(this);
 
-
-            /*
-            CurrentLine.Clear();
-
-            //if (CurrentLine.PointCount < 2)
-            //{
-                Destroy(CurrentLine.gameObject, 0.5f);
-            //}
-            //else
-            //{
-                CurrentLine = null;
-            //}*/
         }
     }
 }

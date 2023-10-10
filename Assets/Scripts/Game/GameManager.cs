@@ -52,9 +52,6 @@ public class GameManager : MonoSingleton<GameManager>
 
     private const float BGM_VOLUME = 0.3f;
 
-    public const int DRAG_SFX_IDX = 2;
-    private const int SEED_SFX_IDX = 3;
-
 
 
 
