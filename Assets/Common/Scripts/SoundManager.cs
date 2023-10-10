@@ -47,7 +47,8 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         var (audioSource, audioClip) = GetAudioSouceAndClip(audioPath);
         if (audioSource == null || audioClip == null) return;
 
-        audioSource.PlayOneShot(audioClip, _Volume);
+        audioSource.volume = _Volume;
+        audioSource.PlayOneShot(audioClip);
 
         if (_OnComplete != null)
         {
