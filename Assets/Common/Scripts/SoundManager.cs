@@ -137,7 +137,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     /// <param name="_FadeTime"></param>
     /// <param name="_Volume"></param>
     /// <param name="_OnComplete"></param>
-    public void FadeVolumeStart(AudioSource _Source, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete = null)
+    private void FadeVolumeStart(AudioSource _Source, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete = null)
     {
         StopFadeCoroutine();
 
