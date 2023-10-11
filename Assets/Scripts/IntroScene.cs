@@ -14,21 +14,25 @@ public class IntroScene : MonoBehaviour
 
     [SerializeField] private Image logo = null;
 
-    private CancellationTokenSource cancellationToken;
+    private CancellationTokenSource fadeCts;
+    private CancellationTokenSource destroyCts;
+
+    private const float LOGO_DELAY_TIME = 1.5f;
 
 
 
     private void Awake()
     {
-        // CommonManager 싱글톤 객체 생성 및 초기화
-        CommonManager.Instance.Initialize();
+        //// CommonManager 싱글톤 객체 생성 및 초기화
+        //CommonManager.Instance.Initialize();
 
-        SoundManager.Instance.Initialize();
+        //SoundManager.Instance.Initialize();
     }
 
     private void Start()
     {
-        this.cancellationToken = new CancellationTokenSource();
+        this.fadeCts = new CancellationTokenSource();
+        this.destroyCts = new CancellationTokenSource();
 
         InitializeAsync().Forget();
     }
@@ -37,21 +41,27 @@ public class IntroScene : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.Fade(true, fadeDuration, true, cancellationToken);
+            await SceneController.Instance.Fade(true, fadeDuration, true, fadeCts);
             
             Sequence shakeSequence = DOTween.Sequence();
-            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
-            shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
-            shakeSequence.Play().SetLoops(2, LoopType.Restart);
-            
-            await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
+            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
+            _ = shakeSequence.WithCancellation(this.destroyCts.Token);
+            _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
 
-            await SceneController.Instance.Fade(false, fadeDuration, true, cancellationToken);
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME));
+
+            await SceneController.Instance.Fade(false, fadeDuration, true, fadeCts);
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
+                // CommonManager 싱글톤 객체 생성 및 초기화
+                CommonManager.Instance.Initialize();
+                SoundManager.Instance.Initialize();
+
                 Debug.Log("1차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(2000));
+                await UniTask.Delay(TimeSpan.FromMilliseconds(10000));
                 Debug.Log("1차 태스크 끝");
             }));
 
@@ -64,24 +74,28 @@ public class IntroScene : MonoBehaviour
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            Debug.LogError($"### exception occurred: {ex}");
+            Debug.Log("### Intro Scene Exception : {" + ex.Message + "} ###");
         }
     }
 
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && this.fadeCts.IsCancellationRequested == false)
         {
-            this.cancellationToken.Cancel();
+            this.fadeCts.Cancel();
         }
     }
 
     private void OnDestroy()
     {
         DOTween.KillAll(true);
-        this.cancellationToken.Cancel();
+        this.fadeCts.Cancel();
+        this.fadeCts.Dispose();
+
+        this.destroyCts.Cancel();
+        this.destroyCts.Dispose();
     }
 }

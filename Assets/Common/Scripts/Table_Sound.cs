@@ -11,17 +11,28 @@ using System.Linq;
 /// </summary>
 
 
-[CreateAssetMenu(fileName = "SoundTable", menuName = "ScriptableObjects/SoundDataList")]
-public class SoundDataList : ScriptableObject
+//[CreateAssetMenu(fileName = "SoundTable", menuName = "ScriptableObjects/SoundDataList")]
+public class Table_Sound : ScriptableObject
 {
     [SerializeField]
     private List<SoundData> soundList = null;
-
     public List<SoundData> SoundList => this.soundList;
 
+    [SerializeField]
+    private Dictionary<string, AudioClip> soundDic = null;
+    public Dictionary<string, AudioClip> SoundDic => this.soundDic;
+
+
+
+    private void Awake()
+    {
+        this.soundDic = this.soundList.ToDictionary(keySelector: x => x.Name, elementSelector: x => x.Clip);
+    }
 
     public AudioClip FindAudioClipWithName(string _Name)
     {
+        //return this.soundDic.TryGetValue(_Name, out var clip) ? clip : null;
+
         SoundData data = this.soundList.FirstOrDefault(data => data.Name.Equals(_Name));
         return data?.Clip;
     }

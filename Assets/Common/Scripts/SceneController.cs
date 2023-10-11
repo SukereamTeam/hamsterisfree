@@ -63,7 +63,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
             {
                 await task;
 
-                if(loadingScene)
+                if (loadingScene)
                 {
                     CompleteCount++;
                     var amount = ((float)CompleteCount / (float)TaskCount);

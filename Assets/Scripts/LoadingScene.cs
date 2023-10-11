@@ -20,6 +20,6 @@ public class LoadingScene : MonoBehaviour
             return;
 
         float targetAmount = Mathf.Clamp01(amount);
-        this.progressBar.DOValue(targetAmount, 0.1f);
+        this.progressBar.DOValue(targetAmount, 0.5f);
     }
 }

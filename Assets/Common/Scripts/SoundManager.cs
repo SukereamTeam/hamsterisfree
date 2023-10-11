@@ -25,7 +25,8 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     {
         base.OnDestroy();
 
-        StopFadeCoroutine();
+        this.soundCts.Cancel();
+        this.soundCts.Dispose();
     }
 
     public void Initialize()
@@ -70,7 +71,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
         if (_FadeTime > 0f)
         {
-            FadeVolumeStart(audioSource, true, _FadeTime, _Volume);
+            FadeVolumeStart(audioSource, true, _FadeTime, _Volume, this.soundCts);
         }
         else
         {
@@ -86,7 +87,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
     public void StopAll()
     {
-        StopFadeCoroutine();
+        this.soundCts.Cancel();
 
         foreach (var source in AudioSources)
         {
@@ -113,7 +114,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
         if (_FadeTime > 0f)
         {
-            FadeVolumeStart(audioSource, false, _FadeTime, audioSource.volume, _OnComplete: () =>
+            FadeVolumeStart(audioSource, false, _FadeTime, audioSource.volume, this.soundCts, _OnComplete: () =>
             {
                 audioSource.clip = null;
             });
@@ -122,8 +123,6 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         {
             audioSource.Stop();
             audioSource.clip = null;
-
-            StopFadeCoroutine();
         }
 
 
@@ -137,33 +136,48 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     /// <param name="_FadeTime"></param>
     /// <param name="_Volume"></param>
     /// <param name="_OnComplete"></param>
-    private void FadeVolumeStart(AudioSource _Source, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete = null)
+    private void FadeVolumeStart(AudioSource _Source, bool _IsFadeIn, float _FadeTime, float _Volume, CancellationTokenSource _Cts, Action _OnComplete = null)
     {
-        StopFadeCoroutine();
-
-        this.fadeCoroutine = StartCoroutine(FadeVolume(_Source, _IsFadeIn, _FadeTime, _Volume, _OnComplete));
+        FadeVolume(_Source, _IsFadeIn, _FadeTime, _Volume, _Cts, _OnComplete).Forget();
     }
 
-    public IEnumerator FadeVolume(AudioSource _AudioSource, bool _IsFadeIn, float _FadeTime, float _Volume, Action _OnComplete)
+    public async UniTaskVoid FadeVolume(AudioSource _AudioSource, bool _IsFadeIn, float _FadeTime, float _Volume, CancellationTokenSource _Cts, Action _OnComplete)
     {
-        float initVolume = _IsFadeIn ? 0f : _Volume;
-        float targetVolume = _IsFadeIn ? _Volume : 0f;
-
-        float timer = 0;
-
-        while (timer < _FadeTime)
+        try
         {
-            _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
-            timer += Time.deltaTime;
+            float initVolume = _IsFadeIn ? 0f : _Volume;
+            float targetVolume = _IsFadeIn ? _Volume : 0f;
 
-            yield return null;
+            float timer = 0;
+
+            while (timer < _FadeTime)
+            {
+                if (_Cts.Token.IsCancellationRequested)
+                {
+                    Debug.Log("### FadeVolume Cancel ###");
+                    return;
+                }
+
+                _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
+                timer += Time.deltaTime;
+
+                await UniTask.Yield();
+            }
+
+            _AudioSource.volume = targetVolume;
+
+            _OnComplete?.Invoke();
         }
-
-        _AudioSource.volume = targetVolume;
-
-        if (_OnComplete != null)
+        catch (Exception ex)
         {
-            _OnComplete();
+            if (ex is OperationCanceledException)
+            {
+                Debug.Log("Fade Volume Cancel with Token" + ex.Message);
+            }
+            else
+            {
+                Debug.LogError($"### exception occurred: {ex}");
+            }
         }
     }
 
@@ -196,12 +210,4 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         return (audioSource, audioClip);
     }
 
-    private void StopFadeCoroutine()
-    {
-        if (this.fadeCoroutine != null)
-        {
-            StopCoroutine(this.fadeCoroutine);
-            this.fadeCoroutine = null;
-        }
-    }
 }
