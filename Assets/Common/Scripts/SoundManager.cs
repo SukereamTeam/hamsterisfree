@@ -12,7 +12,6 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     private int index = 0;
     private bool isInit = false;
     private CancellationTokenSource soundCts;
-    private Coroutine fadeCoroutine;
 
 
     public List<AudioSource> AudioSources
@@ -35,8 +34,6 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             return;
 
         this.isInit = true;
-
-        this.fadeCoroutine = null;
 
         this.soundCts = new CancellationTokenSource();
 
@@ -150,34 +147,26 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
             float timer = 0;
 
-            while (timer < _FadeTime)
+            while (timer < _FadeTime && _Cts.IsCancellationRequested == false)
             {
-                if (_Cts.Token.IsCancellationRequested)
-                {
-                    Debug.Log("### FadeVolume Cancel ###");
-                    return;
-                }
-
                 _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
                 timer += Time.deltaTime;
 
-                await UniTask.Yield();
+                await UniTask.Yield(cancellationToken: _Cts.Token);
+            }
+
+            if (_Cts.IsCancellationRequested == true)
+            {
+                return;
             }
 
             _AudioSource.volume = targetVolume;
 
             _OnComplete?.Invoke();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            if (ex is OperationCanceledException)
-            {
-                Debug.Log("Fade Volume Cancel with Token" + ex.Message);
-            }
-            else
-            {
-                Debug.LogError($"### exception occurred: {ex}");
-            }
+            Debug.Log("### FadeVolume Exception : {" + ex.Message + "} ###");
         }
     }
 

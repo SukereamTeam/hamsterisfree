@@ -15,7 +15,6 @@ public class IntroScene : MonoBehaviour
     [SerializeField] private Image logo = null;
 
     private CancellationTokenSource fadeCts;
-    private CancellationTokenSource destroyCts;
 
     private const float LOGO_DELAY_TIME = 1.5f;
 
@@ -32,7 +31,6 @@ public class IntroScene : MonoBehaviour
     private void Start()
     {
         this.fadeCts = new CancellationTokenSource();
-        this.destroyCts = new CancellationTokenSource();
 
         InitializeAsync().Forget();
     }
@@ -46,7 +44,7 @@ public class IntroScene : MonoBehaviour
             Sequence shakeSequence = DOTween.Sequence();
             _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
             _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
-            _ = shakeSequence.WithCancellation(this.destroyCts.Token);
+            _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
             _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
 
             
@@ -61,15 +59,8 @@ public class IntroScene : MonoBehaviour
                 SoundManager.Instance.Initialize();
 
                 Debug.Log("1차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(10000));
-                Debug.Log("1차 태스크 끝");
-            }));
-
-            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
-            {
-                Debug.Log("2차 태스크");
                 await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
-                Debug.Log("2차 태스크 끝");
+                Debug.Log("1차 태스크 끝");
             }));
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
@@ -83,7 +74,7 @@ public class IntroScene : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && this.fadeCts.IsCancellationRequested == false)
+        if (Input.GetMouseButtonDown(0) && this.fadeCts?.IsCancellationRequested == false)
         {
             this.fadeCts.Cancel();
         }
@@ -94,8 +85,5 @@ public class IntroScene : MonoBehaviour
         DOTween.KillAll(true);
         this.fadeCts.Cancel();
         this.fadeCts.Dispose();
-
-        this.destroyCts.Cancel();
-        this.destroyCts.Dispose();
     }
 }

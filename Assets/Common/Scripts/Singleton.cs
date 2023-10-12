@@ -65,7 +65,7 @@ public abstract class GlobalMonoSingleton<T> : MonoBehaviour where T : GlobalMon
 
     protected virtual void OnDestroy()
     {
-        Debug.Log($"{_instance.name} OnDestroy");
+        //Debug.Log($"{_instance.name} OnDestroy");
         _instance = null;
     }
 
@@ -105,7 +105,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
 
     protected virtual void OnDestroy()
     {
-        Debug.Log($"{_instance.name} OnDestroy");
+        //Debug.Log($"{_instance.name} OnDestroy");
         _instance = null;
     }
 }
