@@ -39,7 +39,7 @@ public class IntroScene : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.Fade(true, fadeDuration, true, fadeCts);
+            await SceneController.Instance.Fade(true, this.fadeDuration, true, fadeCts);
             
             Sequence shakeSequence = DOTween.Sequence();
             _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
@@ -48,7 +48,7 @@ public class IntroScene : MonoBehaviour
             _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
 
             
-            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME));
+            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.fadeCts.Token);
 
             await SceneController.Instance.Fade(false, fadeDuration, true, fadeCts);
 
