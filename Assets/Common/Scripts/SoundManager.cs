@@ -188,7 +188,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
             }
         }
     }
-    private (AudioSource, AudioClip) GetAudioSouceAndClip(string audioPath)
+    private (AudioSource, AudioClip) GetAudioSourceAndClip(string audioPath)
     {
         var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(audioPath);
         if (audioClip == null) return (null, null);
