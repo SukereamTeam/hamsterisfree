@@ -29,3 +29,11 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
   - Name: SFX_MONSTER
     Clip: {fileID: 8300000, guid: 7e9ee6dc04a5d40d1a5dfc4beb9865e7, type: 3}
+  - Name: SFX_GAME_READY
+    Clip: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
+  - Name: SFX_GAME_START
+    Clip: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
+  - Name: SFX_GAME_END
+    Clip: {fileID: 8300000, guid: 52320e590bf774734a288886eba557ba, type: 3}
+  - Name: SFX_GAME_END_FAIL
+    Clip: {fileID: 8300000, guid: 4b4dd7245f6104c8c8eb07ccf6b386ed, type: 3}

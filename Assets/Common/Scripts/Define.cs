@@ -76,10 +76,14 @@ public class Define
         // SFX in Game
         SFX_DRAG_,
         SFX_SEED,
-        SFX_SEED_STAGETYPE,
+        SFX_SEED_STAGETYPE_ADD,
+        SFX_SEED_STAGETYPE_DEC,
         SFX_MONSTER,
+
+        SFX_GAME_READY,
         SFX_GAME_START,
         SFX_GAME_END,
+        SFX_GAME_END_FAIL,
 
         // SFX for somewhere
         SFX_BACK_BUTTON,

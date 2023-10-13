@@ -5,6 +5,9 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine.Serialization;
+using TMPro;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -17,6 +20,11 @@ public class GameManager : MonoSingleton<GameManager>
 
     [SerializeField]
     private float fadeDuration = 0f;
+
+
+    [SerializeField]
+    private Image startTextTrans = null;
+
 
 
 
@@ -45,8 +53,6 @@ public class GameManager : MonoSingleton<GameManager>
 
     private const int REWARD_MAX = 3;
 
-    private const string GAME_SEED_SFX = "_SEED_SFX";
-
     private const float BGM_VOLUME = 0.3f;
 
 
@@ -62,27 +68,37 @@ public class GameManager : MonoSingleton<GameManager>
             .Where(x => x == false)
             .Subscribe(_ =>
             {
-                GameEndFlow().Forget();
+                GameEndFlowAsync().Forget();
             }).AddTo(this);
 
 
         var curStageIndex = CommonManager.Instance.CurStageIndex;
         Debug.Log($"### Current Stage Index : {curStageIndex}");
-        
+
+        Initialize(curStageIndex);
+
+        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+
+        GameStartFlowAsync().Forget();
+    }
+
+    private void Initialize(int _CurStageIndex)
+    {
         // 데이터테이블 로드
-        var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
+        var stageTable = DataContainer.Instance.StageTable.list[_CurStageIndex];
 
         InitGameSound(stageTable.MapName);
 
+        // 스테이지 타입 받아오기
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
-        
+
         // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
         this.maxSeedCount = stageTable.SeedData.SelectMany(data =>
         {
             var targetSubType = data.Item1;     // eg. Default
             var targetSubTypeIndex = data.Item2;  // eg. Default_01 <- '01'
             var targetCount = data.Item3;         // 해당 타입 타일의 갯수
-            
+
             var subType = Enum.Parse<Define.TileType_Sub>(targetSubType);
             if (subType != Define.TileType_Sub.Heart && subType != Define.TileType_Sub.Fake)
             {
@@ -96,24 +112,44 @@ public class GameManager : MonoSingleton<GameManager>
             }
         }).Sum();
 
-        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, this.maxSeedCount);
-        MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
+        // 테이블 토대로 세팅
+        StageManager.SetStage(_CurStageIndex + 1, stageType, stageTable.StageType.Item2, this.maxSeedCount);
+        MapManager.SetMap(_CurStageIndex, DataContainer.Instance.StageSprites);
+    }
 
-        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+    private async UniTaskVoid GameStartFlowAsync()
+    {
+        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
 
-        // TODO : Delete (테스트용으로 5초 대기 걸어놓음), 추후 첫 게임일 경우 Tutorial 구현
-        await UniTask.Delay(TimeSpan.FromMilliseconds(3000));
+        // TODO : Ready 글자 출력 (TODO : Localization)
+        startText.text = $"Ready?";
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_START.ToString()).Forget();
 
-        // 게임 시작 할 수 있는 상태로 전환
-        this.isGame.Value = true;
+        // TODO : Delete (테스트용으로 1초 대기 걸어놓음), 추후 첫 스테이지일 경우 Tutorial 구현
+        await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
 
+
+
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_START.ToString()).Forget();
+
+        // TODO : Start 글자 출력 (TODO : Localization)
+        startText.text = $"Start!";
+        _ = this.startTextTrans.DOFade(0f, 0.5f).OnComplete(() =>
+        {
+            this.startTextTrans.gameObject.SetActive(false);
+
+            // 게임 시작 할 수 있는 상태로 전환
+            this.isGame.Value = true;
+        });
         
+
+        Debug.Log("Game BGM 재생");
+        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
     }
 
 
 
-
-    private async UniTaskVoid GameEndFlow()
+    private async UniTaskVoid GameEndFlowAsync()
     {
         Debug.Log("### Game End ###");
 
@@ -123,6 +159,7 @@ public class GameManager : MonoSingleton<GameManager>
         await UniTask.Yield();
 
         SoundManager.Instance.Stop(DragPath);
+
 
         // TODO :END 팝업 표시
 
@@ -134,11 +171,15 @@ public class GameManager : MonoSingleton<GameManager>
             
             var rewardCount = CalculateReward();
             UserDataManager.Instance.ClearStage(rewardCount);
+
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
         }
         else
         {
             // TODO : Fail 연출
             Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
+
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
         }
     }
 
@@ -162,9 +203,6 @@ public class GameManager : MonoSingleton<GameManager>
     {
         // Map 별로 다른 BGM 재생
         BgmPath = $"{Define.SoundPath.BGM_GAME_.ToString()}{_MapName}";
-
-        Debug.Log("Game BGM 재생");
-        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
 
         DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
     }

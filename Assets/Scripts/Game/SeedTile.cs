@@ -141,7 +141,15 @@ public class SeedTile : TileBase
     {
         if (_type == Define.TileType_Sub.Heart || _type == Define.TileType_Sub.Fake)
         {
-            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED_STAGETYPE.ToString()).Forget();
+            if (this.seedData.SeedValue < 0)
+            {
+                SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED_STAGETYPE_DEC.ToString()).Forget();
+            }
+            else
+            {
+                SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED_STAGETYPE_ADD.ToString()).Forget();
+            }
+
 
             GameManager.Instance.StageManager.ChangeStageValue(this.seedData.SeedValue);
         }
