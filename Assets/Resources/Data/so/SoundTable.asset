@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a0bc7960b3779f4b81db900f0dbea02, type: 3}
+  m_Name: SoundTable
+  m_EditorClassIdentifier: 
+  soundList:
+  - Name: SFX_ENTER_STAGE
+    Clip: {fileID: 8300000, guid: d4afdc63f6d9618469f288dc2b04a497, type: 3}
+  - Name: SFX_BUTTON
+    Clip: {fileID: 8300000, guid: af4f34a7a147437438cd9cc812b098f0, type: 3}
+  - Name: BGM_LOBBY
+    Clip: {fileID: 8300000, guid: c2044fdf56120644c9d4a5de7f65edfc, type: 3}
+  - Name: BGM_GAME_Forest
+    Clip: {fileID: 8300000, guid: 558c41ea90887434ba99db5bcadea67d, type: 3}
+  - Name: SFX_DRAG_Forest
+    Clip: {fileID: 8300000, guid: ea3c98abf1daf14439b6386c6ea0fb26, type: 3}

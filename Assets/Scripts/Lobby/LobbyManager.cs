@@ -18,6 +18,8 @@ public class LobbyManager : MonoSingleton<LobbyManager>
     private InitScrollLobby initScroll = null;
 
 
+    public const float BGM_VOLUME = 0.3f;
+
     private CancellationTokenSource cancellationToken;
     public CancellationTokenSource Cts => this.cancellationToken;
 
@@ -29,12 +31,24 @@ public class LobbyManager : MonoSingleton<LobbyManager>
         Initialize();
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        this.cancellationToken.Cancel();
+        this.cancellationToken.Dispose();
+    }
+
     private void Initialize()
     {
         Debug.Log("# Lobby Initialize #");
-        
+
+        SoundManager.Instance.Play(Define.SoundPath.BGM_LOBBY.ToString(), _FadeTime: this.fadeDuration, _Loop: true, _Volume: BGM_VOLUME).Forget();
+
         this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
-        
+
         this.initScroll.Initialize(DataContainer.Instance.StageTable.list.Count);
     }
+
+
 }

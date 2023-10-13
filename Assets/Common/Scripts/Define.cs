@@ -7,6 +7,7 @@ public class Define
         Game,
     }
 
+
     public enum TileType
     {
         None,
@@ -66,4 +67,22 @@ public class Define
         Out_YEnd = 9
     }
     
+    public enum SoundPath
+    {
+        // Bgm
+        BGM_LOBBY,
+        BGM_GAME_,
+
+        // SFX in Game
+        SFX_DRAG_,
+        SFX_SEED,
+        SFX_MONSTER,
+        SFX_GAME_START,
+        SFX_GAME_END,
+
+        // SFX for somewhere
+        SFX_BUTTON,
+        SFX_ENTER_STAGE,
+        
+    }
 }

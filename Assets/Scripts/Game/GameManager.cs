@@ -35,9 +35,19 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.seedScore = value;
     }
 
+    public AudioClip UiSound { get; private set; }
+    public AudioClip DragSound { get; private set; }
+
+    public string BgmPath { get; private set; }
+    public string DragPath { get; private set; }
+
     private int maxSeedCount = -1;
 
     private const int REWARD_MAX = 3;
+
+    private const string GAME_SEED_SFX = "_SEED_SFX";
+
+    private const float BGM_VOLUME = 0.3f;
 
 
 
@@ -61,6 +71,8 @@ public class GameManager : MonoSingleton<GameManager>
         
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
+
+        InitGameSound(stageTable.MapName);
 
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
         
@@ -94,6 +106,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         // 게임 시작 할 수 있는 상태로 전환
         this.isGame.Value = true;
+
+        
     }
 
 
@@ -107,9 +121,11 @@ public class GameManager : MonoSingleton<GameManager>
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
 
         await UniTask.Yield();
-        
+
+        SoundManager.Instance.Stop(DragPath);
+
         // TODO :END 팝업 표시
-        
+
         if (this.seedScore.Value > 0)
         {
             // TODO : Clear 연출
@@ -142,8 +158,23 @@ public class GameManager : MonoSingleton<GameManager>
         return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
+    private void InitGameSound(string _MapName)
+    {
+        // Map 별로 다른 BGM 재생
+        BgmPath = $"{Define.SoundPath.BGM_GAME_.ToString()}{_MapName}";
+
+        Debug.Log("Game BGM 재생");
+        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
+
+        DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
+    }
+
     public async void OnClick_BackAsync()
     {
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BUTTON.ToString()).Forget();
+
+        SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
+
         await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();

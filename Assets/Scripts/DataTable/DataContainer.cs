@@ -25,7 +25,9 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     private Table_Monster monsterTable;
     public Table_Monster MonsterTable => this.monsterTable;
 
-    
+    [SerializeField]
+    private Table_Sound soundTable;
+    public Table_Sound SoundTable => this.soundTable;
 
 
 
@@ -58,6 +60,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 
         this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
     }
+
 
 
     public async UniTask LoadStageDatas(int _StageIndex)
@@ -110,59 +113,17 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             // TODO : Define.TileSpriteName의 Mask부터 시작하게 해놨는데, 추후 변경 필요
             for (int spriteIndex = 9; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
             {
-                // if (spriteIndex <= (int)Define.TileSpriteName.BottomRight)
-                // {
-                //     var sliceName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
-                //
-                //     if (sliceName == Define.TileSpriteName.Top.ToString() ||
-                //         sliceName == Define.TileSpriteName.Bottom.ToString() ||
-                //         sliceName == Define.TileSpriteName.Left.ToString() ||
-                //         sliceName == Define.TileSpriteName.Right.ToString())
-                //     {
-                //         var random = UnityEngine.Random.Range(1, 3);
-                //         sliceName = $"{sliceName}_{random}";
-                //     }
-                //
-                //     var spriteName = $"{_MapName}_{sliceName}";
-                //
-                //     var sprite = Array.Find(mapSprites, x => x.name == spriteName);
-                //
-                //     if (sprite != null)
-                //     {
-                //         this.stageSprites.Add(sprite);
-                //     }
-                // }
-                // else
+                // 바뀐 버전 2 : TileBack 도 한 장을 늘려서 사용. 근데 이러면 안될 것 같음..
+                var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
+                var spritePath = $"{path}{spriteName}";
+                var resource = await Resources.LoadAsync<Sprite>(spritePath);
+                if (resource is Sprite sprite)
                 {
-                    // 바뀐 버전 2 : TileBack 도 한 장을 늘려서 사용. 근데 이러면 안될 것 같음..
-                    var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
-                    var spritePath = $"{path}{spriteName}";
-                    var resource = await Resources.LoadAsync<Sprite>(spritePath);
-                    if (resource is Sprite sprite)
-                    {
-                        this.stageSprites.Add(sprite);
-                    }
-                    else
-                        Debug.Log("### Fail <Sprite> Type Casting ###");
+                    this.stageSprites.Add(sprite);
                 }
-                
+                else
+                    Debug.Log("### Fail <Sprite> Type Casting ###");
             }
-            
-            // 기존 버전 (Sprite가 여러장이었음)
-            // for (int spriteIndex = 0; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
-            // {
-            //     var spriteName = Enum.GetName(typeof(Define.TileSpriteName), spriteIndex);
-            //
-            //     var spritePath = $"{path}{spriteName}";
-            //
-            //     var resource = await Resources.LoadAsync<Sprite>(spritePath);
-            //
-            //     if (resource is Sprite sprite)
-            //     {
-            //         this.stageSprites.Add(sprite);
-            //     }
-            //     else
-            //         Debug.Log("### Fail <Sprite> Type Casting ###");
             
             
             // TODO : Assetbundle or Addressable 로 변경하기

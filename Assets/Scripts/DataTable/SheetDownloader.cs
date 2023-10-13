@@ -16,12 +16,6 @@ using System.Text.RegularExpressions;
 #if UNITY_EDITOR
 public class SheetDownloader : MonoBehaviour
 {
-    public enum SheetName
-    {
-        StageTable,
-        SeedTable
-    }
-
     [Serializable]
     public class SheetData
     {

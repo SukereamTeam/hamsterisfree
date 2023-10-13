@@ -74,6 +74,8 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             return;
         }
 
+        PlaySoundEnterStage();
+
         CommonManager.Instance.CurStageIndex = this.stageIndex;
         
         await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false, this.lobbyManager.Cts);
@@ -81,5 +83,13 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(this.stageIndex)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
+    }
+
+    private void PlaySoundEnterStage()
+    {
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_ENTER_STAGE.ToString()).Forget();
+
+        SoundManager.Instance.Stop(Define.SoundPath.BGM_LOBBY.ToString(),
+            this.lobbyManager.FadeDuration);
     }
 }
