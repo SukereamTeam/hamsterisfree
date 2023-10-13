@@ -141,10 +141,14 @@ public class SeedTile : TileBase
     {
         if (_type == Define.TileType_Sub.Heart || _type == Define.TileType_Sub.Fake)
         {
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED_STAGETYPE.ToString()).Forget();
+
             GameManager.Instance.StageManager.ChangeStageValue(this.seedData.SeedValue);
         }
         else
         {
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED.ToString()).Forget();
+
             GameManager.Instance.SeedScore.Value++;
         }
     }

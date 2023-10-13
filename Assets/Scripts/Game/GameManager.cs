@@ -171,7 +171,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     public async void OnClick_BackAsync()
     {
-        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BUTTON.ToString()).Forget();
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
 
         SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
 

@@ -15,11 +15,17 @@ MonoBehaviour:
   soundList:
   - Name: SFX_ENTER_STAGE
     Clip: {fileID: 8300000, guid: d4afdc63f6d9618469f288dc2b04a497, type: 3}
-  - Name: SFX_BUTTON
-    Clip: {fileID: 8300000, guid: af4f34a7a147437438cd9cc812b098f0, type: 3}
+  - Name: SFX_BACK_BUTTON
+    Clip: {fileID: 8300000, guid: 724131bc8a7f34041bb9f1701f0cb58d, type: 3}
   - Name: BGM_LOBBY
     Clip: {fileID: 8300000, guid: c2044fdf56120644c9d4a5de7f65edfc, type: 3}
   - Name: BGM_GAME_Forest
     Clip: {fileID: 8300000, guid: 558c41ea90887434ba99db5bcadea67d, type: 3}
   - Name: SFX_DRAG_Forest
     Clip: {fileID: 8300000, guid: ea3c98abf1daf14439b6386c6ea0fb26, type: 3}
+  - Name: SFX_SEED
+    Clip: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
+  - Name: SFX_SEED_STAGETYPE
+    Clip: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
+  - Name: SFX_MONSTER
+    Clip: {fileID: 8300000, guid: 7e9ee6dc04a5d40d1a5dfc4beb9865e7, type: 3}
