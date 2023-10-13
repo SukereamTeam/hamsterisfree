@@ -24,17 +24,18 @@ public class Table_Sound : ScriptableObject
 
 
 
-    private void Awake()
-    {
-        this.soundDic = this.soundList.ToDictionary(keySelector: x => x.Name, elementSelector: x => x.Clip);
-    }
 
     public AudioClip FindAudioClipWithName(string _Name)
     {
-        //return this.soundDic.TryGetValue(_Name, out var clip) ? clip : null;
+        if (this.soundDic == null)
+        {
+            this.soundDic = this.soundList.ToDictionary(keySelector: x => x.Name, elementSelector: x => x.Clip);
+        }
 
-        SoundData data = this.soundList.FirstOrDefault(data => data.Name.Equals(_Name));
-        return data?.Clip;
+        return this.soundDic.TryGetValue(_Name, out var clip) ? clip : null;
+
+        //SoundData data = this.soundList.FirstOrDefault(data => data.Name.Equals(_Name));
+        //return data?.Clip;
     }
 }
 

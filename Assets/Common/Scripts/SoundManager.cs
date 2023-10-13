@@ -138,7 +138,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         FadeVolume(_Source, _IsFadeIn, _FadeTime, _Volume, _Cts, _OnComplete).Forget();
     }
 
-    public async UniTaskVoid FadeVolume(AudioSource _AudioSource, bool _IsFadeIn, float _FadeTime, float _Volume, CancellationTokenSource _Cts, Action _OnComplete)
+    private async UniTaskVoid FadeVolume(AudioSource _AudioSource, bool _IsFadeIn, float _FadeTime, float _Volume, CancellationTokenSource _Cts, Action _OnComplete)
     {
         try
         {

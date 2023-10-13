@@ -48,7 +48,7 @@ public class IntroScene : MonoBehaviour
             _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
 
             
-            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.fadeCts.Token);
+            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
 
             await SceneController.Instance.Fade(false, fadeDuration, true, fadeCts);
 
