@@ -14,10 +14,10 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     private CancellationTokenSource soundCts;
 
 
-    public List<AudioSource> AudioSources
+    private List<AudioSource> AudioSources
     {
         get;
-        private set;
+        set;
     }
 
     protected override void OnDestroy()
