@@ -87,9 +87,9 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
     private void PlaySoundEnterStage()
     {
-        SoundManager.Instance.PlayOneShot(LobbyManager.LOBBY_SFX).Forget();
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_ENTER_STAGE.ToString()).Forget();
 
-        SoundManager.Instance.Stop(LobbyManager.LOBBY_BGM,
+        SoundManager.Instance.Stop(Define.SoundPath.BGM_LOBBY.ToString(),
             this.lobbyManager.FadeDuration);
     }
 }

@@ -11,14 +11,10 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 {
     private int index = 0;
     private bool isInit = false;
+
     private CancellationTokenSource soundCts;
 
-
-    private List<AudioSource> AudioSources
-    {
-        get;
-        set;
-    }
+    private List<AudioSource> AudioSources;
 
     protected override void OnDestroy()
     {
@@ -42,7 +38,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
     public async UniTask PlayOneShot(string audioPath, float _Volume = 1, Action _OnComplete = null)
     {
-        var (audioSource, audioClip) = GetAudioSouceAndClip(audioPath);
+        var (audioSource, audioClip) = GetAudioSourceAndClip(audioPath);
         if (audioSource == null || audioClip == null) return;
 
         audioSource.volume = _Volume;
@@ -58,7 +54,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
     public async UniTask Play(string _AudioPath, bool _Loop = false, float _FadeTime = 0f, float _Volume = 1f, Action _OnComplete = null)
     {
-        var (audioSource, audioClip) = GetAudioSouceAndClip(_AudioPath);
+        var (audioSource, audioClip) = GetAudioSourceAndClip(_AudioPath);
         if (audioSource == null || audioClip == null) return;
 
         audioSource.clip = audioClip;

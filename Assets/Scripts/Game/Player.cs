@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
             GameManager.Instance.MapManager.IsFade.Value = true;
 
             this.mouseDownTime = Time.time;
-            this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);//Input.mousePosition;
+            this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
 
             this.lineManager.BeginDraw();
 
@@ -77,7 +77,7 @@ public class Player : MonoBehaviour
             if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                Debug.Log("### GameScreen 영역을 벗어남 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -96,6 +96,8 @@ public class Player : MonoBehaviour
                 Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
 
                 GameManager.Instance.MapManager.IsFade.Value = false;
+                this.lineManager.EndDraw();
+                PlayDragSound(false);
             }
             else
             {

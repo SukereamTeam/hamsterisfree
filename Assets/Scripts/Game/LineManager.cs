@@ -49,10 +49,8 @@ public class LineManager : MonoBehaviour
                 {
                     Destroy(CurrentLine.gameObject, 0.5f);
                 }
-                else
-                {
-                    CurrentLine = null;
-                }
+
+                CurrentLine = null;
             }
 
             //var ob = Observable.Timer(TimeSpan.FromSeconds(0.5f))

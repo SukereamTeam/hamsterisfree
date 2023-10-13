@@ -45,9 +45,6 @@ public class GameManager : MonoSingleton<GameManager>
 
     private const int REWARD_MAX = 3;
 
-    private const string UI_SFX = "COMMON_UI_SFX";
-    private const string GAME_BGM = "_BGM";
-    private const string GAME_DRAG_SFX = "_DRAG_SFX";
     private const string GAME_SEED_SFX = "_SEED_SFX";
 
     private const float BGM_VOLUME = 0.3f;
@@ -75,7 +72,7 @@ public class GameManager : MonoSingleton<GameManager>
         // 데이터테이블 로드
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        GameSoundInit(stageTable.MapName);
+        InitGameSound(stageTable.MapName);
 
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
         
@@ -124,9 +121,11 @@ public class GameManager : MonoSingleton<GameManager>
         // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
 
         await UniTask.Yield();
-        
+
+        SoundManager.Instance.Stop(DragPath);
+
         // TODO :END 팝업 표시
-        
+
         if (this.seedScore.Value > 0)
         {
             // TODO : Clear 연출
@@ -159,20 +158,20 @@ public class GameManager : MonoSingleton<GameManager>
         return this.seedScore.Value > oneReward ? 2 : 1;
     }
 
-    private void GameSoundInit(string _MapName)
+    private void InitGameSound(string _MapName)
     {
         // Map 별로 다른 BGM 재생
-        BgmPath = $"{_MapName}{GAME_BGM}";
+        BgmPath = $"{Define.SoundPath.BGM_GAME_.ToString()}{_MapName}";
 
         Debug.Log("Game BGM 재생");
         SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
 
-        DragPath = $"{_MapName}{GAME_DRAG_SFX}";
+        DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
     }
 
     public async void OnClick_BackAsync()
     {
-        SoundManager.Instance.PlayOneShot(UI_SFX).Forget();
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BUTTON.ToString()).Forget();
 
         SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
 
