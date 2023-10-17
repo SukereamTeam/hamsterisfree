@@ -75,6 +75,9 @@ public class GameManager : MonoSingleton<GameManager>
         var curStageIndex = CommonManager.Instance.CurStageIndex;
         Debug.Log($"### Current Stage Index : {curStageIndex}");
 
+        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
+        startText.text = $"Ready?";
+
         Initialize(curStageIndex);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
@@ -121,10 +124,6 @@ public class GameManager : MonoSingleton<GameManager>
     {
         var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
 
-        // TODO : Ready 글자 출력 (TODO : Localization)
-        startText.text = $"Ready?";
-        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_START.ToString()).Forget();
-
         // TODO : Delete (테스트용으로 1초 대기 걸어놓음), 추후 첫 스테이지일 경우 Tutorial 구현
         await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
 
@@ -134,6 +133,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         // TODO : Start 글자 출력 (TODO : Localization)
         startText.text = $"Start!";
+        await UniTask.Delay(TimeSpan.FromMilliseconds(500));
         _ = this.startTextTrans.DOFade(0f, 0.5f).OnComplete(() =>
         {
             this.startTextTrans.gameObject.SetActive(false);

@@ -32,7 +32,7 @@ MonoBehaviour:
   - Name: SFX_GAME_READY
     Clip: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
   - Name: SFX_GAME_START
-    Clip: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
+    Clip: {fileID: 8300000, guid: a848e141d2105d54fa12423ae7390c95, type: 3}
   - Name: SFX_GAME_END
     Clip: {fileID: 8300000, guid: 52320e590bf774734a288886eba557ba, type: 3}
   - Name: SFX_GAME_END_FAIL
