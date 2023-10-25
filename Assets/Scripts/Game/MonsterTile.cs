@@ -196,17 +196,9 @@ public class MonsterTile : TileBase
                 await UniTask.Yield();
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            // Cancel 토큰으로 종료되었을 때
-            if (ex is OperationCanceledException)
-            {
-                Debug.Log("### MonsterTile Move ---> " + ex.Message + " ###");
-            }
-            else
-            {
-                Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
-            }
+            Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
         }
 
         this.isFuncStart = false;
@@ -233,7 +225,10 @@ public class MonsterTile : TileBase
         
         // TODO : 닿은 효과 await
         this.spriteRenderer.color = Color.blue;
-        
+
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_MONSTER.ToString()).Forget();
+
+        // 몬스터에 닿으면 다시 처음부터 시작해야 함 -> fade 걷히는 처리
         GameManager.Instance.MapManager.IsFade.Value = false;
         
         // LimitTry Stage인 경우 Try 횟수 1 감소
