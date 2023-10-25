@@ -217,4 +217,15 @@ public class GameManager : MonoSingleton<GameManager>
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
+
+    public void ResetStage()
+    {
+        // 먹은 씨앗 초기화 (그리고 씨앗 상태 초기화)
+        // MonsterTile 도 닿은 상태에서 원래 상태로 초기화
+        // 
+        // 기회는 감소한 채 그대로
+        // 몬스터에 닿거나, 마우스 버튼 업 하면 초기화 된다는 것
+
+        // + ReStart 하면 이 코드도 불러주고, Stage 재로드도 해야 함. Ready? 부터 다시 띄워야 함.
+    }
 }
