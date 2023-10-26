@@ -34,13 +34,16 @@ public class IntroScene : MonoBehaviour
         try
         {
             await SceneController.Instance.Fade(true, this.fadeDuration, true, fadeCts);
-            
-            Sequence shakeSequence = DOTween.Sequence();
-            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
-            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
-            _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-            _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
 
+            Sequence shakeSequence = DOTween.Sequence();
+
+            if (this.logo != null)
+            {
+                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one, 0.1f));
+                _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
+                _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
+            }
             
             await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
 
@@ -59,9 +62,9 @@ public class IntroScene : MonoBehaviour
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)
         {
-            Debug.Log("### Intro Scene Exception : {" + ex.Message + "} ###");
+            Debug.Log("### Intro Scene Exception : {" + ex.Message + ex.StackTrace + "} ###");
         }
     }
 
