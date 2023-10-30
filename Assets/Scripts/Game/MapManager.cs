@@ -149,6 +149,13 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public void ResetMap()
+    {
+        this.seedTiles.ForEach(x => x.Reset());
+
+        this.monsterTiles.ForEach(x => x.Reset());
+    }
+
     //------------------ Create Tiles
     private void CreateExitTile(int? _RootIdx)
     {

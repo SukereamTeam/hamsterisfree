@@ -55,8 +55,25 @@ public class StageManager : MonoBehaviour
     }
     
     private float timer = 0f;
-    
-    
+
+
+    private void Update()
+    {
+        if (GameManager.Instance.IsGame.Value == false)
+            return;
+
+        if (this.stageInfo.Type == Define.StageType.LimitTime)
+        {
+            timer += Time.deltaTime;
+            if (timer >= 0.1f)
+            {
+                // 1초에 1씩 깎는 것
+                this.curValue.Value -= 100f;
+                timer = 0f;
+            }
+        }
+    }
+
     public void SetStage(int _StageNumber, Define.StageType _Type, int _LimitValue, int _StageSeedCount)
     {
         this.stageInfo = new StageInfoData(_Type, _LimitValue, _StageSeedCount);
@@ -99,23 +116,7 @@ public class StageManager : MonoBehaviour
             this.seedInfoText.text = $"{GameManager.Instance.SeedScore} / {this.stageInfo.StageSeedCount}";
         });
     }
-
-    private void Update()
-    {
-        if (GameManager.Instance.IsGame.Value == false)
-            return;
-
-        if (this.stageInfo.Type == Define.StageType.LimitTime)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 0.1f)
-            {
-                // 1초에 1씩 깎는 것
-                this.curValue.Value -= 100f;
-                timer = 0f;
-            }
-        }
-    }
+    
 
     public void ChangeStageValue(int _Value)
     {

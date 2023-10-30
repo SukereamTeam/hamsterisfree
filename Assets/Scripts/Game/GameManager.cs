@@ -50,6 +50,7 @@ public class GameManager : MonoSingleton<GameManager>
     public string DragPath { get; private set; }
 
     private int maxSeedCount = -1;
+    private int curStageIndex = -1;
 
     private const int REWARD_MAX = 3;
 
@@ -72,13 +73,13 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        var curStageIndex = CommonManager.Instance.CurStageIndex;
-        Debug.Log($"### Current Stage Index : {curStageIndex}");
+        this.curStageIndex = CommonManager.Instance.CurStageIndex;
+        Debug.Log($"### Current Stage Index : {this.curStageIndex}");
 
         var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
         startText.text = $"Ready?";
 
-        Initialize(curStageIndex);
+        Initialize(this.curStageIndex);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
 
@@ -220,12 +221,20 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void ResetStage()
     {
-        // 먹은 씨앗 초기화 (그리고 씨앗 상태 초기화)
-        // MonsterTile 도 닿은 상태에서 원래 상태로 초기화
-        // 
-        // 기회는 감소한 채 그대로
+        // 먹은 씨앗 갯수 초기화
+        // SeedTile 상태 초기화
+        // MonsterTile 상태 초기화
+        // => MapManager에서 SetMap 에서 반대로 처리하기
+
+        // 기회는 감소한 채 그대로 => SetStage는 안해도 됨
         // 몬스터에 닿거나, 마우스 버튼 업 하면 초기화 된다는 것
 
         // + ReStart 하면 이 코드도 불러주고, Stage 재로드도 해야 함. Ready? 부터 다시 띄워야 함.
+
+        // 연출
+
+        this.seedScore.Value = 0;
+
+        MapManager.ResetMap();
     }
-}
+} 

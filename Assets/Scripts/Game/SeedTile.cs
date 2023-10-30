@@ -112,7 +112,7 @@ public class SeedTile : TileBase
     {
         Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.seedData.SeedValue} 먹음");
 
-        this.tileCollider.enabled = false;
+        TileCollider.enabled = false;
         
         TriggerEvent(this.subType);
 
@@ -135,6 +135,15 @@ public class SeedTile : TileBase
 
         // TODO
         // Trigger Ani 재생
+    }
+
+    public override void Reset()
+    {
+        this.spriteRenderer.color = Color.white;
+
+        ActClear();
+
+        base.Reset();
     }
 
     private void TriggerEvent(Define.TileType_Sub _type)
@@ -170,6 +179,8 @@ public class SeedTile : TileBase
             Debug.Log($"SeedTile Act Dispose!");
             this.disposable.Dispose();
         }
+
+        this.cts.Dispose();
     }
 
     private void OnDestroy()

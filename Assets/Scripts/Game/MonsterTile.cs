@@ -75,6 +75,15 @@ public class MonsterTile : TileBase
         TileFuncStart().Forget();
     }
 
+    public override void Reset()
+    {
+        this.spriteRenderer.color = Color.white;
+
+        ActClear();
+
+        base.Reset();
+    }
+
     private async UniTaskVoid TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
@@ -209,7 +218,7 @@ public class MonsterTile : TileBase
     {
         Debug.Log($"SeedType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
 
-        this.tileCollider.enabled = false;
+        TileCollider.enabled = false;
         
         if (this.tileActor == null)
         {
@@ -239,7 +248,7 @@ public class MonsterTile : TileBase
 
         // 되돌리는 애니메이션 Play await
         // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
-
+        GameManager.Instance.ResetStage();
     }
 
     private (Vector2 _Start, Vector2 _End) GetStartEndPosition(Vector2 _Pos)
@@ -289,6 +298,9 @@ public class MonsterTile : TileBase
             Debug.Log($"MonsterTile Act Dispose!");
             this.disposable.Dispose();
         }
+
+        this.actCts.Dispose();
+        this.moveCts.Dispose();
     }
     
     private void OnDestroy()
