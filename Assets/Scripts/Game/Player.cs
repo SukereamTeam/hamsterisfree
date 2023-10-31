@@ -71,19 +71,17 @@ public class Player : MonoBehaviour
 
             PlayDragSound(true);
         }
-
-
-        if (GameManager.Instance.IsReset == true)
-        {
-            Debug.Log("Reset 되었음! 다시 선긋기 시작해야 함");
-            PlayDragSound(false);
-
-            return;
-        }
             
 
         if (Input.GetMouseButton(0))
         {
+            if (GameManager.Instance.IsReset == true)
+            {
+                DragEnd();
+
+                return;
+            }
+
             var result = RaycastGameScreen(Input.mousePosition);
 
 
@@ -131,11 +129,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            GameManager.Instance.MapManager.IsFade.Value = false;
-
-            this.lineManager.EndDraw();
-
-            PlayDragSound(false);
+            DragEnd();
         }
     }
 
@@ -147,17 +141,9 @@ public class Player : MonoBehaviour
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
-        Debug.Log($"raycastResult gameObject : {raycastResult.transform.gameObject}");
-        Debug.Log($"raycastResult collider : {raycastResult.collider.enabled}");
-
         if (raycastResult.collider != null)
         {
             var tile = raycastResult.transform.GetComponent<TileBase>();
-
-            if (tile != null)
-            {
-                Debug.Log($"tile collider : {tile.TileCollider.enabled}");
-            }
 
             return tile;
         }
@@ -172,6 +158,26 @@ public class Player : MonoBehaviour
         var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
 
         return (raycastResult, mousePosition);
+    }
+
+    
+
+    private void PlayDragSound(bool _IsPlay)
+    {
+        if (_IsPlay == false)
+        {
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == true)
+            {
+                SoundManager.Instance.Stop(GameManager.Instance.DragPath);
+            }
+        }
+        else
+        {
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == false)
+            {
+                SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
+            }
+        }
     }
 
     private void StartTileAct()
@@ -195,21 +201,12 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void PlayDragSound(bool _IsPlay)
+    private void DragEnd()
     {
-        if (_IsPlay == false)
-        {
-            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == true)
-            {
-                SoundManager.Instance.Stop(GameManager.Instance.DragPath);
-            }
-        }
-        else
-        {
-            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == false)
-            {
-                SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
-            }
-        }
+        GameManager.Instance.MapManager.IsFade.Value = false;
+
+        this.lineManager.EndDraw();
+
+        PlayDragSound(false);
     }
 }
