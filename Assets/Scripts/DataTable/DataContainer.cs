@@ -89,7 +89,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
                 Debug.Log($"### Error ---> {_StageIndex} is Not ContainsKey ###");
             }
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)
         {
             Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
         }
@@ -164,7 +164,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             }
             */
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)
         {
             Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
         }

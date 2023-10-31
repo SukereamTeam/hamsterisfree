@@ -225,7 +225,7 @@ public class MonsterTile : TileBase
                 await UniTask.Yield();
             }
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)// when (!(ex is OperationCanceledException))
         {
             Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
         }

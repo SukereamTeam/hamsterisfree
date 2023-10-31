@@ -41,7 +41,7 @@ public class TileActor_Fade : ITileActor
                 _Tile.SpriteRenderer.color = Color.white;
             }
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)
         {
             Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
         }

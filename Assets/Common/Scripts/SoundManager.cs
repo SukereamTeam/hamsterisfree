@@ -177,7 +177,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
             _OnComplete?.Invoke();
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex)
         {
             Debug.Log("### FadeVolume Exception : {" + ex.Message + "} ###");
         }

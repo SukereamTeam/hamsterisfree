@@ -38,14 +38,14 @@ public class TileActor_Moving : ITileActor
         catch (Exception ex)
         {
             // Cancel 토큰으로 종료되었을 때
-            if (ex is OperationCanceledException)
-            {
-                Debug.Log("### Tile Moving ---> Cancel " + ex.Message + " ###");
-            }
-            else
-            {
+            //if (ex is OperationCanceledException)
+            //{
+            //    Debug.Log("### Tile Moving ---> Cancel " + ex.Message + " ###");
+            //}
+            //else
+            //{
                 Debug.Log("### Tile Moving Error : " + ex.Message + " ###");
-            }
+            //}
         }
 
         return false;
