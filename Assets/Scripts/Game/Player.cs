@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -49,8 +50,8 @@ public class Player : MonoBehaviour
 
             if (hit2D.collider == null)
             {
-                // GameScreen 영역을 벗어나면
-                //Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                //GameScreen 영역을 벗어나면
+                Debug.Log("### GetMouseButtonDown / GameScreen 영역을 벗어나면 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -61,6 +62,8 @@ public class Player : MonoBehaviour
 
             GameManager.Instance.MapManager.IsFade.Value = true;
 
+            StartTileAct();
+
             this.mouseDownTime = Time.time;
             this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
 
@@ -68,6 +71,16 @@ public class Player : MonoBehaviour
 
             PlayDragSound(true);
         }
+
+
+        if (GameManager.Instance.IsReset == true)
+        {
+            Debug.Log("Reset 되었음! 다시 선긋기 시작해야 함");
+            PlayDragSound(false);
+
+            return;
+        }
+            
 
         if (Input.GetMouseButton(0))
         {
@@ -77,7 +90,7 @@ public class Player : MonoBehaviour
             if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                Debug.Log("### GameScreen 영역을 벗어남 ###");
+                Debug.Log("### GetMouseButton / GameScreen 영역을 벗어남 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -134,9 +147,17 @@ public class Player : MonoBehaviour
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
+        Debug.Log($"raycastResult gameObject : {raycastResult.transform.gameObject}");
+        Debug.Log($"raycastResult collider : {raycastResult.collider.enabled}");
+
         if (raycastResult.collider != null)
         {
             var tile = raycastResult.transform.GetComponent<TileBase>();
+
+            if (tile != null)
+            {
+                Debug.Log($"tile collider : {tile.TileCollider.enabled}");
+            }
 
             return tile;
         }
@@ -153,15 +174,42 @@ public class Player : MonoBehaviour
         return (raycastResult, mousePosition);
     }
 
+    private void StartTileAct()
+    {
+        GameManager.Instance.IsReset = false;
+
+        foreach (var seed in GameManager.Instance.MapManager.SeedTiles)
+        {
+            if (seed.IsFuncStart == false)
+            {
+                seed.TileFuncStart().Forget();
+            }
+        }
+
+        foreach (var monster in GameManager.Instance.MapManager.MonsterTiles)
+        {
+            if (monster.IsFuncStart == false)
+            {
+                monster.TileFuncStart().Forget();
+            }
+        }
+    }
+
     private void PlayDragSound(bool _IsPlay)
     {
         if (_IsPlay == false)
         {
-            SoundManager.Instance.Stop(GameManager.Instance.DragPath);
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == true)
+            {
+                SoundManager.Instance.Stop(GameManager.Instance.DragPath);
+            }
         }
         else
         {
-            SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == false)
+            {
+                SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
+            }
         }
     }
 }

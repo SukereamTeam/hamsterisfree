@@ -43,6 +43,13 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.seedScore = value;
     }
 
+    private bool isReset = false;
+    public bool IsReset 
+    {
+        get => this.isReset;
+        set => this.isReset = value;
+    }
+
     public AudioClip UiSound { get; private set; }
     public AudioClip DragSound { get; private set; }
 
@@ -62,6 +69,8 @@ public class GameManager : MonoSingleton<GameManager>
     private async void Start()
     {
         Debug.Log("GameManager에서 Start 진입");
+
+        IsReset = false;
 
         // isGame 변수가 false가 되면 게임이 종료되었다는 것
         this.isGame
@@ -234,6 +243,8 @@ public class GameManager : MonoSingleton<GameManager>
         // 연출
 
         this.seedScore.Value = 0;
+
+        IsReset = true;
 
         MapManager.ResetMap();
     }

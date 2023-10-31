@@ -121,6 +121,23 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
     }
 
+    public bool IsPlaying(string _AudioPath)
+    {
+        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(_AudioPath);
+        if (audioClip == null)
+        {
+            return false;
+        }
+
+        var audioSource = AudioSources.Find((x) => x.clip != null && x.clip.name.Equals(audioClip.name));
+        if (audioSource == null)
+        {
+            return false;
+        }
+
+        return audioSource.isPlaying;
+    }
+
     /// <summary>
     /// 사운드 볼륨이 점점 커지게/작아지게 재생하는 옵션
     /// </summary>

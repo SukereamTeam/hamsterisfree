@@ -20,11 +20,10 @@ public class SeedTile : TileBase
     private Table_Seed.Param seedData;
     
     private ITileActor tileActor;
-
-    private bool isFuncStart = false;
     private CancellationTokenSource cts;
-    private IDisposable disposable = null;
+    private IDisposable actDisposable = null;
 
+    public bool IsFuncStart { get; private set; }
 
 
 
@@ -33,7 +32,9 @@ public class SeedTile : TileBase
         base.Start();
 
         this.cts = new CancellationTokenSource();
-        
+        IsFuncStart = false;
+
+
         GameManager.Instance.IsGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Where(x => x == false)
@@ -58,24 +59,36 @@ public class SeedTile : TileBase
         this.seedData = DataContainer.Instance.SeedTable.GetParamFromType(
             this.info.SubType, this.info.SubTypeIndex);
 
-        TileFuncStart().Forget();
+        //TileFuncStart().Forget();
     }
 
-    private async UniTaskVoid TileFuncStart()
+    public async UniTaskVoid TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
+        //await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
-        if (this.isFuncStart == false)
+        //await UniTask.WaitUntil(() => GameManager.Instance?.MapManager?.IsFade.Value == true);
+
+
+        if (IsFuncStart == true)
+        {
+            return;
+        }
+        else if (IsFuncStart == false)
         {
             Debug.Log("SeedTile Func Start !!!");
-            this.isFuncStart = true;
+            IsFuncStart = true;
         }
 
         if (this.tileActor != null)
         {
             this.tileActor = null;
+        }
+
+        if (this.cts == null || this.cts.IsCancellationRequested == true)
+        {
+            this.cts = new CancellationTokenSource();
         }
 
         switch (this.subType)
@@ -100,9 +113,9 @@ public class SeedTile : TileBase
         if (this.tileActor != null)
         {
             var task = this.tileActor.Act(this, this.cts, this.info.ActiveTime);
-            this.disposable = task.ToObservable().Subscribe(x =>
+            this.actDisposable = task.ToObservable().Subscribe(x =>
             {
-                this.isFuncStart = x;
+                IsFuncStart = x;
             });
         }
     }
@@ -119,16 +132,16 @@ public class SeedTile : TileBase
         if (this.tileActor == null)
         {
             // Default 등 Func가 따로 없는 타일들을 위한
-            this.isFuncStart = false;
+            IsFuncStart = false;
         }
         else
         {
             ActClear();
+            this.tileActor = null;
         }
 
-        await UniTask.WaitUntil(() => this.isFuncStart == false);
+        await UniTask.WaitUntil(() => IsFuncStart == false);
 
-        this.tileActor = null;
 
         // TODO : Delete... 테스트 용도
         this.spriteRenderer.color = Color.red;
@@ -140,6 +153,7 @@ public class SeedTile : TileBase
     public override void Reset()
     {
         this.spriteRenderer.color = Color.white;
+        TileCollider.enabled = true;
 
         ActClear();
 
@@ -172,19 +186,24 @@ public class SeedTile : TileBase
 
     private void ActClear()
     {
-        this.cts.Cancel();
-        
-        if (this.disposable != null)
+        if (IsFuncStart == true)
         {
-            Debug.Log($"SeedTile Act Dispose!");
-            this.disposable.Dispose();
+            Debug.Log("ActClear 에서 IsFuncStart false 처리");
+            IsFuncStart = false;
         }
 
-        this.cts.Dispose();
+        if (this.cts != null || this.cts?.IsCancellationRequested == false)
+        {
+            this.cts.Cancel();
+        }
+        
+        this.actDisposable?.Dispose();
     }
 
     private void OnDestroy()
     {
         ActClear();
+
+        this.cts?.Dispose();
     }
 }

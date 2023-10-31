@@ -76,6 +76,7 @@ public class MapManager : MonoBehaviour
     private object lockMonster = new object();
     private List<MonsterTile> monsterTiles;
     public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
+    public IReadOnlyList<MonsterTile> MonsterTiles => this.monsterTiles;
 
     private int randomSeed = 0;
 

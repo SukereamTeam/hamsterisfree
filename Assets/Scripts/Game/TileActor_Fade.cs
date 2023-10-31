@@ -41,21 +41,9 @@ public class TileActor_Fade : ITileActor
                 _Tile.SpriteRenderer.color = Color.white;
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            // Cancel 토큰으로 종료되었을 때
-            if (ex is OperationCanceledException)
-            {
-                Debug.Log("### Tile Fade ---> 토큰으로 취소 " + ex.Message + " ###");
-
-                // 트윈 삭제
-                tweener.Kill(true);
-                _Tile.SpriteRenderer.color = Color.white;
-            }
-            else
-            {
-                Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
-            }
+            Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
         }
 
         return false;
