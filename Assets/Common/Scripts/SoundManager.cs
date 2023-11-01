@@ -179,7 +179,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
         }
         catch (Exception ex)
         {
-            Debug.Log("### FadeVolume Exception : {" + ex.Message + "} ###");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 

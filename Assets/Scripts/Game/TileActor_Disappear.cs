@@ -26,17 +26,7 @@ public class TileActor_Disappear : ITileActor
         }
         catch (Exception ex)
         {
-            //if (ex is OperationCanceledException)
-            //{
-            //    Debug.Log("### Tile Disappear ---> Cancel " + ex.Message + " ###");
-
-            //    // 트윈 삭제
-            //    tweener.Kill(true);
-            //}
-            //else
-            //{
-                Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
-            //}
+            Debug.Log($"### Tile Disappear Error : {ex.Message} / {ex.StackTrace}");
         }
 
         return false;

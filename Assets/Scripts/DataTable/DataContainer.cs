@@ -87,7 +87,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
         }
         catch (Exception ex)
         {
-            Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
+            Debug.LogError($"### DataContainer exception occurred: {ex.Message} / {ex.StackTrace}");
         }
 
         Debug.Log("LoadStageDatas 끝!");
@@ -162,7 +162,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
         }
         catch (Exception ex)
         {
-            Debug.Log("### LoadTileSprites Failed: " + ex.Message + " ###");
+            Debug.LogError($"### LoadStageSprites exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 

@@ -93,7 +93,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         }
         catch (Exception ex)
         {
-            Debug.LogError($"### exception occurred: {ex}");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 
@@ -166,7 +166,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         }
         catch (Exception ex)
         {
-            Debug.LogError($"### exception occurred: {ex}");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 

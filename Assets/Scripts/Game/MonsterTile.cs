@@ -227,7 +227,7 @@ public class MonsterTile : TileBase
         }
         catch (Exception ex)// when (!(ex is OperationCanceledException))
         {
-            Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
+            Debug.LogError($"### Monster Move exception : {ex.Message} / {ex.StackTrace}");
         }
 
         IsFuncStart = false;

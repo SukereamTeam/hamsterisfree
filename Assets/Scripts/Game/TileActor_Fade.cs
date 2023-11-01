@@ -43,7 +43,7 @@ public class TileActor_Fade : ITileActor
         }
         catch (Exception ex)
         {
-            Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
+            Debug.Log($"### Tile Fade Error : {ex.Message} / {ex.StackTrace}");
         }
 
         return false;
