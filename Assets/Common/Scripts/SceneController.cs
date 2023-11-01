@@ -25,9 +25,11 @@ public class SceneController : GlobalMonoSingleton<SceneController>
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
     [SerializeField]
-    private Image fade;
+    private Image fade = null;
 
     private CancellationTokenSource sceneCts = null;
+
+    private const int SCENE_CHANGE_PAUSE = 500;
 
 
 
@@ -63,14 +65,13 @@ public class SceneController : GlobalMonoSingleton<SceneController>
             LoadingScene loadingScene = null;
             if (_WithLoading == true)
             {
-                //await SceneManager.LoadSceneAsync("Loading");
-                //loadingScene = FindObjectOfType<LoadingScene>();
-                //this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
-
                 var operation = SceneManager.LoadSceneAsync("Loading");
 
-                while (!operation.isDone && this.sceneCts.IsCancellationRequested == false)
+                while (operation != null && operation.isDone == false)
                 {
+                    if (this.sceneCts?.IsCancellationRequested == true)
+                        return;
+
                     float progress = operation.progress;
 
                     await UniTask.Yield(cancellationToken: this.sceneCts.Token);
@@ -104,7 +105,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
             {
                 // 로딩바 1f까지 다 채운 후 0.5초 쉬고 씬 이동
                 loadingScene.UpdateProgress(1f);
-                await UniTask.Delay(TimeSpan.FromMilliseconds(500), cancellationToken: this.sceneCts.Token);
+                await UniTask.Delay(TimeSpan.FromMilliseconds(SCENE_CHANGE_PAUSE), cancellationToken: this.sceneCts.Token);
             }
 
             await LoadSceneAsync(sceneString, this.sceneCts);
@@ -117,7 +118,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
             this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
         }
-        catch (Exception ex)// when (!(ex is OperationCanceledException))
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
             Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
