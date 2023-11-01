@@ -26,7 +26,17 @@ public class TileActor_Disappear : ITileActor
         }
         catch (Exception ex)
         {
-            Debug.Log($"### Tile Disappear Error : {ex.Message} / {ex.StackTrace}");
+            if (ex is OperationCanceledException)
+            {
+                Debug.Log($"Disappear Token Cancel : {ex.Message} / {ex.StackTrace} //");
+
+                tweener.Kill(true);
+                _Tile.SpriteRenderer.color = Color.white;
+            }
+            else
+            {
+                Debug.Log($"### Tile Disappear Error : {ex.Message} / {ex.StackTrace} //");
+            }
         }
 
         return false;

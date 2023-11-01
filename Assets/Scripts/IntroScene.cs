@@ -55,9 +55,7 @@ public class IntroScene : MonoBehaviour
                 CommonManager.Instance.Initialize();
                 SoundManager.Instance.Initialize();
 
-                Debug.Log("1차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
-                Debug.Log("1차 태스크 끝");
+                await UniTask.Yield();
             }));
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();

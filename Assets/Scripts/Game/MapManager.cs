@@ -130,11 +130,12 @@ public class MapManager : MonoBehaviour
             // BugFix (업뎃된 StageTable과 유저의 local에 저장된 StageData가 다른 경우, 업뎃된 테이블로 새로 데이터 구성해야 함)
             var dataEqual = CheckEqualStageDataAndStageTable(stageData, CommonManager.Instance.CurStageIndex);
 
-            Debug.Log("### Not Equal StageTable - User Local StageData ###");
-
-            stageData = null;
+            if (dataEqual == false)
+            {
+                Debug.Log("### Not Equal StageTable - User Local StageData ###");
+                stageData = null;
+            }
         }
-        
 
 
         // stageData 가 있으면 그걸 토대로 로드
@@ -581,7 +582,7 @@ public class MapManager : MonoBehaviour
         int idx = 0;
         for (int i = 0; i < stageTable.SeedData.Count; i++)
         {
-            for (int j = 0; j < stageTable.SeedData[i].Item2; j++)
+            for (int j = 0; j < stageTable.SeedData[i].Item3; j++)
             {
                 if (stageTable.SeedData[i].Item1 != localStageData.seedDatas[idx].SubType)
                 {
@@ -599,7 +600,7 @@ public class MapManager : MonoBehaviour
         idx = 0;
         for (int i = 0; i < stageTable.MonsterData.Count; i++)
         {
-            for (int j = 0; j < stageTable.MonsterData[i].Item2; j++)
+            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
             {
                 if (stageTable.MonsterData[i].Item1 != localStageData.monsterDatas[idx].SubType)
                 {
