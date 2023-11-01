@@ -203,7 +203,7 @@ public class MonsterTile : TileBase
                                     IsFuncStart = x;
                                 });
 
-                                await UniTask.WaitUntil(() => this.isMovingDone == true);
+                                await UniTask.WaitUntil(() => this.isMovingDone == true, cancellationToken: _Cts.Token);
 
                                 this.isMovingDone = false;
                                 Vector2 changePos = new Vector2(this.transform.localPosition.x,
@@ -222,10 +222,10 @@ public class MonsterTile : TileBase
                     (this.startPos, this.endPos) = (this.endPos, this.startPos);
                 }
             
-                await UniTask.Yield();
+                await UniTask.Yield(cancellationToken: _Cts.Token);
             }
         }
-        catch (Exception ex)// when (!(ex is OperationCanceledException))
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
             Debug.LogError($"### Monster Move exception : {ex.Message} / {ex.StackTrace}");
         }

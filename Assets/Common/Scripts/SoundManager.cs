@@ -168,18 +168,16 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
                 await UniTask.Yield(cancellationToken: _Cts.Token);
             }
 
-            if (_Cts.IsCancellationRequested == true)
+            if (_Cts.IsCancellationRequested == false)
             {
-                return;
+                _AudioSource.volume = targetVolume;
+
+                _OnComplete?.Invoke();
             }
-
-            _AudioSource.volume = targetVolume;
-
-            _OnComplete?.Invoke();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace} //");
         }
     }
 

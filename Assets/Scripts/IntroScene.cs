@@ -33,7 +33,7 @@ public class IntroScene : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.Fade(true, this.fadeDuration, true, fadeCts);
+            await SceneController.Instance.Fade(true, this.fadeDuration, true, this.fadeCts);
 
             Sequence shakeSequence = DOTween.Sequence();
 
@@ -47,7 +47,7 @@ public class IntroScene : MonoBehaviour
             
             await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
 
-            await SceneController.Instance.Fade(false, fadeDuration, true, fadeCts);
+            await SceneController.Instance.Fade(false, fadeDuration, true, this.fadeCts);
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
@@ -60,7 +60,7 @@ public class IntroScene : MonoBehaviour
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
         }
-        catch (Exception ex)
+        catch (Exception ex) when(!(ex is OperationCanceledException))      // 실행되는 도중 꺼버릴 경우 UniTask.Delay가 exception throw 해서 무시하도록 처리
         {
             Debug.Log("### Intro Scene Exception : {" + ex.Message + ex.StackTrace + "} ###");
         }
