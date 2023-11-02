@@ -2,6 +2,8 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System;
+using UniRx;
 
 public class Player : MonoBehaviour
 {
@@ -51,7 +53,7 @@ public class Player : MonoBehaviour
             if (hit2D.collider == null)
             {
                 //GameScreen 영역을 벗어나면
-                Debug.Log("### GetMouseButtonDown / GameScreen 영역을 벗어나면 ###");
+                //Debug.Log("### GetMouseButtonDown / GameScreen 영역을 벗어나면 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -88,7 +90,7 @@ public class Player : MonoBehaviour
             if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                Debug.Log("### GetMouseButton / GameScreen 영역을 벗어남 ###");
+                //Debug.Log("### GetMouseButton / GameScreen 영역을 벗어남 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -104,7 +106,7 @@ public class Player : MonoBehaviour
             if (sqrLen > (dragDistance * dragDistance) &&
                 (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
-                Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
+                //Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
 
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
@@ -129,10 +131,24 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            DragEnd();
+            // Drag 뗐을 때도 Reset 되어야 하니까 / if 게임이 끝나지 않았다면 reset stage
+            if (GameManager.Instance.IsGame.Value == true)
+            {
+                DragEnd();
+
+                GameManager.Instance.ResetStage();
+            }
         }
     }
 
+    private void DragEnd()
+    {
+        GameManager.Instance.MapManager.IsFade.Value = false;
+
+        this.lineManager.EndDraw();
+
+        PlayDragSound(false);
+    }
 
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
@@ -201,12 +217,5 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void DragEnd()
-    {
-        GameManager.Instance.MapManager.IsFade.Value = false;
-
-        this.lineManager.EndDraw();
-
-        PlayDragSound(false);
-    }
+    
 }

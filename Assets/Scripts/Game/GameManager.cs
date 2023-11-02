@@ -11,7 +11,11 @@ using DG.Tweening;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-    [SerializeField] private StageManager stageManager;
+    [SerializeField]
+    private Canvas UICanvas = null;
+
+    [SerializeField]
+    private StageManager stageManager;
     public StageManager StageManager => this.stageManager;
 
     [SerializeField]
@@ -59,10 +63,13 @@ public class GameManager : MonoSingleton<GameManager>
     private int maxSeedCount = -1;
     private int curStageIndex = -1;
 
+    // Game Result Popup GameObject
+    private GameObject resultPopup = null;
+    private UI_Popup_GameResult resultScript = null;
+
     private const int REWARD_MAX = 3;
-
     private const float BGM_VOLUME = 0.3f;
-
+    private const string POPUP_RESULT_PATH = "Prefabs/Popup_GameResult";
 
 
 
@@ -163,33 +170,43 @@ public class GameManager : MonoSingleton<GameManager>
     {
         Debug.Log("### Game End ###");
 
-        // TODO
-        // 지금은 이걸로 페이드 없애버리지만 나중엔 애니 효과든 뭐든 넣어야 함
-
         await UniTask.Yield();
 
         SoundManager.Instance.Stop(DragPath);
 
+        //if (this.seedScore.Value > 0)
+        //{
+        //    // TODO : Clear 연출
+
+        //    // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
+
+        //    var rewardCount = CalculateReward();
+        //    UserDataManager.Instance.ClearStage(rewardCount);
+
+        //    SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
+        //}
+        //else
+        //{
+        //    // TODO : Fail 연출
+        //    Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
+
+        //    SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
+        //}
+
+        var rewardCount = CalculateReward();
 
         // TODO :END 팝업 표시
-
-        if (this.seedScore.Value > 0)
+        if (this.resultPopup == null)
         {
-            // TODO : Clear 연출
-            
-            // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
-            
-            var rewardCount = CalculateReward();
-            UserDataManager.Instance.ClearStage(rewardCount);
+            var popup = Resources.Load<GameObject>(POPUP_RESULT_PATH);
 
-            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
-        }
-        else
-        {
-            // TODO : Fail 연출
-            Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
+            if (popup != null)
+            {
+                this.resultScript = popup.GetComponent<UI_Popup_GameResult>();
+                this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
 
-            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
+                this.resultScript.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value);
+            }
         }
     }
 
