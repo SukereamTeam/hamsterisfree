@@ -101,6 +101,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_ENTER_STAGE.ToString()).Forget();
 
         var nextIndex = this.stageNumber + 1;
+        CommonManager.Instance.CurStageIndex = nextIndex;
 
         await this.nextButton.transform.DOScale(TWEEN_SCALE, TWEEN_DURATION).OnComplete(async () =>
         {
