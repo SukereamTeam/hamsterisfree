@@ -29,7 +29,7 @@ public class UI_Popup_GameResult : MonoBehaviour
 
     private CancellationTokenSource cts = null;
 
-    private const float TWEEN_DURATION = 0.3f;
+    private const float TWEEN_DURATION = 0.05f;
     private const float TWEEN_SCALE = 1.2f;
     private const float SEED_SCALE_DURATION = 20000;
     private const string NUMBER_FORMAT = "D3";
@@ -73,11 +73,15 @@ public class UI_Popup_GameResult : MonoBehaviour
 
     public async void OnClick_Lobby()
     {
+        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
+
         await this.lobbyButton.transform.DOScale(TWEEN_SCALE, TWEEN_DURATION).OnComplete(async () =>
         {
             await this.lobbyButton.transform.DOScale(1f, TWEEN_DURATION);
 
-            await SceneController.Instance.Fade(false, TWEEN_DURATION, false, new CancellationTokenSource());
+            SoundManager.Instance.Stop(GameManager.Instance.BgmPath);
+
+            await SceneController.Instance.Fade(false, TWEEN_DURATION, false);
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
         });
@@ -89,7 +93,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         {
             await this.nextButton.transform.DOScale(1f, TWEEN_DURATION);
 
-
+            SoundManager.Instance.Stop(GameManager.Instance.BgmPath);
         });
     }
 

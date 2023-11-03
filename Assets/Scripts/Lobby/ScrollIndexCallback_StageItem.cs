@@ -78,7 +78,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
         CommonManager.Instance.CurStageIndex = this.stageIndex;
         
-        await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false, this.lobbyManager.Cts);
+        await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false);
 
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(this.stageIndex)));
 

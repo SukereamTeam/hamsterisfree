@@ -28,6 +28,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
     private Image fade = null;
 
     private CancellationTokenSource sceneCts = null;
+    private CancellationTokenSource fadeCts = null;
 
     private const int SCENE_CHANGE_PAUSE = 500;
 
@@ -43,6 +44,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         this.loadingTask = new List<UniTask>();
 
         this.sceneCts = new CancellationTokenSource();
+        this.fadeCts = new CancellationTokenSource();
     }
 
     protected override void OnDestroy()
@@ -51,6 +53,9 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
         this.sceneCts.Cancel();
         this.sceneCts.Dispose();
+
+        this.fadeCts.Cancel();
+        this.fadeCts.Dispose();
     }
 
 
@@ -143,11 +148,13 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
 
     // Canvas Fade In/Out -------------------------
-    public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource _Cts, Action _Action = null)
+    public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource _Cts = null, Action _Action = null)
     {
         var fadeInt = _FadeIn ? 1 : 0;  // fade in : 검은 화면에서 서서히 밝아지는 것!
         this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, fadeInt);
         this.fade.raycastTarget = !_Skip;
+
+        _Cts ??= this.fadeCts;
 
         try
         {

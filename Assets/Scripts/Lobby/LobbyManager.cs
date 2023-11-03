@@ -20,23 +20,10 @@ public class LobbyManager : MonoSingleton<LobbyManager>
 
     public const float BGM_VOLUME = 0.3f;
 
-    private CancellationTokenSource cancellationToken;
-    public CancellationTokenSource Cts => this.cancellationToken;
-
 
     private void Start()
     {
-        this.cancellationToken = new CancellationTokenSource();
-        
         Initialize();
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-
-        this.cancellationToken.Cancel();
-        this.cancellationToken.Dispose();
     }
 
     private void Initialize()

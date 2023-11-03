@@ -97,7 +97,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         Initialize(this.curStageIndex);
 
-        await SceneController.Instance.Fade(true, this.fadeDuration, false, new CancellationTokenSource());
+        await SceneController.Instance.Fade(true, this.fadeDuration, false);
 
         GameStartFlowAsync().Forget();
     }
@@ -240,7 +240,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
 
-        await SceneController.Instance.Fade(false, this.fadeDuration, false, new CancellationTokenSource());
+        await SceneController.Instance.Fade(false, this.fadeDuration, false);
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
