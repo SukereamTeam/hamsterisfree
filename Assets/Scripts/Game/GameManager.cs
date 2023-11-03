@@ -193,37 +193,47 @@ public class GameManager : MonoSingleton<GameManager>
         //    SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
         //}
 
-        var rewardCount = CalculateReward();
+        var rewardCount = CalculateReward(this.seedScore.Value);
 
-        // TODO :END 팝업 표시
+        if (rewardCount > 0)
+        {
+            UserDataManager.Instance.ClearStage(this.curStageIndex, rewardCount);
+        }
+        
         if (this.resultPopup == null)
         {
             var popup = Resources.Load<GameObject>(POPUP_RESULT_PATH);
 
             if (popup != null)
             {
-                this.resultScript = popup.GetComponent<UI_Popup_GameResult>();
                 this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
+                this.resultScript = this.resultPopup.GetComponent<UI_Popup_GameResult>();
 
-                this.resultScript.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value);
+                this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value);
             }
         }
     }
 
-    private int CalculateReward()
+    private int CalculateReward(int value)
     {
+        if (value == 0)
+        {
+            // Not Clear
+            return 0;
+        }
+
         if (this.maxSeedCount <= REWARD_MAX)
         {
-            return Math.Min(this.seedScore.Value, REWARD_MAX);
+            return Math.Min(value, REWARD_MAX);
         }
         
         // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산
         var oneReward = maxSeedCount / REWARD_MAX; // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
-        if (this.seedScore.Value > oneReward * 2)
+        if (value > oneReward * 2)
         {
             return REWARD_MAX;
         }
-        return this.seedScore.Value > oneReward ? 2 : 1;
+        return value > oneReward ? 2 : 1;
     }
 
     private void InitGameSound(string _MapName)
