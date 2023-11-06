@@ -51,11 +51,11 @@ public class SceneController : GlobalMonoSingleton<SceneController>
     {
         base.OnDestroy();
 
-        this.sceneCts.Cancel();
-        this.sceneCts.Dispose();
+        this.sceneCts?.Cancel();
+        this.sceneCts?.Dispose();
 
-        this.fadeCts.Cancel();
-        this.fadeCts.Dispose();
+        this.fadeCts?.Cancel();
+        this.fadeCts?.Dispose();
     }
 
 

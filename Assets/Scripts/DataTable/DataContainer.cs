@@ -63,8 +63,8 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     {
         base.OnDestroy();
 
-        this.cts.Cancel();
-        this.cts.Dispose();
+        this.cts?.Cancel();
+        this.cts?.Dispose();
     }
 
 

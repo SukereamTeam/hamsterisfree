@@ -20,8 +20,8 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     {
         base.OnDestroy();
 
-        this.soundCts.Cancel();
-        this.soundCts.Dispose();
+        this.soundCts?.Cancel();
+        this.soundCts?.Dispose();
     }
 
     public void Initialize()
