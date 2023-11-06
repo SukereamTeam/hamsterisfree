@@ -209,7 +209,7 @@ public class GameManager : MonoSingleton<GameManager>
                 this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
                 this.resultScript = this.resultPopup.GetComponent<UI_Popup_GameResult>();
 
-                this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value);
+                this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
             }
         }
     }
@@ -224,7 +224,14 @@ public class GameManager : MonoSingleton<GameManager>
 
         if (this.maxSeedCount <= REWARD_MAX)
         {
-            return Math.Min(value, REWARD_MAX);
+            if (value < this.maxSeedCount)
+            {
+                return Math.Min(value, this.maxSeedCount);
+            }
+            else
+            {
+                return REWARD_MAX;
+            }
         }
         
         // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산

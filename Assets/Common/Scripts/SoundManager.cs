@@ -165,7 +165,7 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
                 _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
                 timer += Time.deltaTime;
 
-                await UniTask.Yield(cancellationToken: _Cts.Token);
+                await UniTask.Yield(/*cancellationToken: _Cts.Token*/);
             }
 
             if (_Cts.IsCancellationRequested == false)

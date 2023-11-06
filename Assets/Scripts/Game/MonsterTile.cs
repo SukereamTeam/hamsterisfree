@@ -90,7 +90,7 @@ public class MonsterTile : TileBase
         base.Reset();
     }
 
-    public async UniTaskVoid TileFuncStart()
+    public void TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
@@ -222,7 +222,7 @@ public class MonsterTile : TileBase
                     (this.startPos, this.endPos) = (this.endPos, this.startPos);
                 }
             
-                await UniTask.Yield(cancellationToken: _Cts.Token);
+                await UniTask.Yield(/*cancellationToken: _Cts.Token*/);
             }
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))

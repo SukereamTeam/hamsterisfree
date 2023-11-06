@@ -204,7 +204,7 @@ public class Player : MonoBehaviour
         {
             if (seed.IsFuncStart == false)
             {
-                seed.TileFuncStart().Forget();
+                seed.TileFuncStart();
             }
         }
 
@@ -212,7 +212,7 @@ public class Player : MonoBehaviour
         {
             if (monster.IsFuncStart == false)
             {
-                monster.TileFuncStart().Forget();
+                monster.TileFuncStart();
             }
         }
     }

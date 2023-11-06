@@ -62,7 +62,7 @@ public class SeedTile : TileBase
         //TileFuncStart().Forget();
     }
 
-    public async UniTaskVoid TileFuncStart()
+    public void TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행

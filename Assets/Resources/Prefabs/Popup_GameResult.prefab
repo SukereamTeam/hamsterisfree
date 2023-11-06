@@ -1573,6 +1573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78064f97f71cb474dae6dfe07a1a9216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  popupRoot: {fileID: 5183003052293059450}
   lobbyButton: {fileID: 8309400451499616045}
   nextButton: {fileID: 7111317505893174043}
   stageNumberText: {fileID: 7651443217880687355}
