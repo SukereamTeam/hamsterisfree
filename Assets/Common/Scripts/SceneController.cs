@@ -65,7 +65,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         {
             var sceneString = Enum.GetName(typeof(Define.Scene), _SceneName);
 
-            await UniTask.Yield(/*cancellationToken: this.sceneCts.Token*/);
+            await UniTask.Yield();
 
             LoadingScene loadingScene = null;
             if (_WithLoading == true)
@@ -79,7 +79,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
                     float progress = operation.progress;
 
-                    await UniTask.Yield(/*cancellationToken: this.sceneCts.Token*/);
+                    await UniTask.Yield();
                 }
 
                 if (this.sceneCts.IsCancellationRequested == false)
@@ -89,7 +89,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                 }
             }
 
-            await UniTask.Yield(/*cancellationToken: this.sceneCts.Token*/);
+            await UniTask.Yield();
 
             await UniTask.WhenAll(LoadingTask.ToArray().Select(async task =>
             {
@@ -104,7 +104,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                 }
             })).AttachExternalCancellation(this.sceneCts.Token);
 
-            await UniTask.Yield(/*cancellationToken: this.sceneCts.Token*/);
+            await UniTask.Yield();
 
             if (loadingScene)
             {
@@ -115,7 +115,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
             await LoadSceneAsync(sceneString, this.sceneCts);
 
-            await UniTask.Yield(/*cancellationToken: this.sceneCts.Token*/);
+            await UniTask.Yield();
 
             LoadingTask.Clear();
             CompleteCount = 0;

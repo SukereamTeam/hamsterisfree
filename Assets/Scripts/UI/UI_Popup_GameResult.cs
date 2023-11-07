@@ -41,7 +41,7 @@ public class UI_Popup_GameResult : MonoBehaviour
     private const float SEED_SCALE_DURATION = 0.2f;
     private const float SCENE_CHANGE_DURATION = 0.5f;
 
-    private const string NUMBER_FORMAT = "D3";
+    private const string NUMBER_FORMAT = "D3";      // 스테이지 번호를 001, 002 형식으로 출력하고 싶어서
 
 
 
