@@ -63,7 +63,7 @@ public class UI_Popup_GameResult : MonoBehaviour
             this.gameObject.SetActive(true);
 
 
-        await this.popupRoot.DOScale(1f, TWEEN_DURATION).SetEase(Ease.InCubic).WithCancellation(this.cts.Token);
+        await this.popupRoot.DOScale(1f, TWEEN_DURATION * 3f).SetEase(Ease.InCubic).WithCancellation(this.cts.Token);
 
 
         SeedFlowAsync(_StarCount).Forget();
@@ -71,7 +71,7 @@ public class UI_Popup_GameResult : MonoBehaviour
 
     public void Hide()
     {
-        this.popupRoot.DOScale(0f, TWEEN_DURATION).SetEase(Ease.InCubic).OnComplete(() =>
+        this.popupRoot.DOScale(0f, TWEEN_DURATION * 3f).SetEase(Ease.InCubic).OnComplete(() =>
         {
             if (this.cts == null || this.cts?.IsCancellationRequested == false)
             {

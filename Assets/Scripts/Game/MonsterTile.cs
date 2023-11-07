@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using DataTable;
 using UnityEngine;
 using UniRx;
+using DG.Tweening;
 
 public class MonsterTile : TileBase
 {
@@ -25,6 +26,8 @@ public class MonsterTile : TileBase
     private CancellationTokenSource moveCts;
     private CancellationTokenSource actCts;
     private IDisposable actDisposable = null;
+
+    private const float TWEEN_TIME = 0.3f;
 
     public bool IsFuncStart { get; private set; }
 
@@ -239,8 +242,7 @@ public class MonsterTile : TileBase
         Debug.Log($"MonsterType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
 
         TileCollider.enabled = false;
-        // TODO : 닿은 효과 await
-        this.spriteRenderer.color = Color.blue;
+        ActClear();
 
         if (this.tileActor == null)
         {
@@ -249,7 +251,6 @@ public class MonsterTile : TileBase
         }
         else
         {
-            ActClear();
             this.tileActor = null;
         }
         
@@ -265,6 +266,10 @@ public class MonsterTile : TileBase
 
         // 몬스터에 닿으면 다시 처음부터 시작해야 함 -> fade 걷히는 처리
         GameManager.Instance.MapManager.IsFade.Value = false;
+
+        await this.transform.DOPunchScale(Vector3.one, 1.5f);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(3), cancellationToken: this.destroyCancellationToken);
 
         // 되돌리는 애니메이션 Play await
         // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
@@ -312,7 +317,6 @@ public class MonsterTile : TileBase
     {
         if (IsFuncStart == true)
         {
-            Debug.Log("ActClear 에서 IsFuncStart false 처리");
             IsFuncStart = false;
         }
 
@@ -327,6 +331,8 @@ public class MonsterTile : TileBase
         }
 
         this.actDisposable?.Dispose();
+
+        this.transform.DOKill(true);
     }
     
     private void OnDestroy()
