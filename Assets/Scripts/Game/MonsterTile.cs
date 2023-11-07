@@ -268,7 +268,7 @@ public class MonsterTile : TileBase
 
         // 되돌리는 애니메이션 Play await
         // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
-        GameManager.Instance.ResetStage();
+        GameManager.Instance.RewindStage();
     }
 
     private (Vector2 _Start, Vector2 _End) GetStartEndPosition(Vector2 _Pos)

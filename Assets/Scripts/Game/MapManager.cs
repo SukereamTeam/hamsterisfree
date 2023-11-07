@@ -567,6 +567,11 @@ public class MapManager : MonoBehaviour
 
     private bool CheckEqualStageDataAndStageTable(StageData localStageData, int curStageIndex)
     {
+        // 유저의 로컬에 있는 스테이지 데이터와, 다운 받은 스테이지 데이터가 같은지 확인
+        // 같지 않거나 존재하지 않는다면, 다운 받은 스테이지 데이터로 덮어씌우기
+
+        Debug.Log("### StageData are not same ###");
+
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
         var tableSeedCount = stageTable.SeedData.Select(x => x.Item3).Sum();

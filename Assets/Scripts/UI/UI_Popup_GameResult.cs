@@ -20,6 +20,9 @@ public class UI_Popup_GameResult : MonoBehaviour
     private Button nextButton = null;
 
     [SerializeField]
+    private TextMeshProUGUI nextButtonText = null;
+
+    [SerializeField]
     private TextMeshProUGUI stageNumberText = null;
 
     [SerializeField]
@@ -31,8 +34,9 @@ public class UI_Popup_GameResult : MonoBehaviour
 
     private CancellationTokenSource cts = null;
     private int stageNumber = -1;
+    private bool canNext = false;
 
-    private const float TWEEN_DURATION = 0.3f;
+    private const float TWEEN_DURATION = 0.1f;
     private const float TWEEN_SCALE = 1.2f;
     private const float SEED_SCALE_DURATION = 0.2f;
     private const float SCENE_CHANGE_DURATION = 0.5f;
@@ -53,22 +57,21 @@ public class UI_Popup_GameResult : MonoBehaviour
 
         this.cts ??= new CancellationTokenSource();
 
-        this.stageNumber = _StageNumber;
-        this.stageNumberText.text = $"STAGE {_StageNumber.ToString(NUMBER_FORMAT)}";
-
-        this.scoreText.text = _Score.ToString();
+        SettingPopupValue(_StageNumber, _Score);
 
         if (this.gameObject.activeSelf == false)
             this.gameObject.SetActive(true);
 
+
         await this.popupRoot.DOScale(1f, TWEEN_DURATION).SetEase(Ease.InCubic).WithCancellation(this.cts.Token);
+
 
         SeedFlowAsync(_StarCount).Forget();
     }
 
     public void Hide()
     {
-        this.popupRoot.DOScale(0f, TWEEN_DURATION).SetEase(Ease.InBounce).OnComplete(() =>
+        this.popupRoot.DOScale(0f, TWEEN_DURATION).SetEase(Ease.InCubic).OnComplete(() =>
         {
             if (this.cts == null || this.cts?.IsCancellationRequested == false)
             {
@@ -77,7 +80,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         }).WithCancellation(this.cts.Token);
     }
 
-    public async void OnClick_Lobby()
+    public async void OnClick_LobbyAsync()
     {
         SoundManager.Instance.Stop(GameManager.Instance.BgmPath);
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
@@ -96,12 +99,15 @@ public class UI_Popup_GameResult : MonoBehaviour
         });
     }
 
-    public async void OnClick_Next()
+    public async void OnClick_NextAsync()
     {
         SoundManager.Instance.Stop(GameManager.Instance.BgmPath);
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_ENTER_STAGE.ToString()).Forget();
 
-        var nextIndex = this.stageNumber + 1;
+
+        var nextIndex = this.canNext == true ? this.stageNumber + 1 : this.stageNumber;
+
+
         CommonManager.Instance.CurStageIndex = nextIndex;
 
         await this.nextButton.transform.DOScale(TWEEN_SCALE, TWEEN_DURATION).OnComplete(async () =>
@@ -112,14 +118,35 @@ public class UI_Popup_GameResult : MonoBehaviour
 
             await SceneController.Instance.Fade(false, SCENE_CHANGE_DURATION, false);
 
-            
+
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(nextIndex)));
 
             SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
-
-            
         });
+    }
+
+    private void SettingPopupValue(int _StageNumber, int _Score)
+    {
+        // set UI popup value
+        this.stageNumber = _StageNumber;
+        this.stageNumberText.text = $"STAGE {(_StageNumber + 1).ToString(NUMBER_FORMAT)}";
+
+        this.scoreText.text = _Score.ToString();
+
+        // 게임 스코어에 따른 사운드 재생
+        if (_Score > 0)
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
+        else
+            SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
+
+
+        // 다음 스테이지로 이동할 수 있는지 체크하여 nextButton에 next 혹은 retry 기능 넣어주기
+        this.canNext = CheckCanNextStage(_StageNumber, _Score);
+        if (this.canNext == true)
+            this.nextButtonText.text = $"다음 스테이지";
+        else
+            this.nextButtonText.text = $"재시작";
     }
 
     private async UniTaskVoid SeedFlowAsync(int _SeedCount)
@@ -145,6 +172,30 @@ public class UI_Popup_GameResult : MonoBehaviour
 
 
             await UniTask.Yield();
+        }
+    }
+
+    private bool CheckCanNextStage(int _StageNumber, int _Score)
+    {
+        var curUserData = UserDataManager.Instance.CurUserData;
+
+        if (_Score > 0)
+        {
+            return true;
+        }
+        else
+        {
+            if (_StageNumber < curUserData.curStage)
+            {
+                // 현재 클리어해야 할 스테이지보다 낮은 스테이지를 클리어 한 것
+                // 과거 클리어 했던 스테이지를 또 클리어 한거니까 다음 스테이지로 이동 할 수 있음
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

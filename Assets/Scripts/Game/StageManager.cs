@@ -30,9 +30,6 @@ public class StageManager : MonoBehaviour
         }
     }
     
-    #if UNITY_EDITOR
-    //[ReadOnlyCustom]
-    #endif
     [SerializeField]
     private StageInfoData stageInfo = new StageInfoData();
     public StageInfoData StageInfo => this.stageInfo;

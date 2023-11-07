@@ -136,7 +136,13 @@ public class Player : MonoBehaviour
             {
                 DragEnd();
 
-                GameManager.Instance.ResetStage();
+                GameManager.Instance.RewindStage();
+
+                // LimitTry Stage인 경우 드래그를 끝내도 Try 횟수 1 감소
+                if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
+                {
+                    GameManager.Instance.StageManager.ChangeStageValue(-1);
+                }
             }
         }
     }

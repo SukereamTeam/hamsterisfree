@@ -174,25 +174,6 @@ public class GameManager : MonoSingleton<GameManager>
 
         SoundManager.Instance.Stop(DragPath);
 
-        //if (this.seedScore.Value > 0)
-        //{
-        //    // TODO : Clear 연출
-
-        //    // 씨앗을 한 개 이상 먹어야 클리어로 간주 (Heart, Fake 는 Score 안올라감)
-
-        //    var rewardCount = CalculateReward();
-        //    UserDataManager.Instance.ClearStage(rewardCount);
-
-        //    SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
-        //}
-        //else
-        //{
-        //    // TODO : Fail 연출
-        //    Debug.Log("Game FAIL! 먹은 씨앗이 없음.");
-
-        //    SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
-        //}
-
         var rewardCount = CalculateReward(this.seedScore.Value);
 
         if (rewardCount > 0)
@@ -262,19 +243,13 @@ public class GameManager : MonoSingleton<GameManager>
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
 
-    public void ResetStage()
+    public void RewindStage()
     {
+        // 스테이지 처음 상태로 되감기
+
         // 먹은 씨앗 갯수 초기화
         // SeedTile 상태 초기화
         // MonsterTile 상태 초기화
-        // => MapManager에서 SetMap 에서 반대로 처리하기
-
-        // 기회는 감소한 채 그대로 => SetStage는 안해도 됨
-        // 몬스터에 닿거나, 마우스 버튼 업 하면 초기화 된다는 것
-
-        // + ReStart 하면 이 코드도 불러주고, Stage 재로드도 해야 함. Ready? 부터 다시 띄워야 함.
-
-        // 연출
 
         this.seedScore.Value = 0;
 
