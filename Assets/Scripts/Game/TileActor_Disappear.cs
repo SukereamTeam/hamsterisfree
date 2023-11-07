@@ -26,17 +26,16 @@ public class TileActor_Disappear : ITileActor
         }
         catch (Exception ex)
         {
-            // Cancel 토큰으로 종료되었을 때
             if (ex is OperationCanceledException)
             {
-                Debug.Log("### Tile Disappear ---> Cancel " + ex.Message + " ###");
+                Debug.Log($"Disappear Token Cancel : {ex.Message} / {ex.StackTrace} //");
 
-                // 트윈 삭제
                 tweener.Kill(true);
+                _Tile.SpriteRenderer.color = Color.white;
             }
             else
             {
-                Debug.Log("### Tile Fade Error : " + ex.Message + " ###");
+                Debug.Log($"### Tile Disappear Error : {ex.Message} / {ex.StackTrace} //");
             }
         }
 

@@ -76,6 +76,7 @@ public class MapManager : MonoBehaviour
     private object lockMonster = new object();
     private List<MonsterTile> monsterTiles;
     public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
+    public IReadOnlyList<MonsterTile> MonsterTiles => this.monsterTiles;
 
     private int randomSeed = 0;
 
@@ -124,6 +125,19 @@ public class MapManager : MonoBehaviour
 
         var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);
 
+        if (stageData != null)
+        {
+            // BugFix (업뎃된 StageTable과 유저의 local에 저장된 StageData가 다른 경우, 업뎃된 테이블로 새로 데이터 구성해야 함)
+            var dataEqual = CheckEqualStageDataAndStageTable(stageData, CommonManager.Instance.CurStageIndex);
+
+            if (dataEqual == false)
+            {
+                Debug.Log("### Not Equal StageTable - User Local StageData ###");
+                stageData = null;
+            }
+        }
+
+
         // stageData 가 있으면 그걸 토대로 로드
         // 없으면 랜덤 생성 후 생성된 타일 정보들 Save
         for (int i = 0; i < Enum.GetValues(typeof(Define.TileType)).Length; i++)
@@ -147,6 +161,13 @@ public class MapManager : MonoBehaviour
         {
             SaveStageToJson();
         }
+    }
+
+    public void ResetMap()
+    {
+        this.seedTiles.ForEach(x => x.Reset());
+
+        this.monsterTiles.ForEach(x => x.Reset());
     }
 
     //------------------ Create Tiles
@@ -544,6 +565,63 @@ public class MapManager : MonoBehaviour
         this.blockRenderer.size = new Vector2(this.mapSize.x + offset, this.mapSize.y + offset);
     }
 
+    private bool CheckEqualStageDataAndStageTable(StageData localStageData, int curStageIndex)
+    {
+        // 유저의 로컬에 있는 스테이지 데이터와, 다운 받은 스테이지 데이터가 같은지 확인
+        // 같지 않거나 존재하지 않는다면, 다운 받은 스테이지 데이터로 덮어씌우기
+
+        Debug.Log("### StageData are not same ###");
+
+        var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
+
+        var tableSeedCount = stageTable.SeedData.Select(x => x.Item3).Sum();
+        var tableMonsterCount = stageTable.MonsterData.Select(x => x.Item3).Sum();
+
+        if (tableSeedCount != localStageData.seedDatas.Count)
+            return false;
+
+        if (tableMonsterCount != localStageData.monsterDatas.Count)
+            return false;
+
+
+        int idx = 0;
+        for (int i = 0; i < stageTable.SeedData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.SeedData[i].Item3; j++)
+            {
+                if (stageTable.SeedData[i].Item1 != localStageData.seedDatas[idx].SubType)
+                {
+                    return false;
+                }
+                else if (stageTable.SeedData[i].Item2 != localStageData.seedDatas[idx].SubTypeIndex)
+                {
+                    return false;
+                }
+
+                idx++;
+            }
+        }
+
+        idx = 0;
+        for (int i = 0; i < stageTable.MonsterData.Count; i++)
+        {
+            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
+            {
+                if (stageTable.MonsterData[i].Item1 != localStageData.monsterDatas[idx].SubType)
+                {
+                    return false;
+                }
+                else if (stageTable.MonsterData[i].Item2 != localStageData.monsterDatas[idx].SubTypeIndex)
+                {
+                    return false;
+                }
+
+                idx++;
+            }
+        }
+
+        return true;
+    }
 
     private void ChangeNameOutlineTiles()
     {

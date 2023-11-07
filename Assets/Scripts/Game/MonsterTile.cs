@@ -13,7 +13,6 @@ public class MonsterTile : TileBase
     private Define.TileType_Sub subType = Define.TileType_Sub.Default;
     
     private ITileActor tileActor;
-    private bool isFuncStart = false;
     private bool isMovingDone = false;
 
     private Vector2 originPos = new Vector2();
@@ -25,12 +24,16 @@ public class MonsterTile : TileBase
     
     private CancellationTokenSource moveCts;
     private CancellationTokenSource actCts;
-    private IDisposable disposable = null;
+    private IDisposable actDisposable = null;
+
+    public bool IsFuncStart { get; private set; }
 
 
     private new void Start()
     {
         base.Start();
+
+        IsFuncStart = false;
 
         this.actCts = new CancellationTokenSource();
         this.moveCts = new CancellationTokenSource();
@@ -72,22 +75,48 @@ public class MonsterTile : TileBase
         }
         
         
-        TileFuncStart().Forget();
+        //TileFuncStart().Forget();
     }
 
-    private async UniTaskVoid TileFuncStart()
+    public override void Reset()
+    {
+
+
+        this.spriteRenderer.color = Color.white;
+        TileCollider.enabled = true;
+
+        ActClear();
+
+        base.Reset();
+    }
+
+    public void TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
+        //await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
-        Move(this.info.ActiveTime, this.monsterData.MoveSpeed, this.moveCts).Forget();
-        
-        if (this.isFuncStart == false)
+        if (IsFuncStart == true)
+        {
+            return;
+        }
+        else if (IsFuncStart == false)
         {
             Debug.Log("Monster Func Start !!!");
-            this.isFuncStart = true;
+            IsFuncStart = true;
         }
+
+        if (this.actCts == null || this.actCts.IsCancellationRequested == true)
+        {
+            this.actCts = new CancellationTokenSource();
+        }
+
+        if (this.moveCts == null || this.moveCts.IsCancellationRequested == true)
+        {
+            this.moveCts = new CancellationTokenSource();
+        }
+
+        Move(this.info.ActiveTime, this.monsterData.MoveSpeed, this.moveCts).Forget();
         
         this.tileActor = null;
         
@@ -126,9 +155,9 @@ public class MonsterTile : TileBase
             }
             
             var task = this.tileActor.Act(this, this.actCts, this.info.ActiveTime);
-            this.disposable = task.ToObservable().Subscribe(x =>
+            this.actDisposable = task.ToObservable().Subscribe(x =>
             {
-                this.isFuncStart = x;
+                IsFuncStart = x;
             });
         }
         
@@ -168,13 +197,13 @@ public class MonsterTile : TileBase
                             {
                                 this.isMovingDone = false;
                                 var task = this.tileActor.Act(this, this.actCts);
-                                this.disposable = task.ToObservable().Subscribe(x =>
+                                this.actDisposable = task.ToObservable().Subscribe(x =>
                                 {
                                     this.isMovingDone = true;
-                                    this.isFuncStart = x;
+                                    IsFuncStart = x;
                                 });
 
-                                await UniTask.WaitUntil(() => this.isMovingDone == true);
+                                await UniTask.WaitUntil(() => this.isMovingDone == true, cancellationToken: _Cts.Token);
 
                                 this.isMovingDone = false;
                                 Vector2 changePos = new Vector2(this.transform.localPosition.x,
@@ -198,48 +227,48 @@ public class MonsterTile : TileBase
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            Debug.Log("### MonsterTile Move Error : " + ex.Message + " ###");
+            Debug.LogError($"### Monster Move exception : {ex.Message} / {ex.StackTrace}");
         }
 
-        this.isFuncStart = false;
+        IsFuncStart = false;
     }
 
 
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log($"SeedType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
+        Debug.Log($"MonsterType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
 
-        this.tileCollider.enabled = false;
-        
+        TileCollider.enabled = false;
+        // TODO : 닿은 효과 await
+        this.spriteRenderer.color = Color.blue;
+
         if (this.tileActor == null)
         {
             // Default 등 Func가 따로 없는 타일들을 위한
-            this.isFuncStart = false;
+            IsFuncStart = false;
         }
         else
         {
             ActClear();
+            this.tileActor = null;
         }
         
-        await UniTask.WaitUntil(() => this.isFuncStart == false);
+        await UniTask.WaitUntil(() => IsFuncStart == false);
         
-        // TODO : 닿은 효과 await
-        this.spriteRenderer.color = Color.blue;
-
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_MONSTER.ToString()).Forget();
 
-        // 몬스터에 닿으면 다시 처음부터 시작해야 함 -> fade 걷히는 처리
-        GameManager.Instance.MapManager.IsFade.Value = false;
-        
         // LimitTry Stage인 경우 Try 횟수 1 감소
         if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
         {
             GameManager.Instance.StageManager.ChangeStageValue(-1);
         }
 
+        // 몬스터에 닿으면 다시 처음부터 시작해야 함 -> fade 걷히는 처리
+        GameManager.Instance.MapManager.IsFade.Value = false;
+
         // 되돌리는 애니메이션 Play await
         // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
-
+        GameManager.Instance.RewindStage();
     }
 
     private (Vector2 _Start, Vector2 _End) GetStartEndPosition(Vector2 _Pos)
@@ -281,18 +310,30 @@ public class MonsterTile : TileBase
 
     private void ActClear()
     {
-        this.actCts.Cancel();
-        this.moveCts.Cancel();
-        
-        if (this.disposable != null)
+        if (IsFuncStart == true)
         {
-            Debug.Log($"MonsterTile Act Dispose!");
-            this.disposable.Dispose();
+            Debug.Log("ActClear 에서 IsFuncStart false 처리");
+            IsFuncStart = false;
         }
+
+        if (this.actCts != null || this.actCts?.IsCancellationRequested == false)
+        {
+            this.actCts.Cancel();
+        }
+
+        if (this.moveCts != null || this.moveCts?.IsCancellationRequested == false)
+        {
+            this.moveCts.Cancel();
+        }
+
+        this.actDisposable?.Dispose();
     }
     
     private void OnDestroy()
     {
         ActClear();
+
+        this.actCts?.Dispose();
+        this.moveCts?.Dispose();
     }
 }

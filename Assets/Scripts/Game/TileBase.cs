@@ -77,12 +77,16 @@ public abstract class TileBase : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
+
     protected Sprite tileSprite;
-
-    protected CircleCollider2D tileCollider;
-    public CircleCollider2D TileCollider => this.tileCollider;
-
     protected Animator animator;
+    protected Vector3 initPos = Vector3.zero;
+
+    public CircleCollider2D TileCollider { get; protected set; }
+
+    
+
+
     
 
     public const float TILE_FADE_TIME = 0.3f;
@@ -93,13 +97,14 @@ public abstract class TileBase : MonoBehaviour
     {
         this.spriteRenderer = this.GetComponent<SpriteRenderer>();
 
-        this.tileCollider = this.GetComponent<CircleCollider2D>();
+        TileCollider = this.GetComponent<CircleCollider2D>();
 
     }
 
     public virtual void Initialize(TileInfo _Info, Vector2 _Pos)
     {
-        this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, 0f);
+        this.initPos = new Vector3(_Pos.x, _Pos.y, 0f);
+        this.transform.localPosition = this.initPos;
 
         info = _Info;
     }
@@ -110,6 +115,11 @@ public abstract class TileBase : MonoBehaviour
         this.info.RootIdx = _RootIdx;
 
         this.transform.localPosition = new Vector3(_Pos.x, _Pos.y, 0f);
+    }
+
+    public virtual void Reset()
+    {
+        this.transform.localPosition = this.initPos;
     }
 
 

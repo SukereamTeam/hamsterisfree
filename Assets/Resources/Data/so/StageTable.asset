@@ -83,11 +83,11 @@ MonoBehaviour:
     SeedData:
     - Item1: Fake
       Item2: 0
-      Item3: 3
+      Item3: 1
     - Item1: Heart
       Item2: 0
-      Item3: 3
-    - Item1: Moving
+      Item3: 1
+    - Item1: Default
       Item2: 0
       Item3: 1
     MonsterData:
