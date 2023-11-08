@@ -73,7 +73,7 @@ public class SeedTile : TileBase
         }
         else if (IsFuncStart == false)
         {
-            Debug.Log("SeedTile Func Start !!!");
+            //Debug.Log("SeedTile Func Start !!!");
             IsFuncStart = true;
         }
 
@@ -179,7 +179,6 @@ public class SeedTile : TileBase
     {
         if (IsFuncStart == true)
         {
-            Debug.Log("ActClear 에서 IsFuncStart false 처리");
             IsFuncStart = false;
         }
 
@@ -188,7 +187,7 @@ public class SeedTile : TileBase
             this.cts.Cancel();
         }
 
-        this.transform.DOKill(true);
+        this.transform?.DOKill(true);
         
         this.actDisposable?.Dispose();
     }

@@ -165,9 +165,9 @@ public class MapManager : MonoBehaviour
 
     public void ResetMap()
     {
-        this.seedTiles.ForEach(x => x.Reset());
+        this.seedTiles?.ForEach(x => x.Reset());
 
-        this.monsterTiles.ForEach(x => x.Reset());
+        this.monsterTiles?.ForEach(x => x.Reset());
     }
 
     //------------------ Create Tiles

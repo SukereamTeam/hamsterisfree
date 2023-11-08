@@ -40,24 +40,30 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        
+
         if (EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
 
+        
+
         if (Input.GetMouseButtonDown(0))
         {
+            if (GameManager.Instance.IsMonsterTrigger == true)
+            {
+                // Monster에 닿아서 Trigger 연출 중이라면
+                return;
+            }
+
             var (hit2D, _) = RaycastGameScreen(Input.mousePosition);
 
             if (hit2D.collider == null)
             {
                 //GameScreen 영역을 벗어나면
-                //Debug.Log("### GetMouseButtonDown / GameScreen 영역을 벗어나면 ###");
-                GameManager.Instance.MapManager.IsFade.Value = false;
-                this.lineManager.EndDraw();
+                DragEnd();
 
-                PlayDragSound(false);
+                RewindAndDecreaseStage(true);
 
                 return;
             }
@@ -77,8 +83,12 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (GameManager.Instance.IsReset == true)
+            if (GameManager.Instance.IsReset == true || GameManager.Instance.IsMonsterTrigger == true)
             {
+                // 몬스터에 닿았거나, 게임화면 밖으로 나갔거나 하는 이유로
+                // RewindStage 가 일어났는데 아직 손가락을 떼지 않았을 때
+                // 드래그 처리 X
+
                 DragEnd();
 
                 return;
@@ -90,11 +100,9 @@ public class Player : MonoBehaviour
             if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                //Debug.Log("### GetMouseButton / GameScreen 영역을 벗어남 ###");
-                GameManager.Instance.MapManager.IsFade.Value = false;
-                this.lineManager.EndDraw();
+                DragEnd();
 
-                PlayDragSound(false);
+                RewindAndDecreaseStage();
 
                 return;
             }
@@ -106,11 +114,10 @@ public class Player : MonoBehaviour
             if (sqrLen > (dragDistance * dragDistance) &&
                 (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
-                //Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
+                // 화면이 아직 가려지지 않았는데 움직였을 경우 reset stage
+                DragEnd();
 
-                GameManager.Instance.MapManager.IsFade.Value = false;
-                this.lineManager.EndDraw();
-                PlayDragSound(false);
+                RewindAndDecreaseStage();
             }
             else
             {
@@ -136,13 +143,7 @@ public class Player : MonoBehaviour
             {
                 DragEnd();
 
-                GameManager.Instance.RewindStage();
-
-                // LimitTry Stage인 경우 드래그를 끝내도 Try 횟수 1 감소
-                if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
-                {
-                    GameManager.Instance.StageManager.ChangeStageValue(-1);
-                }
+                RewindAndDecreaseStage();
             }
         }
     }
@@ -156,9 +157,27 @@ public class Player : MonoBehaviour
         PlayDragSound(false);
     }
 
+    private void RewindAndDecreaseStage(bool _IsDown = false)
+    {
+        if (GameManager.Instance.IsMonsterTrigger == false)
+        {
+            GameManager.Instance.RewindStage();
+
+            // _IsDown 이 true라면 드래그 시작하려고 GetMouseButtonDown 한 상태인데,
+            // 시작하려고 했을 때 Rewind 된 건 Try횟수 깎지 말고 봐주려고
+            if (_IsDown == false)
+            {
+                // LimitTry Stage인 경우 드래그를 끝내도 Try 횟수 1 감소
+                if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
+                {
+                    GameManager.Instance.StageManager.ChangeStageValue(-1);
+                }
+            }
+        }
+    }
+
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
-        int layerMask = 0; //(1 << LayerMask.NameToLayer(""));
         Ray ray = this.gameCamera.ScreenPointToRay(_MousePosition);
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);

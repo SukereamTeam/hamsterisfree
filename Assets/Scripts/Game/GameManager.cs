@@ -54,8 +54,12 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isReset = value;
     }
 
-    public AudioClip UiSound { get; private set; }
-    public AudioClip DragSound { get; private set; }
+    private bool isMonsterTrigger = false;
+    public bool IsMonsterTrigger
+    {
+        get => this.isMonsterTrigger;
+        set => this.isMonsterTrigger = value;
+    }
 
     public string BgmPath { get; private set; }
     public string DragPath { get; private set; }
@@ -251,9 +255,13 @@ public class GameManager : MonoSingleton<GameManager>
         // SeedTile 상태 초기화
         // MonsterTile 상태 초기화
 
+        Debug.Log("### Rewind Stage ###");
+
         this.seedScore.Value = 0;
 
         IsReset = true;
+
+        IsMonsterTrigger = false;
 
         MapManager.ResetMap();
     }
