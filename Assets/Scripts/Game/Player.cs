@@ -41,10 +41,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
+        
 
         
 
@@ -70,6 +67,8 @@ public class Player : MonoBehaviour
 
             GameManager.Instance.MapManager.IsFade.Value = true;
 
+            GameManager.Instance.EnablePressScreen(false);
+
             StartTileAct();
 
             this.mouseDownTime = Time.time;
@@ -79,7 +78,13 @@ public class Player : MonoBehaviour
 
             PlayDragSound(true);
         }
-            
+
+
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
 
         if (Input.GetMouseButton(0))
         {

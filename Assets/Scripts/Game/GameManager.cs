@@ -25,9 +25,9 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField]
     private float fadeDuration = 0f;
 
-
+    // Press The Screen
     [SerializeField]
-    private Image startTextTrans = null;
+    private GameObject pressScreenObj = null;
 
 
 
@@ -96,14 +96,16 @@ public class GameManager : MonoSingleton<GameManager>
         this.curStageIndex = CommonManager.Instance.CurStageIndex;
         Debug.Log($"### Current Stage Index : {this.curStageIndex}");
 
-        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
-        startText.text = $"Ready?";
-
         Initialize(this.curStageIndex);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false);
 
         GameStartFlowAsync().Forget();
+    }
+
+    public void EnablePressScreen(bool _Enable)
+    {
+        this.pressScreenObj.SetActive(_Enable);
     }
 
     private void Initialize(int _CurStageIndex)
@@ -143,31 +145,24 @@ public class GameManager : MonoSingleton<GameManager>
 
     private async UniTaskVoid GameStartFlowAsync()
     {
-        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
+        var pressText = this.pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
 
-        // TODO : Delete (테스트용으로 1초 대기 걸어놓음), 추후 첫 스테이지일 경우 Tutorial 구현
-        await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
+        DOTween.Sequence()
+            .Append(pressText?.transform.DOScale(1.5f, 0.5f))
+            .Append(pressText?.transform.DOScale(Vector3.one, 0.5f))
+            .SetLoops(2, LoopType.Restart)
+            .ToUniTask(cancellationToken: this.destroyCancellationToken).Forget();
 
 
-
-        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_START.ToString()).Forget();
-
-        // TODO : Start 글자 출력 (TODO : Localization)
-        startText.text = $"Start!";
-        await UniTask.Delay(TimeSpan.FromMilliseconds(500));
-        _ = this.startTextTrans.DOFade(0f, 0.5f).OnComplete(() =>
-        {
-            this.startTextTrans.gameObject.SetActive(false);
-
-            // 게임 시작 할 수 있는 상태로 전환
-            this.isGame.Value = true;
-        });
+        // 게임 시작 할 수 있는 상태로 전환
+        IsGame.Value = true;
         
 
         Debug.Log("Game BGM 재생");
         SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
     }
 
+    
 
 
     private async UniTaskVoid GameEndFlowAsync()
@@ -193,10 +188,10 @@ public class GameManager : MonoSingleton<GameManager>
             {
                 this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
                 this.resultScript = this.resultPopup.GetComponent<UI_Popup_GameResult>();
-
-                this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
             }
         }
+
+        this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
     }
 
     private int CalculateReward(int value)
@@ -264,5 +259,7 @@ public class GameManager : MonoSingleton<GameManager>
         IsMonsterTrigger = false;
 
         MapManager.ResetMap();
+
+        EnablePressScreen(true);
     }
 } 
