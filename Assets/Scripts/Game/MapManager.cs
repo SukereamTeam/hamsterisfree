@@ -127,7 +127,8 @@ public class MapManager : MonoBehaviour
 
         if (stageData != null)
         {
-            // BugFix (업뎃된 StageTable과 유저의 local에 저장된 StageData가 다른 경우, 업뎃된 테이블로 새로 데이터 구성해야 함)
+            // 업뎃된 StageTable과 유저의 local에 저장된 StageData가 다른 경우 체크
+            // 데이터 비교 후 업뎃된 테이블로 새로 데이터 구성
             var dataEqual = CheckEqualStageDataAndStageTable(stageData, CommonManager.Instance.CurStageIndex);
 
             if (dataEqual == false)
