@@ -202,16 +202,15 @@ public class GameManager : MonoSingleton<GameManager>
             return 0;
         }
 
+        // 먹을 수 있는 씨앗 갯수가 3보다 작거나 같을 때
         if (this.maxSeedCount <= REWARD_MAX)
         {
-            if (value < this.maxSeedCount)
-            {
-                return Math.Min(value, this.maxSeedCount);
-            }
-            else
+            if (value == this.maxSeedCount)
             {
                 return REWARD_MAX;
             }
+
+            return Math.Min(value, this.maxSeedCount);
         }
         
         // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산

@@ -74,7 +74,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
                 while (operation != null && operation.isDone == false)
                 {
-                    if (this.sceneCts?.IsCancellationRequested == true)
+                    if (this.sceneCts == null || this.sceneCts?.IsCancellationRequested == true)
                         return;
 
                     float progress = operation.progress;
@@ -82,7 +82,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                     await UniTask.Yield();
                 }
 
-                if (this.sceneCts.IsCancellationRequested == false)
+                if (this.sceneCts?.IsCancellationRequested == false)
                 {
                     loadingScene = FindObjectOfType<LoadingScene>();
                     this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
