@@ -100,7 +100,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false);
 
-        GameStartFlowAsync().Forget();
+        GameStartFlow();
     }
 
     public void EnablePressScreen(bool _Enable)
@@ -143,7 +143,7 @@ public class GameManager : MonoSingleton<GameManager>
         MapManager.SetMap(_CurStageIndex, DataContainer.Instance.StageSprites);
     }
 
-    private async UniTaskVoid GameStartFlowAsync()
+    private void GameStartFlow()
     {
         var pressText = this.pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
 
@@ -153,11 +153,9 @@ public class GameManager : MonoSingleton<GameManager>
             .SetLoops(2, LoopType.Restart)
             .ToUniTask(cancellationToken: this.destroyCancellationToken).Forget();
 
-
         // 게임 시작 할 수 있는 상태로 전환
         IsGame.Value = true;
         
-
         Debug.Log("Game BGM 재생");
         SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
     }
@@ -230,6 +228,26 @@ public class GameManager : MonoSingleton<GameManager>
         DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
     }
 
+    private bool RaycastGameScreen(Vector3 _MousePosition)
+    {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(_MousePosition);
+
+        var lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
+        var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, lineLayer);
+
+        return raycastResult.collider != null ? true : false;
+    }
+
+    public void OnClick_PressScreen()
+    {
+        Debug.Log("눌러따");
+
+        if (RaycastGameScreen(Input.mousePosition) == true)
+        {
+            EnablePressScreen(false);
+        }
+    }
+
     public async void OnClick_BackAsync()
     {
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
@@ -240,6 +258,8 @@ public class GameManager : MonoSingleton<GameManager>
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
+
+    
 
     public void RewindStage()
     {
