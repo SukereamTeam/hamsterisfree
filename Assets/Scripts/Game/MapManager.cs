@@ -574,53 +574,7 @@ public class MapManager : MonoBehaviour
 
         var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
-        var tableSeedCount = stageTable.SeedData.Select(x => x.Item3).Sum();
-        var tableMonsterCount = stageTable.MonsterData.Select(x => x.Item3).Sum();
-
-        if (tableSeedCount != localStageData.seedDatas.Count)
-            return false;
-
-        if (tableMonsterCount != localStageData.monsterDatas.Count)
-            return false;
-
-
-        int idx = 0;
-        for (int i = 0; i < stageTable.SeedData.Count; i++)
-        {
-            for (int j = 0; j < stageTable.SeedData[i].Item3; j++)
-            {
-                if (stageTable.SeedData[i].Item1 != localStageData.seedDatas[idx].SubType)
-                {
-                    return false;
-                }
-                else if (stageTable.SeedData[i].Item2 != localStageData.seedDatas[idx].SubTypeIndex)
-                {
-                    return false;
-                }
-
-                idx++;
-            }
-        }
-
-        idx = 0;
-        for (int i = 0; i < stageTable.MonsterData.Count; i++)
-        {
-            for (int j = 0; j < stageTable.MonsterData[i].Item3; j++)
-            {
-                if (stageTable.MonsterData[i].Item1 != localStageData.monsterDatas[idx].SubType)
-                {
-                    return false;
-                }
-                else if (stageTable.MonsterData[i].Item2 != localStageData.monsterDatas[idx].SubTypeIndex)
-                {
-                    return false;
-                }
-
-                idx++;
-            }
-        }
-
-        return true;
+        return localStageData.EqualsWithStageParam(stageTable);
     }
 
     private void ChangeNameOutlineTiles()
