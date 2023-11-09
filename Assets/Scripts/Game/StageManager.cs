@@ -66,7 +66,7 @@ public class StageManager : MonoBehaviour
             {
                 // 1초에 1씩 깎는 것
                 this.curValue.Value -= 100f;
-                timer = 0f;
+                timer -= 0.1f;
             }
         }
     }
