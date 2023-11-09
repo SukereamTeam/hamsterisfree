@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Linq;
+using System;
+using UniRx;
 
 public class Player : MonoBehaviour
 {
@@ -17,7 +20,7 @@ public class Player : MonoBehaviour
     private Vector3 mouseDownPos = Vector3.zero;
 
     private int lineLayer = -1;
-
+    
 
 
     private void Start()
@@ -49,8 +52,8 @@ public class Player : MonoBehaviour
 
             if (hit2D.collider == null)
             {
-                // GameScreen 영역을 벗어나면
-                //Debug.Log("### GameScreen 영역을 벗어나면 ###");
+                //GameScreen 영역을 벗어나면
+                //Debug.Log("### GetMouseButtonDown / GameScreen 영역을 벗어나면 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -61,6 +64,8 @@ public class Player : MonoBehaviour
 
             GameManager.Instance.MapManager.IsFade.Value = true;
 
+            StartTileAct();
+
             this.mouseDownTime = Time.time;
             this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
 
@@ -68,16 +73,24 @@ public class Player : MonoBehaviour
 
             PlayDragSound(true);
         }
+            
 
         if (Input.GetMouseButton(0))
         {
+            if (GameManager.Instance.IsReset == true)
+            {
+                DragEnd();
+
+                return;
+            }
+
             var result = RaycastGameScreen(Input.mousePosition);
 
 
             if (result.hit2D.collider == null)
             {
                 // GameScreen 영역을 벗어나면
-                Debug.Log("### GameScreen 영역을 벗어남 ###");
+                //Debug.Log("### GetMouseButton / GameScreen 영역을 벗어남 ###");
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
 
@@ -93,7 +106,7 @@ public class Player : MonoBehaviour
             if (sqrLen > (dragDistance * dragDistance) &&
                 (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
-                Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
+                //Debug.Log($"아직 시간 안됨, 움직이지 마! 움직인 거리 : {sqrLen}");
 
                 GameManager.Instance.MapManager.IsFade.Value = false;
                 this.lineManager.EndDraw();
@@ -118,14 +131,30 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            GameManager.Instance.MapManager.IsFade.Value = false;
+            // Drag 뗐을 때도 Reset 되어야 하니까 / if 게임이 끝나지 않았다면 reset stage
+            if (GameManager.Instance.IsGame.Value == true)
+            {
+                DragEnd();
 
-            this.lineManager.EndDraw();
+                GameManager.Instance.RewindStage();
 
-            PlayDragSound(false);
+                // LimitTry Stage인 경우 드래그를 끝내도 Try 횟수 1 감소
+                if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
+                {
+                    GameManager.Instance.StageManager.ChangeStageValue(-1);
+                }
+            }
         }
     }
 
+    private void DragEnd()
+    {
+        GameManager.Instance.MapManager.IsFade.Value = false;
+
+        this.lineManager.EndDraw();
+
+        PlayDragSound(false);
+    }
 
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
@@ -153,15 +182,46 @@ public class Player : MonoBehaviour
         return (raycastResult, mousePosition);
     }
 
+    
+
     private void PlayDragSound(bool _IsPlay)
     {
         if (_IsPlay == false)
         {
-            SoundManager.Instance.Stop(GameManager.Instance.DragPath);
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == true)
+            {
+                SoundManager.Instance.Stop(GameManager.Instance.DragPath);
+            }
         }
         else
         {
-            SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
+            if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == false)
+            {
+                SoundManager.Instance.Play(GameManager.Instance.DragPath, _Loop: true).Forget();
+            }
         }
     }
+
+    private void StartTileAct()
+    {
+        GameManager.Instance.IsReset = false;
+
+        foreach (var seed in GameManager.Instance.MapManager.SeedTiles)
+        {
+            if (seed.IsFuncStart == false)
+            {
+                seed.TileFuncStart();
+            }
+        }
+
+        foreach (var monster in GameManager.Instance.MapManager.MonsterTiles)
+        {
+            if (monster.IsFuncStart == false)
+            {
+                monster.TileFuncStart();
+            }
+        }
+    }
+
+    
 }

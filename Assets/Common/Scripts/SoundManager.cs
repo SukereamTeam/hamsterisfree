@@ -20,8 +20,8 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
     {
         base.OnDestroy();
 
-        this.soundCts.Cancel();
-        this.soundCts.Dispose();
+        this.soundCts?.Cancel();
+        this.soundCts?.Dispose();
     }
 
     public void Initialize()
@@ -121,6 +121,23 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
 
     }
 
+    public bool IsPlaying(string _AudioPath)
+    {
+        var audioClip = DataContainer.Instance.SoundTable.FindAudioClipWithName(_AudioPath);
+        if (audioClip == null)
+        {
+            return false;
+        }
+
+        var audioSource = AudioSources.Find((x) => x.clip != null && x.clip.name.Equals(audioClip.name));
+        if (audioSource == null)
+        {
+            return false;
+        }
+
+        return audioSource.isPlaying;
+    }
+
     /// <summary>
     /// 사운드 볼륨이 점점 커지게/작아지게 재생하는 옵션
     /// </summary>
@@ -148,21 +165,19 @@ public class SoundManager : GlobalMonoSingleton<SoundManager>
                 _AudioSource.volume = Mathf.Lerp(initVolume, targetVolume, timer / _FadeTime);
                 timer += Time.deltaTime;
 
-                await UniTask.Yield(cancellationToken: _Cts.Token);
+                await UniTask.Yield();
             }
 
-            if (_Cts.IsCancellationRequested == true)
+            if (_Cts.IsCancellationRequested == false)
             {
-                return;
+                _AudioSource.volume = targetVolume;
+
+                _OnComplete?.Invoke();
             }
-
-            _AudioSource.volume = targetVolume;
-
-            _OnComplete?.Invoke();
         }
         catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            Debug.Log("### FadeVolume Exception : {" + ex.Message + "} ###");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace} //");
         }
     }
 

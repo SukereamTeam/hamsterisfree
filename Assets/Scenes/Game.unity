@@ -6338,7 +6338,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_TargetDisplay: 0
 --- !u!224 &1009608640
 RectTransform:
@@ -6657,6 +6657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b7b06ec37ddcb24587bb513f515a5bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UICanvas: {fileID: 1009608639}
   stageManager: {fileID: 1043671498}
   mapManager: {fileID: 1975502251}
   fadeDuration: 0.5
@@ -10907,7 +10908,7 @@ MonoBehaviour:
   blockRenderer: {fileID: 1983302965}
   backgroundImage: {fileID: 857869363}
   background: {fileID: 0}
-  fadeTime: 0.5
+  fadeTime: 0.25
   tileRoot: {fileID: 783463873}
   exitPrefab: {fileID: 1242813034118986203, guid: 5b4701f9c0486f44e9edae527c15c5be, type: 3}
   seedPrefab: {fileID: 1242813034118986203, guid: aef133be346caf846834139c720d9d8c, type: 3}

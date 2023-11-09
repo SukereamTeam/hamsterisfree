@@ -50,10 +50,12 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
         if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
         {
+            // 현재 깰 수 없는 스테이지 (남은 스테이지)
             this.itemImage.color = Color.yellow;
         }
         else if (UserDataManager.Instance.CurUserData.curStage == this.stageIndex)
         {
+            // 현재 깨야 하는 스테이지
             this.itemImage.color = Color.white;
             
             this.layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
@@ -61,6 +63,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         }
         else
         {
+            // 깬 스테이지
             this.itemImage.color = Color.blue;
         }
     }
@@ -78,7 +81,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
         CommonManager.Instance.CurStageIndex = this.stageIndex;
         
-        await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false, this.lobbyManager.Cts);
+        await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false);
 
         SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(this.stageIndex)));
 

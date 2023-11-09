@@ -25,8 +25,12 @@ public class SceneController : GlobalMonoSingleton<SceneController>
     public bool LoadingDone { get => this.loadingDone; set => this.loadingDone = value; }
 
     [SerializeField]
-    private Image fade;
+    private Image fade = null;
 
+    private CancellationTokenSource sceneCts = null;
+    private CancellationTokenSource fadeCts = null;
+
+    private const int SCENE_CHANGE_PAUSE = 500;
 
 
 
@@ -38,6 +42,20 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         }
 
         this.loadingTask = new List<UniTask>();
+
+        this.sceneCts = new CancellationTokenSource();
+        this.fadeCts = new CancellationTokenSource();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        this.sceneCts?.Cancel();
+        this.sceneCts?.Dispose();
+
+        this.fadeCts?.Cancel();
+        this.fadeCts?.Dispose();
     }
 
 
@@ -52,9 +70,23 @@ public class SceneController : GlobalMonoSingleton<SceneController>
             LoadingScene loadingScene = null;
             if (_WithLoading == true)
             {
-                await SceneManager.LoadSceneAsync("Loading");
-                loadingScene = FindObjectOfType<LoadingScene>();
-                this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
+                var operation = SceneManager.LoadSceneAsync("Loading");
+
+                while (operation != null && operation.isDone == false)
+                {
+                    if (this.sceneCts == null || this.sceneCts?.IsCancellationRequested == true)
+                        return;
+
+                    float progress = operation.progress;
+
+                    await UniTask.Yield();
+                }
+
+                if (this.sceneCts?.IsCancellationRequested == false)
+                {
+                    loadingScene = FindObjectOfType<LoadingScene>();
+                    this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
+                }
             }
 
             await UniTask.Yield();
@@ -70,7 +102,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                     var progress = Mathf.Round(amount * 100) / 100;    // 소수점 둘째자리까지 반올림
                     loadingScene.UpdateProgress(progress);
                 }
-            }));
+            })).AttachExternalCancellation(this.sceneCts.Token);
 
             await UniTask.Yield();
 
@@ -78,10 +110,10 @@ public class SceneController : GlobalMonoSingleton<SceneController>
             {
                 // 로딩바 1f까지 다 채운 후 0.5초 쉬고 씬 이동
                 loadingScene.UpdateProgress(1f);
-                await UniTask.Delay(TimeSpan.FromMilliseconds(500));
+                await UniTask.Delay(TimeSpan.FromMilliseconds(SCENE_CHANGE_PAUSE), cancellationToken: this.sceneCts.Token);
             }
 
-            await LoadSceneAsync(sceneString);
+            await LoadSceneAsync(sceneString, this.sceneCts);
 
             await UniTask.Yield();
 
@@ -91,18 +123,18 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
             this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, 0f);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is OperationCanceledException))
         {
-            Debug.LogError($"### exception occurred: {ex}");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 
 
-    private async UniTask LoadSceneAsync(string _SceneName)
+    private async UniTask LoadSceneAsync(string _SceneName, CancellationTokenSource _Cts)
     {
         var operation = SceneManager.LoadSceneAsync(_SceneName);
 
-        while (!operation.isDone)
+        while (!operation.isDone && _Cts.IsCancellationRequested == false)
         {
             await UniTask.Yield(); // 다음 프레임까지 대기
         }
@@ -116,11 +148,13 @@ public class SceneController : GlobalMonoSingleton<SceneController>
 
 
     // Canvas Fade In/Out -------------------------
-    public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource cancellationToken, Action _Action = null)
+    public async UniTask Fade(bool _FadeIn, float _Duration, bool _Skip, CancellationTokenSource _Cts = null, Action _Action = null)
     {
         var fadeInt = _FadeIn ? 1 : 0;  // fade in : 검은 화면에서 서서히 밝아지는 것!
         this.fade.color = new Color(this.fade.color.r, this.fade.color.g, this.fade.color.b, fadeInt);
         this.fade.raycastTarget = !_Skip;
+
+        _Cts ??= this.fadeCts;
 
         try
         {
@@ -146,7 +180,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
                     _Action();
             };
 
-            using (cancellationToken.Token.Register(() => cancelAction()))
+            using (_Cts.Token.Register(() => cancelAction()))
             {
                 await tweener
                     .OnKill(() =>
@@ -166,7 +200,7 @@ public class SceneController : GlobalMonoSingleton<SceneController>
         }
         catch (Exception ex)
         {
-            Debug.LogError($"### exception occurred: {ex}");
+            Debug.LogError($"### exception occurred: {ex.Message} / {ex.StackTrace}");
         }
     }
 

@@ -29,22 +29,16 @@ public class TileActor_Moving : ITileActor
                     return true;
                 }
             }
-
-            if (_Cts.IsCancellationRequested == true)
-            {
-                Debug.Log("Cancel 토큰으로 취소됨!");
-            }
         }
         catch (Exception ex)
         {
-            // Cancel 토큰으로 종료되었을 때
             if (ex is OperationCanceledException)
             {
-                Debug.Log("### Tile Moving ---> Cancel " + ex.Message + " ###");
+                Debug.Log($"Moving Token Cancel : {ex.Message} / {ex.StackTrace} //");
             }
             else
             {
-                Debug.Log("### Tile Moving Error : " + ex.Message + " ###");
+                Debug.Log($"### Tile Moving Error : {ex.Message} / {ex.StackTrace}");
             }
         }
 

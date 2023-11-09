@@ -20,13 +20,7 @@ public class IntroScene : MonoBehaviour
 
 
 
-    private void Awake()
-    {
-        //// CommonManager 싱글톤 객체 생성 및 초기화
-        //CommonManager.Instance.Initialize();
-
-        //SoundManager.Instance.Initialize();
-    }
+    
 
     private void Start()
     {
@@ -39,18 +33,21 @@ public class IntroScene : MonoBehaviour
     {
         try
         {
-            await SceneController.Instance.Fade(true, this.fadeDuration, true, fadeCts);
-            
-            Sequence shakeSequence = DOTween.Sequence();
-            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one * 1.2f, 0.1f));
-            _ = shakeSequence.Append(this.logo.transform.DOScale(Vector3.one, 0.1f));
-            _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-            _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
+            await SceneController.Instance.Fade(true, this.fadeDuration, true, this.fadeCts);
 
+            Sequence shakeSequence = DOTween.Sequence();
+
+            if (this.logo != null)
+            {
+                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one, 0.1f));
+                _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
+                _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
+            }
             
             await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
 
-            await SceneController.Instance.Fade(false, fadeDuration, true, fadeCts);
+            await SceneController.Instance.Fade(false, fadeDuration, true, this.fadeCts);
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
@@ -58,16 +55,14 @@ public class IntroScene : MonoBehaviour
                 CommonManager.Instance.Initialize();
                 SoundManager.Instance.Initialize();
 
-                Debug.Log("1차 태스크");
-                await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
-                Debug.Log("1차 태스크 끝");
+                await UniTask.Yield();
             }));
 
             SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
         }
-        catch (Exception ex) when (!(ex is OperationCanceledException))
+        catch (Exception ex) when(!(ex is OperationCanceledException))      // 실행되는 도중 꺼버릴 경우 UniTask.Delay가 exception throw 해서 무시하도록 처리
         {
-            Debug.Log("### Intro Scene Exception : {" + ex.Message + "} ###");
+            Debug.Log("### Intro Scene Exception : {" + ex.Message + ex.StackTrace + "} ###");
         }
     }
 

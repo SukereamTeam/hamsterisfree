@@ -27,11 +27,14 @@ public class UserDataManager : Singleton<UserDataManager>
         }
     }
     
-    public void ClearStage(int _Reward)
+    public void ClearStage(int _CurStage, int _Reward)
     {
-        CurUserData.curStage++;
-            
-        CurUserData.rewardCount += _Reward;
+        if (_CurStage == CurUserData.curStage)
+        {
+            CurUserData.curStage++;
+
+            CurUserData.rewardCount += _Reward;
+        }
 
         JsonManager.Instance.SaveData(CurUserData);
     }
