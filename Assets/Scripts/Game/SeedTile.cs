@@ -4,7 +4,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using DataTable;
-using UnityEngine.Serialization;
+using DG.Tweening;
 
 public class SeedTile : TileBase
 {
@@ -22,6 +22,8 @@ public class SeedTile : TileBase
     private ITileActor tileActor;
     private CancellationTokenSource cts;
     private IDisposable actDisposable = null;
+
+    private const float TWEEN_TIME = 0.25f;
 
     public bool IsFuncStart { get; private set; }
 
@@ -58,26 +60,20 @@ public class SeedTile : TileBase
 
         this.seedData = DataContainer.Instance.SeedTable.GetParamFromType(
             this.info.SubType, this.info.SubTypeIndex);
-
-        //TileFuncStart().Forget();
     }
 
     public void TileFuncStart()
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        //await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
-
-        //await UniTask.WaitUntil(() => GameManager.Instance?.MapManager?.IsFade.Value == true);
-
-
+        
         if (IsFuncStart == true)
         {
             return;
         }
         else if (IsFuncStart == false)
         {
-            Debug.Log("SeedTile Func Start !!!");
+            //Debug.Log("SeedTile Func Start !!!");
             IsFuncStart = true;
         }
 
@@ -140,19 +136,14 @@ public class SeedTile : TileBase
             this.tileActor = null;
         }
 
-        await UniTask.WaitUntil(() => IsFuncStart == false);
+        await UniTask.WaitUntil(() => IsFuncStart == false, cancellationToken: this.cts.Token);
 
-
-        // TODO : Delete... 테스트 용도
-        this.spriteRenderer.color = Color.red;
-
-        // TODO
-        // Trigger Ani 재생
+        await this.transform.DOScale(0f, TWEEN_TIME).SetEase(Ease.InOutBack);
     }
 
     public override void Reset()
     {
-        this.spriteRenderer.color = Color.white;
+        this.transform.DOScale(1f, TWEEN_TIME).SetEase(Ease.Linear);
         TileCollider.enabled = true;
 
         ActClear();
@@ -188,7 +179,6 @@ public class SeedTile : TileBase
     {
         if (IsFuncStart == true)
         {
-            Debug.Log("ActClear 에서 IsFuncStart false 처리");
             IsFuncStart = false;
         }
 
@@ -196,6 +186,8 @@ public class SeedTile : TileBase
         {
             this.cts.Cancel();
         }
+
+        this.transform?.DOKill(true);
         
         this.actDisposable?.Dispose();
     }

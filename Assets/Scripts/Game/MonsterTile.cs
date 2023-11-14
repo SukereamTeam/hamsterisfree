@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using DataTable;
 using UnityEngine;
 using UniRx;
+using DG.Tweening;
 
 public class MonsterTile : TileBase
 {
@@ -25,6 +26,8 @@ public class MonsterTile : TileBase
     private CancellationTokenSource moveCts;
     private CancellationTokenSource actCts;
     private IDisposable actDisposable = null;
+
+    private const float TWEEN_TIME = 0.25f;
 
     public bool IsFuncStart { get; private set; }
 
@@ -63,7 +66,6 @@ public class MonsterTile : TileBase
         if (sprite != null)
         {
             this.spriteRenderer.sprite = sprite;
-            this.spriteRenderer.color = Color.cyan;
         }
         
         this.monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(
@@ -73,16 +75,18 @@ public class MonsterTile : TileBase
         {
             this.bossFunc = Enum.Parse<Define.TileType_Sub>(this.monsterData.Func);
         }
-        
-        
-        //TileFuncStart().Forget();
     }
 
     public override void Reset()
     {
+        this.transform.localScale = Vector3.one;
 
+        // Moving Type 경우 주기적으로 처음 위치와 다른 곳으로 이동하기 때문에
+        // Initialize에서 저장했던 this.originPos 값으로 다시 세팅해준다.
+        var posTuple = GetStartEndPosition(this.originPos);
+        this.startPos = posTuple._Start;
+        this.endPos = posTuple._End;
 
-        this.spriteRenderer.color = Color.white;
         TileCollider.enabled = true;
 
         ActClear();
@@ -94,7 +98,6 @@ public class MonsterTile : TileBase
     {
         // 스테이지 세팅 끝나고 게임 시작할 상태가 되었을 때(IsGame == true)
         // 그 때 타일 타입마다 부여된 액션 실행
-        //await UniTask.WaitUntil(() => GameManager.Instance?.IsGame.Value == true);
 
         if (IsFuncStart == true)
         {
@@ -102,7 +105,7 @@ public class MonsterTile : TileBase
         }
         else if (IsFuncStart == false)
         {
-            Debug.Log("Monster Func Start !!!");
+            //Debug.Log("Monster Func Start !!!");
             IsFuncStart = true;
         }
 
@@ -212,7 +215,7 @@ public class MonsterTile : TileBase
                                 this.startPos = posTuple._Start;
                                 this.endPos = posTuple._End;
                         
-                                this.originPos = changePos;
+                                //this.originPos = changePos;
                                 
                                 continue;
                             }
@@ -239,11 +242,15 @@ public class MonsterTile : TileBase
         Debug.Log($"MonsterType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
 
         TileCollider.enabled = false;
-        // TODO : 닿은 효과 await
-        this.spriteRenderer.color = Color.blue;
-
+        GameManager.Instance.IsMonsterTrigger = true;
+        
         if (this.tileActor == null)
         {
+            if (this.moveCts != null || this.moveCts?.IsCancellationRequested == false)
+            {
+                this.moveCts.Cancel();
+            }
+
             // Default 등 Func가 따로 없는 타일들을 위한
             IsFuncStart = false;
         }
@@ -266,8 +273,13 @@ public class MonsterTile : TileBase
         // 몬스터에 닿으면 다시 처음부터 시작해야 함 -> fade 걷히는 처리
         GameManager.Instance.MapManager.IsFade.Value = false;
 
-        // 되돌리는 애니메이션 Play await
-        // TODO : 다시 처음 스테이지 상태로 돌리기 -> 처음 스테이지 구성될 때 타일 위치들을 json으로 저장해야 함!
+        // Trigger 연출
+        await DOTween.Sequence()
+            .Append(this.transform.DOScale(1.5f, TWEEN_TIME))
+            .Append(this.transform.DOScale(Vector3.one, TWEEN_TIME))
+            .SetLoops(2, LoopType.Restart)
+            .ToUniTask(cancellationToken: this.destroyCancellationToken);
+
         GameManager.Instance.RewindStage();
     }
 
@@ -312,7 +324,6 @@ public class MonsterTile : TileBase
     {
         if (IsFuncStart == true)
         {
-            Debug.Log("ActClear 에서 IsFuncStart false 처리");
             IsFuncStart = false;
         }
 
@@ -327,6 +338,8 @@ public class MonsterTile : TileBase
         }
 
         this.actDisposable?.Dispose();
+
+        this.transform?.DOKill(true);
     }
     
     private void OnDestroy()

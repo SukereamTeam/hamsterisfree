@@ -25,9 +25,9 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField]
     private float fadeDuration = 0f;
 
-
+    // Press The Screen
     [SerializeField]
-    private Image startTextTrans = null;
+    private GameObject pressScreenObj = null;
 
 
 
@@ -54,8 +54,12 @@ public class GameManager : MonoSingleton<GameManager>
         set => this.isReset = value;
     }
 
-    public AudioClip UiSound { get; private set; }
-    public AudioClip DragSound { get; private set; }
+    private bool isMonsterTrigger = false;
+    public bool IsMonsterTrigger
+    {
+        get => this.isMonsterTrigger;
+        set => this.isMonsterTrigger = value;
+    }
 
     public string BgmPath { get; private set; }
     public string DragPath { get; private set; }
@@ -92,14 +96,16 @@ public class GameManager : MonoSingleton<GameManager>
         this.curStageIndex = CommonManager.Instance.CurStageIndex;
         Debug.Log($"### Current Stage Index : {this.curStageIndex}");
 
-        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
-        startText.text = $"Ready?";
-
         Initialize(this.curStageIndex);
 
         await SceneController.Instance.Fade(true, this.fadeDuration, false);
 
-        GameStartFlowAsync().Forget();
+        GameStartFlow();
+    }
+
+    public void EnablePressScreen(bool _Enable)
+    {
+        this.pressScreenObj.SetActive(_Enable);
     }
 
     private void Initialize(int _CurStageIndex)
@@ -137,33 +143,24 @@ public class GameManager : MonoSingleton<GameManager>
         MapManager.SetMap(_CurStageIndex, DataContainer.Instance.StageSprites);
     }
 
-    private async UniTaskVoid GameStartFlowAsync()
+    private void GameStartFlow()
     {
-        var startText = this.startTextTrans.GetComponentInChildren<TextMeshProUGUI>();
+        var pressText = this.pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
 
-        // TODO : Delete (테스트용으로 1초 대기 걸어놓음), 추후 첫 스테이지일 경우 Tutorial 구현
-        await UniTask.Delay(TimeSpan.FromMilliseconds(1000));
+        DOTween.Sequence()
+            .Append(pressText?.transform.DOScale(1.5f, 0.5f))
+            .Append(pressText?.transform.DOScale(Vector3.one, 0.5f))
+            .SetLoops(2, LoopType.Restart)
+            .ToUniTask(cancellationToken: this.destroyCancellationToken).Forget();
 
-
-
-        SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_START.ToString()).Forget();
-
-        // TODO : Start 글자 출력 (TODO : Localization)
-        startText.text = $"Start!";
-        await UniTask.Delay(TimeSpan.FromMilliseconds(500));
-        _ = this.startTextTrans.DOFade(0f, 0.5f).OnComplete(() =>
-        {
-            this.startTextTrans.gameObject.SetActive(false);
-
-            // 게임 시작 할 수 있는 상태로 전환
-            this.isGame.Value = true;
-        });
+        // 게임 시작 할 수 있는 상태로 전환
+        IsGame.Value = true;
         
-
         Debug.Log("Game BGM 재생");
         SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
     }
 
+    
 
 
     private async UniTaskVoid GameEndFlowAsync()
@@ -189,10 +186,10 @@ public class GameManager : MonoSingleton<GameManager>
             {
                 this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
                 this.resultScript = this.resultPopup.GetComponent<UI_Popup_GameResult>();
-
-                this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
             }
         }
+
+        this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
     }
 
     private int CalculateReward(int value)
@@ -231,6 +228,26 @@ public class GameManager : MonoSingleton<GameManager>
         DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
     }
 
+    private bool RaycastGameScreen(Vector3 _MousePosition)
+    {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(_MousePosition);
+
+        var lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
+        var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, lineLayer);
+
+        return raycastResult.collider != null ? true : false;
+    }
+
+    public void OnClick_PressScreen()
+    {
+        Debug.Log("눌러따");
+
+        if (RaycastGameScreen(Input.mousePosition) == true)
+        {
+            EnablePressScreen(false);
+        }
+    }
+
     public async void OnClick_BackAsync()
     {
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
@@ -242,6 +259,8 @@ public class GameManager : MonoSingleton<GameManager>
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
 
+    
+
     public void RewindStage()
     {
         // 스테이지 처음 상태로 되감기
@@ -250,10 +269,16 @@ public class GameManager : MonoSingleton<GameManager>
         // SeedTile 상태 초기화
         // MonsterTile 상태 초기화
 
+        Debug.Log("### Rewind Stage ###");
+
         this.seedScore.Value = 0;
 
         IsReset = true;
 
+        IsMonsterTrigger = false;
+
         MapManager.ResetMap();
+
+        EnablePressScreen(true);
     }
 } 
