@@ -58,6 +58,9 @@
   - Lobby
 	- 프리팹으로 스테이지 버튼 만들어서 세팅하기.
 	- 화면 하단에 스크롤로 스테이지 선택 가능
+  - 연출 작업
+      - Start Screen (Press the Screen)
+      - End UI -> GameResult Popup, 스코어 연출
 
 
 현재 진행 중인 작업
@@ -66,15 +69,17 @@
 - Player Drag
 	- Drag Line Z포지션 변경 (몬스터, 씨앗보다 뒤에 그려져야 한다.)
 	- Line에 Texture 넣기
+- 연출 및 리소스 작업
+	- 씨앗, 몬스터, 스테이지+배경, UI 리소스
+ 	- Trigger 파티클 
 
 
 남아있는 작업
 --------------------
+- 시스템옵션 메뉴 기능 (BGM, SFX Volume 조절, 로그인 등)
 
-- 연출 작업
-      - Start UI -> 햄스터 한번 회전하는 연출 끝난 후 Start! (if Stage 1 : Tutorial)
-      - End UI -> End Popup, 보상 연출
-	  
+- Google Play Games 연동
+
 - Resources.Load -> Addressable 로 변환
 
 - 버전 체크 (웹 통신 필요)
@@ -89,6 +94,8 @@
 - Firebase
 	- 앱 푸시
 	- Oauth 로그인
+
+- Localization
   
 
 <p align="center">
