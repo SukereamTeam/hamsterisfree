@@ -8,6 +8,18 @@ using UnityEngine.UI;
 public class ScrollIndexCallback_StageItem : MonoBehaviour
 {
     [SerializeField]
+    private GameObject lockObject = null;
+
+    [SerializeField]
+    private Sprite curStageSprite = null;
+
+    [SerializeField]
+    private Sprite otherStageSprite = null;
+
+    [SerializeField]
+    private Color clearColor = Color.black;
+
+    [SerializeField]
     private TextMeshProUGUI stageItemText = null;
 
     [SerializeField]
@@ -46,25 +58,37 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         
         this.stageIndex = _Index;
 
-        this.stageItemText.text = $"Stage {_Index}";
+        this.stageItemText.text = $"{_Index + 1}";
+
+        this.itemImage.color = Color.white;
+
+        if (this.lockObject.activeSelf == true)
+        {
+            this.lockObject.SetActive(false);
+        }
 
         if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
         {
             // 현재 깰 수 없는 스테이지 (남은 스테이지)
-            this.itemImage.color = Color.yellow;
+            this.lockObject.SetActive(true);
+
+            this.itemImage.sprite = this.otherStageSprite;
+            this.itemImage.color = Color.grey;
         }
         else if (UserDataManager.Instance.CurUserData.curStage == this.stageIndex)
         {
             // 현재 깨야 하는 스테이지
-            this.itemImage.color = Color.white;
-            
             this.layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
             this.layoutElement.preferredHeight = STAGE_ITEM_SIZE_CUR;
+
+            this.itemImage.sprite = this.curStageSprite;
+            this.itemImage.color = Color.white;
         }
         else
         {
             // 깬 스테이지
-            this.itemImage.color = Color.blue;
+            this.itemImage.sprite = this.otherStageSprite;
+            this.itemImage.color = this.clearColor;
         }
     }
 
