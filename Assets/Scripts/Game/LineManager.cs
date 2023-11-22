@@ -7,7 +7,7 @@ public class LineManager : MonoBehaviour
     private GameObject linePrefab;
 
     [SerializeField]
-    private Gradient lineColor;
+    private Gradient[] lineColorArray;
 
     [SerializeField]
     private float linePointMinDistance;
@@ -26,7 +26,8 @@ public class LineManager : MonoBehaviour
     {
         CurrentLine = Instantiate(linePrefab, this.transform).GetComponent<Line>();
 
-        CurrentLine.SetLineColor(this.lineColor);
+        var idx = GetRandomColorIdx();
+        CurrentLine.SetLineColor(this.lineColorArray[idx]);
         CurrentLine.SetPointMinDistance(this.linePointMinDistance);
         CurrentLine.SetLineWidth(this.lineWidth);
     }
@@ -64,5 +65,10 @@ public class LineManager : MonoBehaviour
             //    }).AddTo(this);
 
         }
+    }
+
+    private int GetRandomColorIdx()
+    {
+        return Random.Range(0, this.lineColorArray.Length);
     }
 }
