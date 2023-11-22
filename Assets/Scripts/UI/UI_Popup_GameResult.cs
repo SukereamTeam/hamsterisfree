@@ -49,6 +49,8 @@ public class UI_Popup_GameResult : MonoBehaviour
     {
         this.cts?.Cancel();
         this.cts?.Dispose();
+
+        DOTween.KillAll(true);
     }
 
     public async UniTaskVoid Initialize(int _StageNumber, int _StarCount, int _Score)
@@ -73,7 +75,7 @@ public class UI_Popup_GameResult : MonoBehaviour
     {
         this.popupRoot.DOScale(0f, TWEEN_DURATION * 3f).SetEase(Ease.InCubic).OnComplete(() =>
         {
-            if (this.cts == null || this.cts?.IsCancellationRequested == false)
+            if (this.cts != null || this.cts?.IsCancellationRequested == false)
             {
                 Reset();
             }
@@ -164,7 +166,7 @@ public class UI_Popup_GameResult : MonoBehaviour
             await this.seedArray[i].DOScale(TWEEN_SCALE, SEED_SCALE_DURATION)
             .SetEase(Ease.OutCirc).OnComplete(() =>
             {
-                if (this.cts == null || this.cts?.IsCancellationRequested == false)
+                if (this.cts != null || this.cts?.IsCancellationRequested == false)
                 {
                     this.seedArray[i].DOScale(1f, SEED_SCALE_DURATION);
                 }
