@@ -44,12 +44,18 @@ public class InitScrollLobby : MonoBehaviour, LoopScrollPrefabSource, LoopScroll
 
         var loopScrollRect = this.GetComponent<LoopScrollRect>();
 
+        var curIdx = UserDataManager.Instance.CurUserData.curStage - 2;
+        if (curIdx < 0)
+        {
+            curIdx = 0;
+        }
+
         if (loopScrollRect != null)
         {
             loopScrollRect.prefabSource = this;
             loopScrollRect.dataSource = this;
             loopScrollRect.totalCount = _StageCount;
-            loopScrollRect.RefillCells();
+            loopScrollRect.RefillCells(curIdx);
         }
         else
         {
