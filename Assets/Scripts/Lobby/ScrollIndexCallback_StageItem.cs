@@ -17,7 +17,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
     private Sprite otherStageSprite = null;
 
     [SerializeField]
-    private Color clearColor = Color.black;
+    private GameObject prevStageItem = null;
 
     [SerializeField]
     private TextMeshProUGUI stageItemText = null;
@@ -69,10 +69,19 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
         this.itemImage.color = Color.white;
 
+        //if (this.prevStageItem.activeSelf == true)
+        //{
+        //    this.prevStageItem.SetActive(false);
+        //}
+
+        
+
         if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
         {
             // 현재 깰 수 없는 스테이지 (남은 스테이지)
             this.lockObject.SetActive(true);
+
+            //this.prevStageItem.SetActive(true);
 
             this.itemImage.sprite = this.otherStageSprite;
             this.itemImage.color = Color.grey;
@@ -90,7 +99,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         {
             // 깬 스테이지
             this.itemImage.sprite = this.otherStageSprite;
-            //this.itemImage.color = this.clearColor;
+            //this.prevStageItem.SetActive(true);
         }
     }
 
