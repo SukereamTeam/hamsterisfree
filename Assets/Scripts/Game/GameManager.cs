@@ -103,6 +103,11 @@ public class GameManager : MonoSingleton<GameManager>
         GameStartFlow();
     }
 
+    protected override void OnDestroy()
+    {
+        DOTween.KillAll(true);
+    }
+
     public void EnablePressScreen(bool _Enable)
     {
         this.pressScreenObj.SetActive(_Enable);

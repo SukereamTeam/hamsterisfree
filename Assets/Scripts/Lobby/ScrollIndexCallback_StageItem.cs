@@ -67,6 +67,8 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             this.lockObject.SetActive(false);
         }
 
+        this.itemImage.color = Color.white;
+
         if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
         {
             // 현재 깰 수 없는 스테이지 (남은 스테이지)
@@ -82,13 +84,13 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             this.layoutElement.preferredHeight = STAGE_ITEM_SIZE_CUR;
 
             this.itemImage.sprite = this.curStageSprite;
-            this.itemImage.color = Color.white;
+            
         }
         else
         {
             // 깬 스테이지
             this.itemImage.sprite = this.otherStageSprite;
-            this.itemImage.color = this.clearColor;
+            //this.itemImage.color = this.clearColor;
         }
     }
 

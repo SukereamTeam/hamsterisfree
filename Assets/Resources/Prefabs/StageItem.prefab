@@ -170,7 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockObject: {fileID: 2916888725943022483}
   curStageSprite: {fileID: 21300000, guid: 9d3cbc2e3f7cab245aabc0075bed643e, type: 3}
-  otherStageSprite: {fileID: 21300000, guid: 88b8b7896e3e1bd4fb2263b023b3bcd4, type: 3}
+  otherStageSprite: {fileID: 21300000, guid: dfad3bd321c314f68acef1480a7e4f57, type: 3}
   clearColor: {r: 0.972549, g: 0.9647059, b: 0.61960787, a: 1}
   stageItemText: {fileID: 4190422826877727973}
   layoutElement: {fileID: 8310474926945134643}
