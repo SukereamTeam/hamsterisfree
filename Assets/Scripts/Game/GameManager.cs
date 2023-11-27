@@ -103,6 +103,11 @@ public class GameManager : MonoSingleton<GameManager>
         GameStartFlow();
     }
 
+    protected override void OnDestroy()
+    {
+        DOTween.KillAll(true);
+    }
+
     public void EnablePressScreen(bool _Enable)
     {
         this.pressScreenObj.SetActive(_Enable);
@@ -148,9 +153,9 @@ public class GameManager : MonoSingleton<GameManager>
         var pressText = this.pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
 
         DOTween.Sequence()
-            .Append(pressText?.transform.DOScale(1.5f, 0.5f))
-            .Append(pressText?.transform.DOScale(Vector3.one, 0.5f))
-            .SetLoops(2, LoopType.Restart)
+            .Append(pressText?.transform.DOScale(1.2f, 0.3f))
+            .Append(pressText?.transform.DOScale(Vector3.one, 0.3f))
+            .SetLoops(-1, LoopType.Restart)
             .ToUniTask(cancellationToken: this.destroyCancellationToken).Forget();
 
         // 게임 시작 할 수 있는 상태로 전환
