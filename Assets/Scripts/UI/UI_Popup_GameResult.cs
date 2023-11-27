@@ -10,6 +10,12 @@ using System;
 
 public class UI_Popup_GameResult : MonoBehaviour
 {
+    private enum RESULT
+    {
+        SUCCESS = 0,
+        FAIL
+    }
+
     [SerializeField]
     private Transform popupRoot = null;
 
@@ -30,6 +36,15 @@ public class UI_Popup_GameResult : MonoBehaviour
 
     [SerializeField]
     private Transform[] seedArray = null;
+
+    [SerializeField]
+    private GameObject[] topResultIcon = null;
+
+    [SerializeField]
+    private TextMeshProUGUI topResultText = null;
+
+    [SerializeField]
+    private GameObject[] bottomResultIcon = null;
 
 
     private CancellationTokenSource cts = null;
@@ -138,17 +153,41 @@ public class UI_Popup_GameResult : MonoBehaviour
 
         // 게임 스코어에 따른 사운드 재생
         if (_Score > 0)
+        {
             SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
+
+            this.topResultText.text = $"Success";
+        }
         else
+        {
             SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
+
+            this.topResultText.text = $"Fail";
+        }
 
 
         // 다음 스테이지로 이동할 수 있는지 체크하여 nextButton에 next 혹은 retry 기능 넣어주기
         this.canNext = CheckCanNextStage(_StageNumber, _Score);
         if (this.canNext == true)
+        {
             this.nextButtonText.text = $"다음 스테이지";
+
+            this.topResultIcon[(int)RESULT.SUCCESS].SetActive(true);
+            this.topResultIcon[(int)RESULT.FAIL].SetActive(false);
+
+            this.bottomResultIcon[(int)RESULT.SUCCESS].SetActive(true);
+            this.bottomResultIcon[(int)RESULT.FAIL].SetActive(false);
+        }
         else
+        {
             this.nextButtonText.text = $"재시작";
+
+            this.topResultIcon[(int)RESULT.SUCCESS].SetActive(false);
+            this.topResultIcon[(int)RESULT.FAIL].SetActive(true);
+
+            this.bottomResultIcon[(int)RESULT.SUCCESS].SetActive(true);
+            this.bottomResultIcon[(int)RESULT.FAIL].SetActive(false);
+        }
     }
 
     private async UniTaskVoid SeedFlowAsync(int _SeedCount)
