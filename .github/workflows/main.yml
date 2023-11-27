@@ -89,7 +89,7 @@ jobs:
         with:
           upload_url: ${{ steps.create-new-release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/build/Android/Android.apk
-          asset_name: build-Android-v${{ github.run_number }}
+          asset_name: build-Android-v${{ github.run_number }}.apk
           asset_content_type: application/zip
 
       # - name: Return license
