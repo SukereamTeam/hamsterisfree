@@ -17,9 +17,6 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
     private Sprite otherStageSprite = null;
 
     [SerializeField]
-    private GameObject prevStageItem = null;
-
-    [SerializeField]
     private TextMeshProUGUI stageItemText = null;
 
     [SerializeField]
