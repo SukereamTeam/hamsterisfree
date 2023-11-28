@@ -82,6 +82,12 @@ public class UI_Popup_GameResult : MonoBehaviour
 
         await this.popupRoot.DOScale(1f, TWEEN_DURATION * 3f).SetEase(Ease.InCubic).WithCancellation(this.cts.Token);
 
+        var grayStartIdx = _StarCount;
+        for (int i = grayStartIdx; i < this.seedArray.Length; i++)
+        {
+            var image = this.seedArray[i].GetComponent<Image>();
+            image.color = Color.gray;
+        }
 
         SeedFlowAsync(_StarCount).Forget();
     }
@@ -149,7 +155,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         this.stageNumber = _StageNumber;
         this.stageNumberText.text = $"STAGE {(_StageNumber + 1).ToString(NUMBER_FORMAT)}";
 
-        this.scoreText.text = _Score.ToString();
+        this.scoreText.text = $"얻은 씨앗 : {_Score.ToString()}";
 
         // 게임 스코어에 따른 사운드 재생
         if (_Score > 0)
@@ -170,7 +176,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         this.canNext = CheckCanNextStage(_StageNumber, _Score);
         if (this.canNext == true)
         {
-            this.nextButtonText.text = $"다음 스테이지";
+            this.nextButtonText.text = $"다음\n스테이지";
 
             this.topResultIcon[(int)RESULT.SUCCESS].SetActive(true);
             this.topResultIcon[(int)RESULT.FAIL].SetActive(false);
@@ -180,7 +186,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         }
         else
         {
-            this.nextButtonText.text = $"재시작";
+            this.nextButtonText.text = $"다시하기";
 
             this.topResultIcon[(int)RESULT.SUCCESS].SetActive(false);
             this.topResultIcon[(int)RESULT.FAIL].SetActive(true);
