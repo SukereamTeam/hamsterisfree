@@ -31,7 +31,7 @@ public class LobbyManager : MonoSingleton<LobbyManager>
 
         SoundManager.Instance.Play(Define.SoundPath.BGM_LOBBY.ToString(), _FadeTime: this.fadeDuration, _Loop: true, _Volume: BGM_VOLUME).Forget();
 
-        this.rewardText.text = $"Reward : {UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
+        this.rewardText.text = $"{UserDataManager.Instance.CurUserData.rewardCount.ToString()}";
 
         this.initScroll.Initialize(DataContainer.Instance.StageTable.list.Count);
     }
