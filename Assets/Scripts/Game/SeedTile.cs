@@ -136,7 +136,7 @@ public class SeedTile : TileBase
             this.tileActor = null;
         }
 
-        await UniTask.WaitUntil(() => IsFuncStart == false, cancellationToken: this.cts.Token);
+        await UniTask.WaitUntil(() => IsFuncStart == false/*, cancellationToken: this.cts.Token*/);
 
         await this.transform.DOScale(0f, TWEEN_TIME).SetEase(Ease.InOutBack);
     }

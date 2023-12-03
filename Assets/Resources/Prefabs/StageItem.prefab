@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockObject: {fileID: 2916888725943022483}
-  curStageSprite: {fileID: 21300000, guid: 9d3cbc2e3f7cab245aabc0075bed643e, type: 3}
+  curStageSprite: {fileID: 21300000, guid: 71f126a62ce254fb1826870793a7b89f, type: 3}
   otherStageSprite: {fileID: 21300000, guid: 5ec6459c3b7b57c46aa1128cf8553e16, type: 3}
   stageItemText: {fileID: 4190422826877727973}
   layoutElement: {fileID: 8310474926945134643}
@@ -308,7 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.5615012, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

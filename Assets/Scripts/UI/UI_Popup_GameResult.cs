@@ -46,6 +46,12 @@ public class UI_Popup_GameResult : MonoBehaviour
     [SerializeField]
     private GameObject[] bottomResultIcon = null;
 
+    [SerializeField]
+    private Image topBar = null;
+
+    [SerializeField]
+    private Color[] topBarColor = null;
+
 
     private CancellationTokenSource cts = null;
     private int stageNumber = -1;
@@ -163,12 +169,16 @@ public class UI_Popup_GameResult : MonoBehaviour
             SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END.ToString()).Forget();
 
             this.topResultText.text = $"Success";
+
+            this.topBar.color = this.topBarColor[(int)RESULT.SUCCESS];
         }
         else
         {
             SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_GAME_END_FAIL.ToString()).Forget();
 
             this.topResultText.text = $"Fail";
+
+            this.topBar.color = this.topBarColor[(int)RESULT.FAIL];
         }
 
 
