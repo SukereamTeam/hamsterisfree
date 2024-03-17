@@ -81,10 +81,9 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             {
                 await LoadStageSprites(item.MapName, this.cts);
 
-                // TODO : Modify ExitTile에 스프라이트 넣기
-                //this.exitSprite = await Resources.LoadAsync<Sprite>("Images/Map/Forest/Forest_Center") as Sprite;
-                //if (this.exitSprite == null)
-                //    Debug.Log("### ERROR ---> ExitSprite is Null ###");
+                this.exitSprite = await Resources.LoadAsync<Sprite>($"Images/Map/{item.MapName}/Exit") as Sprite;
+                if (this.exitSprite == null)
+                    Debug.Log("### ERROR ---> ExitSprite is Null ###");
 
                 await LoadSeedSprites(item, this.cts);
 

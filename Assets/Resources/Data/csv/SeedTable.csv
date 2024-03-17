@@ -1,7 +1,7 @@
 UID,Type,TypeIndex,ActiveTime,SeedValue,SpritePath
 0,Default,0,1,1,Images/Seed/Seed_Default
-1,Fade,0,0.5,1,Images/Map/Forest/Forest_BottomRight
-2,Moving,0,2,1,Images/Map/Forest/Forest_Left
-3,Disappear,0,5,1,Images/Map/Forest/Forest_Right
-4,Fake,0,1,-3,Images/Map/Forest/Forest_Top
-5,Heart,0,1,3,Images/Map/Forest/Forest_Bottom
+1,Fade,0,0.5,1,Images/Seed/Seed_Default
+2,Moving,0,2,1,Images/Seed/Seed_Moving
+3,Disappear,0,5,1,Images/Seed/Seed_Default
+4,Fake,0,1,-3,Images/Seed/Seed_Fake
+5,Heart,0,1,3,Images/Seed/Seed_Heart

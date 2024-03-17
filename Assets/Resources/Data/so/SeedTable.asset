@@ -24,28 +24,28 @@ MonoBehaviour:
     TypeIndex: 0
     ActiveTime: 0.5
     SeedValue: 1
-    SpritePath: Images/Map/Forest/Forest_BottomRight
+    SpritePath: Images/Seed/Seed_Default
   - UID: 2
     Type: Moving
     TypeIndex: 0
     ActiveTime: 2
     SeedValue: 1
-    SpritePath: Images/Map/Forest/Forest_Left
+    SpritePath: Images/Seed/Seed_Moving
   - UID: 3
     Type: Disappear
     TypeIndex: 0
     ActiveTime: 5
     SeedValue: 1
-    SpritePath: Images/Map/Forest/Forest_Right
+    SpritePath: Images/Seed/Seed_Default
   - UID: 4
     Type: Fake
     TypeIndex: 0
     ActiveTime: 1
     SeedValue: -3
-    SpritePath: Images/Map/Forest/Forest_Top
+    SpritePath: Images/Seed/Seed_Fake
   - UID: 5
     Type: Heart
     TypeIndex: 0
     ActiveTime: 1
     SeedValue: 3
-    SpritePath: Images/Map/Forest/Forest_Bottom
+    SpritePath: Images/Seed/Seed_Heart

@@ -22,7 +22,7 @@ MonoBehaviour:
       Item1: 1
       Item2: 1
     Func: 
-    SpritePath: Images/Map/Forest/Forest_TopLeft
+    SpritePath: Images/Monster/Monster_Default
   - UID: 1
     Type: Fade
     TypeIndex: 0
@@ -32,7 +32,7 @@ MonoBehaviour:
       Item1: 1
       Item2: 1
     Func: 
-    SpritePath: Images/Map/Forest/Forest_BottomRight
+    SpritePath: Images/Monster/Monster_Default
   - UID: 2
     Type: Moving
     TypeIndex: 0
@@ -42,7 +42,7 @@ MonoBehaviour:
       Item1: 1
       Item2: 1
     Func: 
-    SpritePath: Images/Map/Forest/Forest_Left
+    SpritePath: Images/Monster/Monster_Default
   - UID: 3
     Type: Boss
     TypeIndex: 0
@@ -52,4 +52,4 @@ MonoBehaviour:
       Item1: 2
       Item2: 2
     Func: Default
-    SpritePath: Images/Map/Forest/Forest_Right
+    SpritePath: Images/Monster/Monster_Default
