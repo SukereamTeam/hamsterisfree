@@ -15,6 +15,7 @@
   
 - CI/CD : [BeautyfullCastle](https://github.com/BeautyfullCastle)
   - 빌드 CI/CD 를 담당하며 Pull Request 요청 시 [Code Review](https://github.com/SukereamTeam/hamsterisfree/pulls?q=is%3Apr+is%3Aclosed)를 맡고 있습니다.
+    (eg. [https://github.com/SukereamTeam/hamsterisfree/pull/27#discussion_r1328291154](https://github.com/SukereamTeam/hamsterisfree/pull/27#discussion_r1328291154))
   - 현재 repository에 push 시 Github Action을 통한 Android 빌드가 생성되도록 구성되어 있습니다.
  
 - 개발 일지
