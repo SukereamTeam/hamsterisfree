@@ -17,7 +17,7 @@
   - 빌드 CI/CD 를 담당하며 Pull Request 요청 시 [Code Review](https://github.com/SukereamTeam/hamsterisfree/pulls?q=is%3Apr+is%3Aclosed)를 맡고 있습니다.
   - 현재 repository에 push 시 Github Action을 통한 Android 빌드가 생성되도록 구성되어 있습니다.
  
-- 개발 일지 (~ing)
+- 개발 일지
   - [https://eggmong.github.io/categories/devlog](https://eggmong.github.io/categories/devlog)
 
 
@@ -86,7 +86,7 @@
 	- Mask 이미지 알파값 0으로 바꿔주는 효과를 얻을 수 있음
 
 - InApp 결제
-	- 스테이지 별 3개로 클리어 해주도록 함
+	- 스테이지 별 3개로 클리어 해주도록 하는 아이템 구매 넣기
 
 - Firebase
 	- 앱 푸시
