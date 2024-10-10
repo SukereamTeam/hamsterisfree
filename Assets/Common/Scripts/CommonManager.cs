@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class CommonManager : GlobalMonoSingleton<CommonManager>
 {
+    public static SDKFirebase Firebase { private set; get; } = new();
+    public static SDKFirebaseAuth FirebaseAuth { private set; get; } = new();
+    
     // Lobby 씬에서 선택한 스테이지 Index를 저장
     private int curStageIndex = -1;
     public int CurStageIndex
@@ -12,9 +15,9 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
         get => this.curStageIndex;
         set => this.curStageIndex = value;
     }
-
-
+    
     private bool isInit = false;
+    
     public void Initialize()
     {
         if (isInit)

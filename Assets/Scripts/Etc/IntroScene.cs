@@ -26,6 +26,7 @@ public class IntroScene : MonoBehaviour
     {
         this.fadeCts = new CancellationTokenSource();
 
+        SDKFirebase.Instance.Initialize();
         InitializeAsync().Forget();
     }
 
@@ -54,7 +55,7 @@ public class IntroScene : MonoBehaviour
                 // CommonManager 싱글톤 객체 생성 및 초기화
                 CommonManager.Instance.Initialize();
                 SoundManager.Instance.Initialize();
-
+                
                 await UniTask.Yield();
             }));
 
@@ -78,7 +79,7 @@ public class IntroScene : MonoBehaviour
     private void OnDestroy()
     {
         DOTween.KillAll(true);
-        this.fadeCts.Cancel();
-        this.fadeCts.Dispose();
+        this.fadeCts?.Cancel();
+        this.fadeCts?.Dispose();
     }
 }
