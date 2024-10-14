@@ -52,6 +52,13 @@ public class IntroScene : MonoBehaviour
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
+                // TODO : 로그인
+                var loginResult = await LoginFlow();
+                if (loginResult == false)
+                {
+                    // 앱 종료
+                }
+                
                 // CommonManager 싱글톤 객체 생성 및 초기화
                 CommonManager.Instance.Initialize();
                 SoundManager.Instance.Initialize();
@@ -81,5 +88,35 @@ public class IntroScene : MonoBehaviour
         DOTween.KillAll(true);
         this.fadeCts?.Cancel();
         this.fadeCts?.Dispose();
+    }
+
+    private async UniTask<bool> LoginFlow()
+    {
+        // 1. 로그인 타입이 PlayerPrefs 에 저장되어 있으면
+        //     계정 정보도 저장되어있다고 판단하고 로그인을 시도한다.
+        //
+        //     로그인 실패 시 로그인 팝업 출력.
+        //
+        // 2. 로그인 타입이 저장되어 있지 않으면
+        // 신규 로그인이라고 생각하고
+        //     회원가입 팝업 출력.
+        
+        var data = PlayerPrefs.GetString("UserAccount", null);
+        if (data == null)
+        {
+            // TODO : 첫 로그인, 로그인 UI 띄우기
+            // 팝업에서 선택 결과에 따라 true, false 반환
+            // 아무것도 선택 안하면 false 반환?
+            var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
+            var result = await loginPopup.ShowAsync();
+
+            return result != false;
+        }
+        else
+        {
+            
+            
+            return true;
+        }
     }
 }
