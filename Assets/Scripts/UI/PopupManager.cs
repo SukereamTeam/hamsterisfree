@@ -1,9 +1,18 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class PopupManager
+public class PopupManager : Singleton<PopupManager>
 {
+    private GameObject _popupRoot;
+    
     private const string POPUP_PATH = "Prefabs/";
+
+    public async UniTask InitializeAsync()
+    {
+        var prefab = await Resources.LoadAsync(POPUP_PATH + "PopupRoot") as GameObject;
+        _popupRoot = Object.Instantiate(prefab);
+        Object.DontDestroyOnLoad(_popupRoot);
+    }
     
     public async UniTask<T> CreateAsync<T>() where T : PopupBase
     {
@@ -19,7 +28,7 @@ public class PopupManager
         var go = Object.Instantiate(prefab);
         var popup = go.GetComponent<T>();
 
-        Object.DontDestroyOnLoad(go.gameObject);
+        if (_popupRoot != null) go.transform.SetParent(_popupRoot.transform);
 
         prefab.SetActive(true);
 

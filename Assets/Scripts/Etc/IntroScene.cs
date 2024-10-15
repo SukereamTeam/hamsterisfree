@@ -27,6 +27,7 @@ public class IntroScene : MonoBehaviour
         this.fadeCts = new CancellationTokenSource();
 
         SDKFirebase.Instance.Initialize();
+        
         InitializeAsync().Forget();
     }
 
@@ -52,16 +53,18 @@ public class IntroScene : MonoBehaviour
 
             SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
             {
+                // CommonManager 싱글톤 객체 생성 및 초기화
+                CommonManager.Instance.Initialize();
+                SoundManager.Instance.Initialize();
+
+                await CommonManager.Popup.InitializeAsync();
+                
                 // TODO : 로그인
                 var loginResult = await LoginFlow();
                 if (loginResult == false)
                 {
                     // 앱 종료
                 }
-                
-                // CommonManager 싱글톤 객체 생성 및 초기화
-                CommonManager.Instance.Initialize();
-                SoundManager.Instance.Initialize();
                 
                 await UniTask.Yield();
             }));
@@ -92,31 +95,17 @@ public class IntroScene : MonoBehaviour
 
     private async UniTask<bool> LoginFlow()
     {
-        // 1. 로그인 타입이 PlayerPrefs 에 저장되어 있으면
-        //     계정 정보도 저장되어있다고 판단하고 로그인을 시도한다.
-        //
-        //     로그인 실패 시 로그인 팝업 출력.
-        //
-        // 2. 로그인 타입이 저장되어 있지 않으면
-        // 신규 로그인이라고 생각하고
-        //     회원가입 팝업 출력.
-        
-        var data = PlayerPrefs.GetString("UserAccount", null);
-        if (data == null)
+        var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        var currentUser = auth.CurrentUser;
+        if (currentUser != null)
         {
-            // TODO : 첫 로그인, 로그인 UI 띄우기
-            // 팝업에서 선택 결과에 따라 true, false 반환
-            // 아무것도 선택 안하면 false 반환?
-            var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
-            var result = await loginPopup.ShowAsync();
+            Debug.LogFormat("Already signed in: {0} ({1})", currentUser.DisplayName, currentUser.UserId);
+            return true; // 이미 로그인되어 있으므로 재로그인하지 않음
+        }
 
-            return result != false;
-        }
-        else
-        {
-            
-            
-            return true;
-        }
+        var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
+        var result = await loginPopup.ShowAsync();
+
+        return result != false;
     }
 }

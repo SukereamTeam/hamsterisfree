@@ -7,25 +7,34 @@ using UnityEngine.UI;
 
 public class PopupLoginSelect : PopupBase
 {
-    [SerializeField] private Button _confirmButton;
+    [SerializeField] private Button _guestLogin;
+    [SerializeField] private Button _emailLogin;
     
     public async UniTask<bool> ShowAsync()
     {
-        UniTaskCompletionSource completionSource = new UniTaskCompletionSource();
+        UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
+
+        bool loginResult = false;
         
-        _confirmButton.OnClickAsObservable().Subscribe(async _ =>
+        _guestLogin.OnClickAsObservable().Subscribe(async _ =>
         {
-            
-            
-            completionSource.TrySetResult();
+            loginResult = await SDKFirebase.Instance.SignInAnonymously();
+
+            completionSource.TrySetResult(loginResult);
         }).AddTo(this);
         
-        AddCloseTask(completionSource.Task, 0);
+        //_emailLogin.OnClickAsObservable().Subscribe(async _ =>
+        //{
+            // TODO : email 로그인 팝업 
+            //var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
+            //var result = await loginPopup.ShowAsync();
+            
+            //completionSource.TrySetResult();
+        //}).AddTo(this);
         
-        var result = await WaitInputAsync();
-        
+        Show();
+        var result = await completionSource.Task;
         await HideAsync();
-        
-        return result == 0;
+        return result;
     }
 }

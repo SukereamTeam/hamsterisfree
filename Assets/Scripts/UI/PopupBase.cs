@@ -12,6 +12,11 @@ public abstract class PopupBase : MonoBehaviour
     
     public void AddCloseTask(UniTask task, int id, Action onCloseAction = null) => _closeTaskList.Add((task, id, onCloseAction));
     
+    public virtual void Show()
+    {
+        gameObject.SetActive(true);
+    }
+    
     public virtual UniTask HideAsync()
     {
         OnHideComplete?.Invoke();
