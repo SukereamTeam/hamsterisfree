@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class CommonManager : GlobalMonoSingleton<CommonManager>
 {
-    public static SDKFirebase Firebase { private set; get; } = new();
     public static PopupManager Popup { private set; get; } = new();
     
     // Lobby 씬에서 선택한 스테이지 Index를 저장
@@ -26,8 +25,6 @@ public class CommonManager : GlobalMonoSingleton<CommonManager>
         this.isInit = true;
 
         CurStageIndex = 0;
-        
-        UserDataManager.Instance.LoadUserData();
     }
 
     public void OnDisable()

@@ -9,8 +9,8 @@ using UnityEngine.UI;
 
 public class PopupLoginEmail : PopupBase
 {
-    [SerializeField] private TextMeshProUGUI _emailText;
-    [SerializeField] private TextMeshProUGUI _passwordText;
+    [SerializeField] private TMP_InputField _emailText;
+    [SerializeField] private TMP_InputField _passwordText;
     [SerializeField] private Button _comfirmButton;
     
     public async UniTask<bool> ShowAsync()

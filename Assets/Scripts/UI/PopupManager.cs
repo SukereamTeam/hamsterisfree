@@ -4,11 +4,16 @@ using UnityEngine;
 public class PopupManager : Singleton<PopupManager>
 {
     private GameObject _popupRoot;
+    private bool _isInit = false;
     
     private const string POPUP_PATH = "Prefabs/";
 
     public async UniTask InitializeAsync()
     {
+        if (_isInit == true)
+            return;
+
+        _isInit = true;
         var prefab = await Resources.LoadAsync(POPUP_PATH + "PopupRoot") as GameObject;
         _popupRoot = Object.Instantiate(prefab);
         Object.DontDestroyOnLoad(_popupRoot);

@@ -120,7 +120,6 @@ public class MapManager : MonoBehaviour
         }
 
         SetBackground(_StageSprites);
-        //SetOutlineTiles(_StageSprites);
         SetMask(_StageSprites);
 
         var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);

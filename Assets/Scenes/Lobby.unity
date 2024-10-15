@@ -446,6 +446,7 @@ MonoBehaviour:
   fadeDuration: 0.5
   rewardText: {fileID: 766157716}
   initScroll: {fileID: 114060077}
+  infoButton: {fileID: 1260171963}
 --- !u!4 &185753363
 Transform:
   m_ObjectHideFlags: 0

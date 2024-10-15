@@ -62,9 +62,9 @@ public class IntroScene : MonoBehaviour
                 // TODO : 로그인
                 var loginResult = await LoginFlow();
                 if (loginResult == false)
-                {
-                    // 앱 종료
-                }
+                    Application.Quit();
+                
+                UserDataManager.Instance.LoadUserData();
                 
                 await UniTask.Yield();
             }));
@@ -105,6 +105,9 @@ public class IntroScene : MonoBehaviour
 
         var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
         var result = await loginPopup.ShowAsync();
+        
+        JsonManager.Instance.RemoveData<UserData>();
+        JsonManager.Instance.RemoveData<StageData>();
 
         return result != false;
     }

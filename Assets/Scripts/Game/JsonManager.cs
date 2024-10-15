@@ -163,6 +163,18 @@ public class JsonManager : Singleton<JsonManager>
         return JsonConvert.DeserializeObject<T>(result);
     }
 
+    public void RemoveData<T>()
+    {
+        var fileName = GetJsonFileName<T>();
+        
+        string path = Path.Combine(Application.persistentDataPath, fileName);
+
+        if (File.Exists(path) == true)
+        {
+            File.Delete(path);
+        }
+    }
+
     private byte[] GetKey()
     {
         string path = Path.Combine(Application.persistentDataPath, KEY_PATH);
