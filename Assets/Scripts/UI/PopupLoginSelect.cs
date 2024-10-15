@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
@@ -23,14 +21,13 @@ public class PopupLoginSelect : PopupBase
             completionSource.TrySetResult(loginResult);
         }).AddTo(this);
         
-        //_emailLogin.OnClickAsObservable().Subscribe(async _ =>
-        //{
-            // TODO : email 로그인 팝업 
-            //var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
-            //var result = await loginPopup.ShowAsync();
+        _emailLogin.OnClickAsObservable().Subscribe(async _ =>
+        {
+            var popupEmail = await CommonManager.Popup.CreateAsync<PopupLoginEmail>();
+            loginResult = await popupEmail.ShowAsync();
             
-            //completionSource.TrySetResult();
-        //}).AddTo(this);
+            completionSource.TrySetResult(loginResult);
+        }).AddTo(this);
         
         Show();
         var result = await completionSource.Task;
