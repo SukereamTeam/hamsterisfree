@@ -33,7 +33,7 @@ public class PopupManager : Singleton<PopupManager>
         var go = Object.Instantiate(prefab);
         var popup = go.GetComponent<T>();
 
-        if (_popupRoot != null) go.transform.SetParent(_popupRoot.transform);
+        if (_popupRoot != null) go.transform.SetParent(_popupRoot.transform.GetChild(0));
 
         prefab.SetActive(true);
 
@@ -43,6 +43,8 @@ public class PopupManager : Singleton<PopupManager>
         rect.anchoredPosition = Vector2.zero;
         rect.localScale = Vector3.one;
         rect.localPosition = Vector3.zero;
+        rect.offsetMax = Vector2.zero;
+        rect.offsetMin = Vector2.zero;
         rect.SetAsLastSibling();
 
         popup.OnHideComplete += () => { RemovePopup(popup); };
