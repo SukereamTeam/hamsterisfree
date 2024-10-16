@@ -18,9 +18,6 @@ public class LineManager : MonoBehaviour
 
     public Line CurrentLine { get; private set; }
 
-    // TODO
-    // Queue 로 만들어서 인덱스로 접근해 CurrentLine 삭제 관리?
-
 
     public void BeginDraw()
     {

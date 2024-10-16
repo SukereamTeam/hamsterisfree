@@ -59,12 +59,13 @@ public class IntroScene : MonoBehaviour
 
                 await CommonManager.Popup.InitializeAsync();
                 
-                // TODO : 로그인
                 var loginResult = await LoginFlow();
                 if (loginResult == false)
                     Application.Quit();
                 
-                UserDataManager.Instance.LoadUserData();
+                var loadSuccess = await UserDataManager.Instance.LoadUserData();
+                if (loadSuccess == false)
+                    SceneController.Instance.LoadScene(Define.Scene.Intro, false).Forget();
                 
                 await UniTask.Yield();
             }));
@@ -95,6 +96,11 @@ public class IntroScene : MonoBehaviour
 
     private async UniTask<bool> LoginFlow()
     {
+        // 로컬에 저장된 데이터가 있는지 확인해서 있으면 true 리턴 (게스트 로그인 되어있다는 뜻)
+        var localData = JsonManager.Instance.LoadData<UserData>();
+        if (localData != null)
+            return true;
+        
         var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         var currentUser = auth.CurrentUser;
         if (currentUser != null)
@@ -102,13 +108,13 @@ public class IntroScene : MonoBehaviour
             Debug.LogFormat("Already signed in: {0} ({1})", currentUser.DisplayName, currentUser.UserId);
             return true; // 이미 로그인되어 있으므로 재로그인하지 않음
         }
-
-        var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
-        var result = await loginPopup.ShowAsync();
         
         JsonManager.Instance.RemoveData<UserData>();
         JsonManager.Instance.RemoveData<StageData>();
-
+        
+        var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
+        var result = await loginPopup.ShowAsync();
+        
         return result != false;
     }
 }

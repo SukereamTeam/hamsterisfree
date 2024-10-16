@@ -16,7 +16,7 @@ public class PopupLoginSelect : PopupBase
         
         _guestLogin.OnClickAsObservable().Subscribe(async _ =>
         {
-            loginResult = await SDKFirebase.Instance.SignInAnonymously();
+            loginResult = await SignInGuest();  //await SDKFirebase.Instance.SignInAnonymously();
 
             completionSource.TrySetResult(loginResult);
         }).AddTo(this);
@@ -33,5 +33,10 @@ public class PopupLoginSelect : PopupBase
         var result = await completionSource.Task;
         await HideAsync();
         return result;
+    }
+
+    private async UniTask<bool> SignInGuest()
+    {
+        return await UserDataManager.Instance.CreateUserData();
     }
 }
