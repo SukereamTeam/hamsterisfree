@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Firebase;
 using Firebase.Analytics;
+using Firebase.Firestore;
 using Firebase.Extensions;
 using UnityEngine;
 
@@ -81,5 +82,38 @@ public class SDKFirebase : GlobalMonoSingleton<SDKFirebase>
             Debug.LogError("SignInEmail error: " + ex.Message);
             return false;
         }
+    }
+    
+    public void LoadUserDataWithFirestore(string userId)
+    {
+        FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
+        DocumentReference docRef = db.Collection("users").Document(userId);
+
+        docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted && task.Result.Exists)
+            {
+                DocumentSnapshot snapshot = task.Result;
+                var dataList = snapshot.ToDictionary(); //ReadEncryptedData<Dictionary<int, T>>(path);
+                
+                string jsonData = snapshot.ToDictionary()["UserData"].ToString();
+            }
+            else
+            {
+                Debug.LogError("데이터 로드 실패 또는 데이터가 없음: " + task.Exception);
+            }
+        });
+    }
+
+    public void SaveUserDataWithFirestore()
+    {
+        // TODO
+        // key 값과 암호화된 데이터를 저장해야 함
+        // Dictionary<string, object> userData = new()
+        //{
+        //    { "Key", "~" },
+        //    { "Data", "~" }
+        //} 이렇게
+        // 그래서 load 할 땐 Key 값으로 Data를 복호화해서 가져온다.
     }
 }

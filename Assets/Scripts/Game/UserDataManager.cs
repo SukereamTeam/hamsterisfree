@@ -10,6 +10,11 @@ public class UserDataManager : Singleton<UserDataManager>
     
     public async UniTask<bool> LoadUserData()
     {
+        // 먼저 로컬에 저장된 데이터가 있는지 확인
+        
+        // TODO : 로컬에 key도 저장해두기? ...
+        
+        
         var userData = JsonManager.Instance.LoadData<UserData>();
         if (userData == null)
         {

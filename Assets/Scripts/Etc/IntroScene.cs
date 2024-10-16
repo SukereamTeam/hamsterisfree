@@ -97,6 +97,7 @@ public class IntroScene : MonoBehaviour
     private async UniTask<bool> LoginFlow()
     {
         // 로컬에 저장된 데이터가 있는지 확인해서 있으면 true 리턴 (게스트 로그인 되어있다는 뜻)
+        
         var localData = JsonManager.Instance.LoadData<UserData>();
         if (localData != null)
             return true;
