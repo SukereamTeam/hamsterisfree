@@ -19,7 +19,13 @@ public class UserDataManager : Singleton<UserDataManager>
         if (userData == null)
         {
             // TODO : 로컬에 저장된 데이터가 없다면 ,,, 파이어베이스에서 로드해오기 그리고 return
-            
+            var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+            if (auth.CurrentUser != null)
+            {
+                return await SDKFirebase.Instance.LoadUserDataWithFirestore(auth.CurrentUser.UserId);
+            }
+            else
+                return false;
         }
         else
         {

@@ -84,25 +84,34 @@ public class SDKFirebase : GlobalMonoSingleton<SDKFirebase>
         }
     }
     
-    public void LoadUserDataWithFirestore(string userId)
+    public async UniTask<bool> LoadUserDataWithFirestore(string userId)
     {
         FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
         DocumentReference docRef = db.Collection("users").Document(userId);
+        UniTaskCompletionSource<bool> completionSource = new();
 
-        docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        await docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompleted && task.Result.Exists)
             {
                 DocumentSnapshot snapshot = task.Result;
                 var dataList = snapshot.ToDictionary(); //ReadEncryptedData<Dictionary<int, T>>(path);
                 
-                string jsonData = snapshot.ToDictionary()["UserData"].ToString();
+                var key = snapshot.ToDictionary()["UserDataKey"];
+                var data = snapshot.ToDictionary()["UserData"];
+                
+                // TODO : 키로 데이터 복호화?
+                
+                completionSource.TrySetResult(true);
             }
             else
             {
                 Debug.LogError("데이터 로드 실패 또는 데이터가 없음: " + task.Exception);
+                completionSource.TrySetResult(false);
             }
         });
+
+        return await completionSource.Task;
     }
 
     public void SaveUserDataWithFirestore()
