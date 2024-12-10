@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Firebase;
 using Firebase.Analytics;
@@ -71,9 +72,9 @@ public class SDKFirebase : GlobalMonoSingleton<SDKFirebase>
             var signInTask = await auth.SignInWithEmailAndPasswordAsync(email, password);
             if (signInTask != null)
             {
-                Debug.LogFormat("User signed in successfully: {0} ({1})",
-                    signInTask.User.DisplayName, signInTask.User.UserId);
-                return true;
+                Debug.Log($"User signed in successfully ---> DisplayName: {signInTask.User.DisplayName} / UserId: ({signInTask.User.UserId})");
+
+                return await UserDataManager.Instance.CreateUserData();
             }
             return false;
         }
@@ -84,45 +85,88 @@ public class SDKFirebase : GlobalMonoSingleton<SDKFirebase>
         }
     }
     
-    public async UniTask<bool> LoadUserDataWithFirestore(string userId)
+    public async UniTask<UserData> LoadUserDataWithFirestore(string userId)
     {
         FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
         DocumentReference docRef = db.Collection("users").Document(userId);
-        UniTaskCompletionSource<bool> completionSource = new();
+        UniTaskCompletionSource<UserData> completionSource = new UniTaskCompletionSource<UserData>();
 
         await docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompleted && task.Result.Exists)
             {
                 DocumentSnapshot snapshot = task.Result;
-                var dataList = snapshot.ToDictionary(); //ReadEncryptedData<Dictionary<int, T>>(path);
+                var dataList = snapshot.ToDictionary();
                 
-                var key = snapshot.ToDictionary()["UserDataKey"];
-                var data = snapshot.ToDictionary()["UserData"];
-                
-                // TODO : 키로 데이터 복호화?
-                
-                completionSource.TrySetResult(true);
+                if (dataList.TryGetValue("UserDataKey", out var key) &&
+                    dataList.TryGetValue("UserData", out var data))
+                {
+	                var cryptoKey = JsonManager.Instance.SetCryptoKey(key);
+	                if (cryptoKey == null)
+	                {
+		                completionSource.TrySetResult(null);
+	                }
+
+	                var userData = JsonManager.Instance.LoadUserDataWithFirestore(data);
+	                completionSource.TrySetResult(userData);
+                }
+                else
+                {
+	                completionSource.TrySetResult(null);
+                }
             }
             else
             {
-                Debug.LogError("데이터 로드 실패 또는 데이터가 없음: " + task.Exception);
-                completionSource.TrySetResult(false);
+                Debug.LogError(": " + task.Exception);
+                completionSource.TrySetResult(null);
             }
         });
 
         return await completionSource.Task;
     }
 
-    public void SaveUserDataWithFirestore()
+    public async UniTask<bool> SaveUserDataWithFirestore(string userId, byte[] key, byte[] data)
     {
-        // TODO
-        // key 값과 암호화된 데이터를 저장해야 함
-        // Dictionary<string, object> userData = new()
-        //{
-        //    { "Key", "~" },
-        //    { "Data", "~" }
-        //} 이렇게
-        // 그래서 load 할 땐 Key 값으로 Data를 복호화해서 가져온다.
+        FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
+        DocumentReference docRef = db.Collection("users").Document(userId);
+        UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
+
+        var saveData = new Dictionary<string, object>
+        {
+	        { "UserDataKey", key },
+	        { "UserData", data }
+        };
+        
+        try
+        {
+	        await docRef.SetAsync(saveData).ContinueWithOnMainThread(task =>
+	        {
+		        if (task.IsCompleted)
+		        {
+			        if (task.Exception == null)
+			        {
+				        Debug.Log("UserData saved.");
+				        completionSource.TrySetResult(true);
+			        }
+			        else
+			        {
+				        Debug.LogError("Firestore save error. : " + task.Exception.Message);
+				        completionSource.TrySetResult(false);
+			        }
+		        }
+		        else
+		        {
+			        Debug.LogError("Firestore save error.");
+			        completionSource.TrySetResult(false);
+		        }
+	        });
+        }
+        catch (Exception ex)
+        {
+	        Debug.LogError("Exception in SaveUserDataWithFirestore: " + ex.Message);
+	        completionSource.TrySetResult(false);
+        }
+
+        return await completionSource.Task;
     }
 }

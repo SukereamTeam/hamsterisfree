@@ -10,48 +10,28 @@ public class UserDataManager : Singleton<UserDataManager>
     
     public async UniTask<bool> LoadUserData()
     {
-        // 먼저 로컬에 저장된 데이터가 있는지 확인
-        
-        // TODO : 로컬에 key도 저장해두기? ...
-        
-        
-        var userData = JsonManager.Instance.LoadData<UserData>();
+        var userData = JsonManager.Instance.LoadUserDataWithLocal();
         if (userData == null)
         {
-            // TODO : 로컬에 저장된 데이터가 없다면 ,,, 파이어베이스에서 로드해오기 그리고 return
             var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-            if (auth.CurrentUser != null)
-            {
-                return await SDKFirebase.Instance.LoadUserDataWithFirestore(auth.CurrentUser.UserId);
-            }
-            else
-                return false;
-        }
-        else
-        {
-            CurUserData = userData;
-            return true;
+            if (auth.CurrentUser == null) return false;
+            
+            userData = await SDKFirebase.Instance.LoadUserDataWithFirestore(auth.CurrentUser.UserId);
         }
 
-        return false;
+        CurUserData = userData;
+        return userData != null;
     }
 
-    public async UniTask<bool> CreateUserData()
+    public async UniTask<bool> CreateLocalUserData()
     {
-        UniTaskCompletionSource<bool> completionSource = new();
+        UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
         
         try
         {
-            UserData newData = new()
-            {
-                curStage = 0,
-                rewardCount = 0
-            };
-
-            JsonManager.Instance.SaveData(newData);
-
+            var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
+            JsonManager.Instance.SaveLocalData(newData);
             CurUserData = newData;
-
             completionSource.TrySetResult(true);
         }
         catch (Exception e)
@@ -62,16 +42,45 @@ public class UserDataManager : Singleton<UserDataManager>
 
         return await completionSource.Task;
     }
-    
-    public void ClearStage(int _CurStage, int _Reward)
-    {
-        if (_CurStage == CurUserData.curStage)
-        {
-            CurUserData.curStage++;
 
-            CurUserData.rewardCount += _Reward;
+    public async UniTask<bool> CreateUserData()
+    {
+	    UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
+	    var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+	    if (auth.CurrentUser == null)
+	    {
+		    Debug.Log($"auth.CurrentUser is null");
+		    return false;
+	    }
+        
+	    try
+	    {
+		    var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
+		    var data = JsonManager.Instance.EncryptUserDataForFirestore(newData);
+		    
+		    await SDKFirebase.Instance.SaveUserDataWithFirestore(auth.CurrentUser.UserId, data.key, data.data);
+		    CurUserData = newData;
+		    
+		    completionSource.TrySetResult(true);
+	    }
+	    catch (Exception e)
+	    {
+		    Debug.Log($"CreateUserData Error ---> {e.Message} / {e.StackTrace} ");
+		    completionSource.TrySetResult(false);
+	    }
+
+	    return await completionSource.Task;
+    }
+    
+    public void ClearStage(int currentStage, int reward)
+    {
+        if (currentStage == CurUserData.CurrentStage)
+        {
+            CurUserData.CurrentStage++;
+            CurUserData.RewardCount += reward;
         }
 
-        JsonManager.Instance.SaveData(CurUserData);
+        // TODO : 수정 필요... 이거 파베 로그인 계정도 쓸거임
+        JsonManager.Instance.SaveLocalData(CurUserData);
     }
 }

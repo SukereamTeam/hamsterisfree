@@ -242,7 +242,7 @@ public class UI_Popup_GameResult : MonoBehaviour
         }
         else
         {
-            if (_StageNumber < curUserData.curStage)
+            if (_StageNumber < curUserData.CurrentStage)
             {
                 // 현재 클리어해야 할 스테이지보다 낮은 스테이지를 클리어 한 것
                 // 과거 클리어 했던 스테이지를 또 클리어 한거니까 다음 스테이지로 이동 할 수 있음

@@ -111,18 +111,18 @@ public class MapManager : MonoBehaviour
 
     }
 
-    public void SetMap(int _CurStage, IReadOnlyList<Sprite> _StageSprites)
+    public void SetMap(int stageIndex, IReadOnlyList<Sprite> stageSprites)
     {
-        if (_StageSprites.Count == 0)
+        if (stageSprites.Count == 0)
         {
             Debug.Log("### Error ---> DataContainer.StageTileSprites.Count == 0 ###");
             return;
         }
 
-        SetBackground(_StageSprites);
-        SetMask(_StageSprites);
+        SetBackground(stageSprites);
+        SetMask(stageSprites);
 
-        var stageData = JsonManager.Instance.LoadData<StageData>(CommonManager.Instance.CurStageIndex);
+        UserDataManager.Instance.CurUserData.StageData.TryGetValue(CommonManager.Instance.CurStageIndex, out var stageData);
 
         if (stageData != null)
         {
@@ -148,11 +148,11 @@ public class MapManager : MonoBehaviour
             }
             else if (i == (int)Define.TileType.Seed)
             {
-                CreateSeedTile(_CurStage, stageData?.seedDatas);
+                CreateSeedTile(stageIndex, stageData?.seedDatas);
             }
             else if (i == (int)Define.TileType.Monster)
             {
-                CreateMonsterTile(_CurStage, stageData?.monsterDatas);
+                CreateMonsterTile(stageIndex, stageData?.monsterDatas);
             }
         }
 
@@ -472,8 +472,7 @@ public class MapManager : MonoBehaviour
 
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
-        var result = JsonManager.Instance.SaveData(newData, CommonManager.Instance.CurStageIndex);
-        Debug.Log($"### SaveData result : {result} ###");
+        JsonManager.Instance.SaveStageData(newData, CommonManager.Instance.CurStageIndex);
     }
 
     

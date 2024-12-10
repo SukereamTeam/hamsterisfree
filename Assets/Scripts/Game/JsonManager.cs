@@ -7,201 +7,260 @@ using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
 
-
-
-
-
-
 public class JsonManager : Singleton<JsonManager>
 {
     private const string KEY_PATH = "aes.key";
-    private const string FILE_FORMAT = ".json";
-    
-    public bool SaveData<T>(T _Data, int _Index = 0)
-    {
-        var fileName = GetJsonFileName<T>();
-        
-        string path = Path.Combine(Application.persistentDataPath, fileName);
-        
-        try
-        {
-            if (File.Exists(path) == true)
-            {
-                Debug.Log($"Load {fileName} File!");
-                
-                var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
 
-                if (dataList != null)
-                {
-                    dataList[_Index] = _Data;
+    private byte[] _key = null;
+    private byte[] _iv = null;
+
+    public void SaveStageData(StageData data, int stageIndex)
+    {
+	    var curUserData = UserDataManager.Instance.CurUserData;
+
+	    if (curUserData.StageData.TryAdd(stageIndex, data) == false)
+	    {
+		    curUserData.StageData[stageIndex] = data;
+	    }
+    }
+
+    public bool SaveLocalData(UserData data)
+    {
+	    // local 인지, 로그인했는지 확인
+	    // local 이면 persistentDataPath 경로에서 파일 읽어온 후 저장(업뎃)
+	    // 로그인했으면 ,, SaveUserDataWithFirestore 호출
+	    
+	    string path = Path.Combine(Application.persistentDataPath, $"{(typeof(UserData))}");
+	    try
+	    {
+		    if (File.Exists(path) == true)
+		    {
+			    Debug.Log($"Load {(typeof(UserData))} File!");
+			    var savedData = ReadEncryptedData(path);
+
+			    if (savedData != null)
+			    {
+				    savedData = data;
                     
-                    using FileStream stream = File.Open(path, FileMode.Open);
-                    WriteEncryptedData(dataList, stream);
-                    stream.Close();
-                    return true;
-                }
-                else
-                {
-                    Debug.Log($"SaveData Error ---> dataList is null. ");
-                    return false;
-                }
-            }
-            else
-            {
-                Debug.Log("json 파일이 없었음. 새로 만들기 시작!");
+				    using FileStream stream = File.Open(path, FileMode.Open);
+				    WriteEncryptedData(savedData, stream);
+				    stream.Close();
+				    return true;
+			    }
 
-                var dataList = new Dictionary<int, T>
-                {
-                    { _Index, _Data }
-                };
-                
-                // 암호화하여 저장
-                using FileStream stream = File.Create(path);
-                WriteEncryptedData(dataList, stream);
-                stream.Close();
-                return true;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log($"SaveData Error ---> {e.Message} / {e.StackTrace} ");
-            return false;
-        }
+			    Debug.Log($"SaveData Error ---> dataList is null. ");
+			    return false;
+		    }
+		    else
+		    {
+			    Debug.Log("Create UserData");
+			    using FileStream stream = File.Create(path);
+			    WriteEncryptedData(data, stream);
+			    stream.Close();
+			    return true;
+		    }
+	    }
+	    catch (Exception e)
+	    {
+		    Debug.Log($"SaveData Error ---> {e.Message} / {e.StackTrace} ");
+		    return false;
+	    }
     }
-
-
-    private void WriteEncryptedData<T>(T _Data, FileStream _Stream)
-    {
-        using Aes aesProvider = Aes.Create();
-
-        var keyValue = GetKey();
-
-        aesProvider.Key = keyValue;
-        
-        // 새로 암호화 하기 위해 IV 새로 생성
-        aesProvider.GenerateIV();
-        
-        byte[] iv = aesProvider.IV;
-
-        using ICryptoTransform cryptoTransform = aesProvider.CreateEncryptor();
-        using CryptoStream cryptoStream = new CryptoStream(
-            _Stream,
-            cryptoTransform,
-            CryptoStreamMode.Write);
-        
-        // IV를 먼저 파일에 저장 (데이터를 새로 저장할 때 마다 iv값 덮어 씌움)
-        _Stream.Write(iv, 0, iv.Length);
-
-        var jsonData = JsonConvert.SerializeObject(_Data);
-        cryptoStream.Write(Encoding.ASCII.GetBytes(jsonData));
-    }
-
     
-    public T LoadData<T>(int _Index = 0)
+    public byte[] SetCryptoKey(object keyValue = null)
     {
-        var fileName = GetJsonFileName<T>();
-        
-        string path = Path.Combine(Application.persistentDataPath, fileName);
+	    if (_key != null)
+		    return _key;
+
+	    if (keyValue == null)
+	    {
+		    // 로컬 데이터에서 Crypto 세팅
+		    string keyPath = Path.Combine(Application.persistentDataPath, KEY_PATH);
+		    if (File.Exists(keyPath))
+		    {
+			    var key = File.ReadAllBytes(keyPath);
+			    return key;
+		    }
+		    else
+		    {
+			    using Aes aesProvider = Aes.Create();
+			    aesProvider.GenerateKey();
+                
+			    var key = aesProvider.Key;
+			    File.WriteAllBytes(keyPath, key);
+
+			    return key;
+		    }
+	    }
+	    
+	    if (keyValue is string base64String)
+	    {
+		    return Convert.FromBase64String(base64String);
+	    }
+
+	    return null;
+    }
+    
+    public UserData LoadUserDataWithLocal()
+    {
+        string path = Path.Combine(Application.persistentDataPath, $"{(typeof(UserData))}");
 
         if (File.Exists(path) == false)
         {
-            Debug.Log($"파일 없음 ---> {path}.");
-            
-            return default(T);
+            Debug.Log($"### Not exist ---> {path}");
+            return null;
         }
-
-        try
-        {
-            var dataList = ReadEncryptedData<Dictionary<int, T>>(path);
-
-            if (dataList.ContainsKey(_Index) == false)
-                return default(T);
-
-            return dataList[_Index];
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($" LoadData Error ---> {e.Message} / {e.StackTrace}");
-            throw e;
-        }
+        
+        var savedData = ReadEncryptedData(path);
+        return savedData;
     }
 
-    private T ReadEncryptedData<T>(string _Path)
+    public UserData LoadUserDataWithFirestore(object data)
     {
-        byte[] fileBytes = File.ReadAllBytes(_Path);
-
-        using Aes aesProvider = Aes.Create();
-
-        // key 파일 로드해서 읽어오기
-        var keyValue = GetKey();
-
-        aesProvider.Key = keyValue;
+	    if (_key == null)
+		    return null;
+	    
+	    if (data is string base64String)
+	    {
+		    var convertData = Convert.FromBase64String(base64String);
+		    
+		    using Aes aesProvider = Aes.Create();
+		    aesProvider.Key = _key;
         
-        // IV를 파일에서 읽어옴
-        byte[] iv = new byte[aesProvider.BlockSize / 8];
-        Array.Copy(fileBytes, 0, iv, 0, iv.Length);
-        aesProvider.IV = iv;
+		    // IV를 파일에서 읽어옴
+		    byte[] iv = new byte[aesProvider.BlockSize / 8];
+		    Array.Copy(convertData, 0, iv, 0, iv.Length);
+		    aesProvider.IV = iv;
 
-        using ICryptoTransform cryptoTransform = aesProvider.CreateDecryptor(
-            aesProvider.Key,
-            aesProvider.IV);
+		    using ICryptoTransform cryptoTransform = aesProvider.CreateDecryptor(
+			    aesProvider.Key,
+			    aesProvider.IV);
 
-        // iv값이 먼저 있고, 그 다음 값이 데이터 부분임. 그래서 iv의 length만큼 뛰어넘고 그 다음 값부터 읽어들이기
-        using MemoryStream decryptionStream = new MemoryStream(fileBytes, iv.Length, fileBytes.Length - iv.Length);
+		    // iv값이 먼저 있고, 그 다음 값이 데이터 부분임. 그래서 iv의 length만큼 뛰어넘고 그 다음 값부터 읽어들이기
+		    using MemoryStream decryptionStream = new MemoryStream(convertData, iv.Length, convertData.Length - iv.Length);
         
-        using CryptoStream cryptoStream = new CryptoStream(
-            decryptionStream,
-            cryptoTransform,
-            CryptoStreamMode.Read);
+		    using CryptoStream cryptoStream = new CryptoStream(
+			    decryptionStream,
+			    cryptoTransform,
+			    CryptoStreamMode.Read);
 
-        using StreamReader reader = new StreamReader(cryptoStream);
+		    using StreamReader reader = new StreamReader(cryptoStream);
 
-        string result = reader.ReadToEnd();
+		    string result = reader.ReadToEnd();
+		    return JsonConvert.DeserializeObject<UserData>(result);
+	    }
+
+	    return null;
+    }
+
+    public (byte[] key, byte[] data) EncryptUserDataForFirestore(UserData data)
+    {
+	    var encryptData = EncryptDataToBytes(data);
+	    
+	    return (_key, encryptData);
+    }
+    
+    private byte[] EncryptDataToBytes(UserData data)
+    {
+	    _key ??= SetCryptoKey();
+
+	    if (_key == null)
+		    return null;
+
+	    using Aes aesProvider = Aes.Create();
+	    aesProvider.Key = _key;
+	    aesProvider.GenerateIV();
+	    byte[] iv = aesProvider.IV;
+
+	    using ICryptoTransform cryptoTransform = aesProvider.CreateEncryptor();
+	    using MemoryStream memoryStream = new MemoryStream();
+	    using CryptoStream cryptoStream = new CryptoStream(
+		    memoryStream,
+		    cryptoTransform,
+		    CryptoStreamMode.Write);
+	    
+	    memoryStream.Write(iv, 0, iv.Length);
+	    
+	    var jsonData = JsonConvert.SerializeObject(data);
+	    cryptoStream.Write(Encoding.ASCII.GetBytes(jsonData));
+	    cryptoStream.FlushFinalBlock();
+	    
+	    return memoryStream.ToArray();
+    }
+    
+    private void WriteEncryptedData(UserData data, FileStream stream)
+    {
+	    _key ??= SetCryptoKey();
+
+	    if (_key == null)
+		    return;
+	    
+	    using Aes aesProvider = Aes.Create();
+	    aesProvider.Key = _key;
         
-        Debug.Log($"Decrypted result : {result}");
+	    // 새로 암호화 하기 위해 IV 새로 생성
+	    aesProvider.GenerateIV();
         
-        return JsonConvert.DeserializeObject<T>(result);
+	    byte[] iv = aesProvider.IV;
+
+	    using ICryptoTransform cryptoTransform = aesProvider.CreateEncryptor();
+	    using CryptoStream cryptoStream = new CryptoStream(
+		    stream,
+		    cryptoTransform,
+		    CryptoStreamMode.Write);
+        
+	    // IV를 먼저 파일에 저장 (데이터를 새로 저장할 때 마다 iv값 덮어 씌움)
+	    stream.Write(iv, 0, iv.Length);
+
+	    var jsonData = JsonConvert.SerializeObject(data);
+	    cryptoStream.Write(Encoding.ASCII.GetBytes(jsonData));
+	    cryptoStream.FlushFinalBlock();
+    }
+    
+    private UserData ReadEncryptedData(string path)
+    {
+	    _key ??= SetCryptoKey();
+
+	    if (_key == null)
+		    return null;
+	    
+	    byte[] fileBytes = File.ReadAllBytes(path);
+
+	    using Aes aesProvider = Aes.Create();
+
+	    // key 파일 로드해서 읽어오기
+	    aesProvider.Key = _key;
+        
+	    // IV를 파일에서 읽어옴
+	    byte[] iv = new byte[aesProvider.BlockSize / 8];
+	    Array.Copy(fileBytes, 0, iv, 0, iv.Length);
+	    aesProvider.IV = iv;
+
+	    using ICryptoTransform cryptoTransform = aesProvider.CreateDecryptor(
+		    aesProvider.Key,
+		    aesProvider.IV);
+
+	    // iv값이 먼저 있고, 그 다음 값이 데이터 부분임. 그래서 iv의 length만큼 뛰어넘고 그 다음 값부터 읽어들이기
+	    using MemoryStream decryptionStream = new MemoryStream(fileBytes, iv.Length, fileBytes.Length - iv.Length);
+        
+	    using CryptoStream cryptoStream = new CryptoStream(
+		    decryptionStream,
+		    cryptoTransform,
+		    CryptoStreamMode.Read);
+
+	    using StreamReader reader = new StreamReader(cryptoStream);
+
+	    string result = reader.ReadToEnd();
+	    return JsonConvert.DeserializeObject<UserData>(result);
     }
 
     public void RemoveData<T>()
     {
-        var fileName = GetJsonFileName<T>();
-        
-        string path = Path.Combine(Application.persistentDataPath, fileName);
+        string path = Path.Combine(Application.persistentDataPath, $"{(typeof(T))}");
 
         if (File.Exists(path) == true)
         {
             File.Delete(path);
         }
-    }
-
-    private byte[] GetKey()
-    {
-        string path = Path.Combine(Application.persistentDataPath, KEY_PATH);
-
-        byte[] key = null;
-        
-        if (File.Exists(path) == true)
-        {
-            key = File.ReadAllBytes(path);
-        }
-        else
-        {
-            using Aes aesProvider = Aes.Create();
-            aesProvider.GenerateKey();
-                
-            key = aesProvider.Key;
-                
-            File.WriteAllBytes(path, key);
-        }
-
-        return key;
-    }
-
-    private string GetJsonFileName<T>()
-    {
-        string name = $"{(typeof(T).ToString())}";
-
-        return name;
     }
 }

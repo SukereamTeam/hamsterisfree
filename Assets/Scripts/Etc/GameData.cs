@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 using DataTable;
 using System.Linq;
 
 
 
-// Stage 데이터 저장 --------------------
 [Serializable]
 public struct TileData
 {
@@ -75,10 +72,10 @@ public class StageData
 }
 
 
-// User Data 저장 --------------------
 [Serializable]
 public class UserData
 {
-    public int curStage;
-    public int rewardCount;
+    public int CurrentStage;
+    public int RewardCount;
+    public Dictionary<int, StageData> StageData;
 }

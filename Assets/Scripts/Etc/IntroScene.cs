@@ -17,11 +17,8 @@ public class IntroScene : MonoBehaviour
     private CancellationTokenSource fadeCts;
 
     private const float LOGO_DELAY_TIME = 1.5f;
-
-
-
     
-
+    
     private void Start()
     {
         this.fadeCts = new CancellationTokenSource();
@@ -30,55 +27,7 @@ public class IntroScene : MonoBehaviour
         
         InitializeAsync().Forget();
     }
-
-    private async UniTask InitializeAsync()
-    {
-        try
-        {
-            await SceneController.Instance.Fade(true, this.fadeDuration, true, this.fadeCts);
-
-            Sequence shakeSequence = DOTween.Sequence();
-
-            if (this.logo != null)
-            {
-                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one * 1.2f, 0.1f));
-                _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one, 0.1f));
-                _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
-                _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
-            }
-            
-            await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
-
-            await SceneController.Instance.Fade(false, fadeDuration, true, this.fadeCts);
-
-            SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
-            {
-                // CommonManager 싱글톤 객체 생성 및 초기화
-                CommonManager.Instance.Initialize();
-                SoundManager.Instance.Initialize();
-
-                await CommonManager.Popup.InitializeAsync();
-                
-                var loginResult = await LoginFlow();
-                if (loginResult == false)
-                    Application.Quit();
-                
-                var loadSuccess = await UserDataManager.Instance.LoadUserData();
-                if (loadSuccess == false)
-                    SceneController.Instance.LoadScene(Define.Scene.Intro, false).Forget();
-                
-                await UniTask.Yield();
-            }));
-
-            SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
-        }
-        catch (Exception ex) when(!(ex is OperationCanceledException))      // 실행되는 도중 꺼버릴 경우 UniTask.Delay가 exception throw 해서 무시하도록 처리
-        {
-            Debug.Log("### Intro Scene Exception : {" + ex.Message + ex.StackTrace + "} ###");
-        }
-    }
-
-
+    
     private void Update()
     {
         if (Input.GetMouseButtonDown(0) && this.fadeCts?.IsCancellationRequested == false)
@@ -93,29 +42,65 @@ public class IntroScene : MonoBehaviour
         this.fadeCts?.Cancel();
         this.fadeCts?.Dispose();
     }
+    
+    private async UniTask InitializeAsync()
+    {
+	    try
+	    {
+		    await SceneController.Instance.Fade(true, this.fadeDuration, true, this.fadeCts);
+
+		    Sequence shakeSequence = DOTween.Sequence();
+
+		    if (this.logo != null)
+		    {
+			    _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one * 1.2f, 0.1f));
+			    _ = shakeSequence.Append(this.logo?.transform.DOScale(Vector3.one, 0.1f));
+			    _ = shakeSequence.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
+			    _ = shakeSequence.Play().SetLoops(2, LoopType.Restart);
+		    }
+            
+		    await UniTask.Delay(TimeSpan.FromSeconds(LOGO_DELAY_TIME), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+		    await SceneController.Instance.Fade(false, fadeDuration, true, this.fadeCts);
+
+		    SceneController.Instance.AddLoadingTask(UniTask.Defer(async () =>
+		    {
+			    // CommonManager 싱글톤 객체 생성 및 초기화
+			    CommonManager.Instance.Initialize();
+			    SoundManager.Instance.Initialize();
+
+			    await CommonManager.Popup.InitializeAsync();
+                
+			    var loginResult = await LoginFlow();
+			    if (loginResult == false)
+				    SceneController.Instance.LoadScene(Define.Scene.Intro, false).Forget();
+                
+			    await UniTask.Yield();
+		    }));
+
+		    SceneController.Instance.LoadScene(Define.Scene.Lobby, true).Forget();
+	    }
+	    catch (Exception ex) when(!(ex is OperationCanceledException))      // 실행되는 도중 꺼버릴 경우 UniTask.Delay가 exception throw 해서 무시하도록 처리
+	    {
+		    Debug.Log("### Intro Scene Exception : {" + ex.Message + ex.StackTrace + "} ###");
+	    }
+    }
 
     private async UniTask<bool> LoginFlow()
     {
-        // 로컬에 저장된 데이터가 있는지 확인해서 있으면 true 리턴 (게스트 로그인 되어있다는 뜻)
-        
-        var localData = JsonManager.Instance.LoadData<UserData>();
-        if (localData != null)
+        // 로컬에 저장된 데이터가 있는지 확인해서 있으면 true 리턴 (true : 게스트 로그인 되어있다는 뜻)
+        // TODO : 게스트 로그인 했다가 연동했을 경우 저장되어있던 로컬 데이터는 지워야 한다
+        var existData = await UserDataManager.Instance.LoadUserData();
+        if (existData == true)
             return true;
         
-        var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        var currentUser = auth.CurrentUser;
-        if (currentUser != null)
-        {
-            Debug.LogFormat("Already signed in: {0} ({1})", currentUser.DisplayName, currentUser.UserId);
-            return true; // 이미 로그인되어 있으므로 재로그인하지 않음
-        }
-        
+        // 로컬에도 데이터 없고, 로그인도 되어있지 않다면 sign 진행
         JsonManager.Instance.RemoveData<UserData>();
         JsonManager.Instance.RemoveData<StageData>();
         
         var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
         var result = await loginPopup.ShowAsync();
         
-        return result != false;
+        return result;
     }
 }

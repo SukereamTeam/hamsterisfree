@@ -73,7 +73,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
         
 
-        if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
+        if (UserDataManager.Instance.CurUserData.CurrentStage < this.stageIndex)
         {
             // 현재 깰 수 없는 스테이지 (남은 스테이지)
             this.lockObject.SetActive(true);
@@ -83,7 +83,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
             this.itemImage.sprite = this.otherStageSprite;
             this.itemImage.color = Color.grey;
         }
-        else if (UserDataManager.Instance.CurUserData.curStage == this.stageIndex)
+        else if (UserDataManager.Instance.CurUserData.CurrentStage == this.stageIndex)
         {
             // 현재 깨야 하는 스테이지
             this.layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
@@ -102,7 +102,7 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
     public async void OnClick_ItemAsync()
     {
-        if (UserDataManager.Instance.CurUserData.curStage < this.stageIndex)
+        if (UserDataManager.Instance.CurUserData.CurrentStage < this.stageIndex)
         {
             Debug.Log("아직 이전 스테이지 클리어 안 함!");
             
