@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UniRx;
 using DG.Tweening;
 using DataTable;
@@ -25,11 +26,11 @@ public class MapManager : MonoBehaviour
     private SpriteRenderer[] edgeTiles;
 
     [SerializeField] private GameObject mask;
-    public GameObject Mask => this.mask;
+    public GameObject Mask => mask;
     
     [FormerlySerializedAs("mask")] [SerializeField]
     private SpriteRenderer blockRenderer;
-    public SpriteRenderer BlockRenderer => this.blockRenderer;
+    public SpriteRenderer BlockRenderer => blockRenderer;
 
     [SerializeField]
     private Image backgroundImage;
@@ -38,7 +39,7 @@ public class MapManager : MonoBehaviour
 
     [SerializeField]
     private float fadeTime = 0f;
-    public float FadeTime => this.fadeTime;
+    public float FadeTime => fadeTime;
 
     [SerializeField]
     private Transform tileRoot;
@@ -64,21 +65,21 @@ public class MapManager : MonoBehaviour
     private IReactiveProperty<bool> isFade = new ReactiveProperty<bool>(false);
     public IReactiveProperty<bool> IsFade
     {
-        get => this.isFade;
-        set => this.isFade = value;
+        get => isFade;
+        set => isFade = value;
     }
 
-    private ExitTile exitTile;
+    private ExitTile _exitTile;
     
-    private object lockSeed = new object();
-    private List<SeedTile> seedTiles;
+    private readonly object _lockSeed = new object();
+    private List<SeedTile> _seedTiles;
     
-    private object lockMonster = new object();
-    private List<MonsterTile> monsterTiles;
-    public IReadOnlyList<SeedTile> SeedTiles => this.seedTiles;
-    public IReadOnlyList<MonsterTile> MonsterTiles => this.monsterTiles;
+    private readonly object _lockMonster = new object();
+    private List<MonsterTile> _monsterTiles;
+    public IReadOnlyList<SeedTile> SeedTiles => _seedTiles;
+    public IReadOnlyList<MonsterTile> MonsterTiles => _monsterTiles;
 
-    private int randomSeed = 0;
+    private int _randomSeed = 0;
 
 
 
@@ -88,21 +89,21 @@ public class MapManager : MonoBehaviour
         // 하이어라키의 타일 오브젝트들 보기 편하도록 이름 바꿔주기
         ChangeNameOutlineTiles();
 
-        this.backTiles = this.tileBackRenderer.transform.parent.GetComponentsInChildren<SpriteRenderer>()
+        backTiles = tileBackRenderer.transform.parent.GetComponentsInChildren<SpriteRenderer>()
             .Select(x => x.transform)
-            .Where(x => x != this.tileBackRenderer.transform)
+            .Where(x => x != tileBackRenderer.transform)
             .ToArray();
 
-        this.seedTiles = new List<SeedTile>();
-        this.monsterTiles = new List<MonsterTile>();
+        _seedTiles = new List<SeedTile>();
+        _monsterTiles = new List<MonsterTile>();
 
-        this.randomSeed = (int)DateTime.Now.Ticks;
-        UnityEngine.Random.InitState(this.randomSeed);
+        _randomSeed = (int)DateTime.Now.Ticks;
+        Random.InitState(_randomSeed);
     }
 
     private void Start()
     {
-        this.isFade
+        isFade
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Subscribe(_ =>
             {
@@ -159,24 +160,24 @@ public class MapManager : MonoBehaviour
         // Save StageData 
         if (stageData == null)
         {
-            SaveStageToJson();
+            SaveStageToJson().Forget();
         }
     }
 
     public void ResetMap()
     {
-        this.seedTiles?.ForEach(x => x.Reset());
+        _seedTiles?.ForEach(x => x.Reset());
 
-        this.monsterTiles?.ForEach(x => x.Reset());
+        _monsterTiles?.ForEach(x => x.Reset());
     }
 
     //------------------ Create Tiles
-    private void CreateExitTile(int? _RootIdx)
+    private void CreateExitTile(int? rootIdx)
     {
-        var random = _RootIdx ?? UnityEngine.Random.Range(0, outlineTiles.Length);
+        var random = rootIdx ?? Random.Range(0, outlineTiles.Length);
         var randomPos = new Vector2(outlineTiles[random].transform.localPosition.x, outlineTiles[random].transform.localPosition.y);
 
-        var tile = Instantiate<GameObject>(this.exitPrefab, this.tileRoot);
+        var tile = Instantiate<GameObject>(exitPrefab, tileRoot);
         var exitScript = tile.GetComponent<ExitTile>();
 
         TileBase.TileInfo baseInfo = new TileBase.TileInfo
@@ -189,7 +190,7 @@ public class MapManager : MonoBehaviour
 
         exitScript.Initialize(tileInfo, randomPos);
 
-        this.exitTile = exitScript;
+        _exitTile = exitScript;
 
         // TODO
         // 하위에 탈출 셰이더(빛 효과) 메테리얼 오브젝트 추가
@@ -199,24 +200,24 @@ public class MapManager : MonoBehaviour
         // 굳이 Exit가 외곽에 있어야 할까? 맵 내부에 있어도 괜찮을 것 같다.
     }
 
-    private void CreateSeedTile(int _CurStage, List<TileData> _SaveData)
+    private void CreateSeedTile(int curStage, List<TileData> saveData)
     {
-        var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+        var stageTable = DataContainer.Instance.StageTable.list[curStage];
         
-        var allSeedCount = _SaveData?.Count ?? stageTable.SeedData.Count;
+        var allSeedCount = saveData?.Count ?? stageTable.SeedData.Count;
         
         var posList = GetRandomPosList(Define.TileType.Seed, stageTable.SeedData);
         int posIdx = 0;
         
         for (int i = 0; i < allSeedCount; i++)
         {
-            var subType = _SaveData != null ? _SaveData[i].SubType : stageTable.SeedData[i].Item1;
-            var subTypeIndex = _SaveData != null ? _SaveData[i].SubTypeIndex : stageTable.SeedData[i].Item2;
-            var subTypeCount = _SaveData != null ? 1 : stageTable.SeedData[i].Item3;
+            var subType = saveData != null ? saveData[i].SubType : stageTable.SeedData[i].Item1;
+            var subTypeIndex = saveData != null ? saveData[i].SubTypeIndex : stageTable.SeedData[i].Item2;
+            var subTypeCount = saveData != null ? 1 : stageTable.SeedData[i].Item3;
             
             for (int j = 0; j < subTypeCount; j++)
             {
-                var seedTile = Instantiate<GameObject>(seedPrefab, this.tileRoot);
+                var seedTile = Instantiate<GameObject>(seedPrefab, tileRoot);
                 var seedScript = seedTile.GetComponent<SeedTile>();
                 
                 // eg. SeedTile 의 타입들 중 'Default0' 타입에 대한 데이터를 SeedTable에서 가져오기 (subType : Default, subTypeIndex : 0)
@@ -227,7 +228,7 @@ public class MapManager : MonoBehaviour
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo
                 {
                     Type = Define.TileType.Seed,
-                    RootIdx =  _SaveData != null ? _SaveData[i].RootIdx : posList[posIdx].root
+                    RootIdx =  saveData != null ? saveData[i].RootIdx : posList[posIdx].root
                 };
                 
                 // 추가 정보 더해서 초기화 (SubType, ActiveTime)
@@ -235,45 +236,45 @@ public class MapManager : MonoBehaviour
                     seedDataParam.TypeIndex,
                     seedDataParam.ActiveTime);
 
-                var posX = _SaveData != null
-                    ? this.backTiles[_SaveData[i].RootIdx].position.x
+                var posX = saveData != null
+                    ? backTiles[saveData[i].RootIdx].position.x
                     : posList[posIdx].transform.position.x;
                 
-                var posY = _SaveData != null
-                    ? this.backTiles[_SaveData[i].RootIdx].position.y
+                var posY = saveData != null
+                    ? backTiles[saveData[i].RootIdx].position.y
                     : posList[posIdx].transform.position.y;
 
                 var pos = new Vector2(posX, posY);
                 
                 seedScript.Initialize(tileInfo, pos);
 
-                this.seedTiles.Add(seedScript);
+                _seedTiles.Add(seedScript);
 
                 posIdx++;
             }
         }
     }
     
-    private void CreateMonsterTile(int _CurStage, List<TileData> _SaveData)
+    private void CreateMonsterTile(int curStage, List<TileData> saveData)
     {
         // MonsterTile은 기본적으로 위아래 혹은 양 옆으로 반복해서 움직인다.
         
-        var stageTable = DataContainer.Instance.StageTable.list[_CurStage];
+        var stageTable = DataContainer.Instance.StageTable.list[curStage];
         
-        var allMonsterCount = _SaveData?.Count ?? stageTable.MonsterData.Count;
+        var allMonsterCount = saveData?.Count ?? stageTable.MonsterData.Count;
         
         var posList = GetRandomPosList(Define.TileType.Monster, stageTable.MonsterData);
         int posIdx = 0;
 
         for (int i = 0; i < allMonsterCount; i++)
         {
-            var subType = _SaveData != null ? _SaveData[i].SubType : stageTable.MonsterData[i].Item1;
-            var subTypeIndex = _SaveData != null ? _SaveData[i].SubTypeIndex : stageTable.MonsterData[i].Item2;
-            var subTypeCount = _SaveData != null ? 1 : stageTable.MonsterData[i].Item3;
+            var subType = saveData != null ? saveData[i].SubType : stageTable.MonsterData[i].Item1;
+            var subTypeIndex = saveData != null ? saveData[i].SubTypeIndex : stageTable.MonsterData[i].Item2;
+            var subTypeCount = saveData != null ? 1 : stageTable.MonsterData[i].Item3;
 
             for (int j = 0; j < subTypeCount; j++)
             {
-                var monsterTile = Instantiate<GameObject>(this.monsterPrefab, this.tileRoot);
+                var monsterTile = Instantiate<GameObject>(monsterPrefab, tileRoot);
                 var monsterScript = monsterTile.GetComponent<MonsterTile>();
 
                 var monsterDataParam = DataContainer.Instance.MonsterTable.GetParamFromType(subType, subTypeIndex);
@@ -281,38 +282,38 @@ public class MapManager : MonoBehaviour
                 TileBase.TileInfo baseInfo = new TileBase.TileInfo()
                 {
                     Type = Define.TileType.Monster,
-                    RootIdx = _SaveData != null ? _SaveData[i].RootIdx : posList[posIdx].root
+                    RootIdx = saveData != null ? saveData[i].RootIdx : posList[posIdx].root
                 };
 
                 var tileInfo = GetTileInfo(baseInfo, monsterDataParam.Type,
                     monsterDataParam.TypeIndex,
                     monsterDataParam.ActiveTime);
                 
-                var posX = _SaveData != null
-                    ? this.backTiles[_SaveData[i].RootIdx].position.x
+                var posX = saveData != null
+                    ? backTiles[saveData[i].RootIdx].position.x
                     : posList[posIdx].transform.position.x;
                 
-                var posY = _SaveData != null
-                    ? this.backTiles[_SaveData[i].RootIdx].position.y
+                var posY = saveData != null
+                    ? backTiles[saveData[i].RootIdx].position.y
                     : posList[posIdx].transform.position.y;
 
                 var pos = new Vector2(posX, posY);
                 
                 monsterScript.Initialize(tileInfo, pos);
 
-                this.monsterTiles.Add(monsterScript);
+                _monsterTiles.Add(monsterScript);
 
                 posIdx++;
             }
         }
     }
 
-    private TileBase.TileInfo GetTileInfo(TileBase.TileInfo _BaseInfo, string _SubType, int _SubTypeIndex, float _ActiveTime)
+    private TileBase.TileInfo GetTileInfo(TileBase.TileInfo baseInfo, string subType, int subTypeIndex, float activeTime)
     {
-        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(_BaseInfo)
-            .WithSubType(_SubType)
-            .WithSubTypeIndex(_SubTypeIndex)
-            .WithActiveTime(_ActiveTime)
+        TileBase.TileInfo tileInfo = new TileBase.TileBuilder(baseInfo)
+            .WithSubType(subType)
+            .WithSubTypeIndex(subTypeIndex)
+            .WithActiveTime(activeTime)
             .Build();
         
         
@@ -335,7 +336,7 @@ public class MapManager : MonoBehaviour
         
         if (_TileType == Define.TileType.Monster)
         {
-            targetArray = this.backTiles.Where(tile =>
+            targetArray = backTiles.Where(tile =>
                 {
                     // X와 Y가 특정 범위에 있는 타일
                     bool isXInRange = (tile.position.x >= (float)Define.MapSize.In_XStart && tile.position.x <= (float)Define.MapSize.In_XEnd);
@@ -356,7 +357,7 @@ public class MapManager : MonoBehaviour
         }
         else if (_TileType == Define.TileType.Seed)
         {
-            targetArray = this.backTiles;
+            targetArray = backTiles;
         }
         
         
@@ -367,10 +368,10 @@ public class MapManager : MonoBehaviour
         
         for (int i = 0; i < randomCount; i++)
         {
-            var random = UnityEngine.Random.Range(0, targetTiles.Count);
+            var random = Random.Range(0, targetTiles.Count);
 
             // 참조한 타일이 어느 타일인지
-            int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+            int index = Array.FindIndex(backTiles, x => x == targetTiles[random]);
             
             resultTile.Add((transform: targetTiles[random], root: index));
 
@@ -380,22 +381,22 @@ public class MapManager : MonoBehaviour
         return resultTile;
     }
 
-    public (int rootIdx, Vector2 pos) GetRandomPosition_Next(Define.TileType _TileType)
+    public (int rootIdx, Vector2 pos) GetRandomPosition_Next(Define.TileType tileType)
     {
         int rootIdx = -1;
         Vector2 pos = Vector2.zero;
 
 
-        switch (_TileType)
+        switch (tileType)
         {
             case Define.TileType.Seed:
             {
-                lock (lockSeed)
+                lock (_lockSeed)
                 {
                     // Seed랑 Monster는 backTiles를 참조하여 타일들을 만듦 (Exit는 outlineTiles 참조)
-                    var targetTiles = new List<Transform>(this.backTiles);
+                    var targetTiles = new List<Transform>(backTiles);
 
-                    var seedTilesRoot = this.seedTiles.Select(x => x.Info.RootIdx).ToList();
+                    var seedTilesRoot = _seedTiles.Select(x => x.Info.RootIdx).ToList();
 
                     // targetTiles 리스트를 순회하면서
                     // seedTiles 리스트의 RootIdx와 같은 인덱스를 가진 요소는 제외한 리스트 생성
@@ -408,7 +409,7 @@ public class MapManager : MonoBehaviour
                     var randomPos = new Vector2(tilePool[random].position.x, tilePool[random].position.y);
 
                     // 참조한 타일이 어느 타일인지
-                    int index = Array.FindIndex(this.backTiles, x => x == tilePool[random]);
+                    int index = Array.FindIndex(backTiles, x => x == tilePool[random]);
 
                     rootIdx = index;
                     pos = randomPos;
@@ -418,11 +419,11 @@ public class MapManager : MonoBehaviour
             
             case Define.TileType.Monster:
             {
-                lock (lockMonster)
+                lock (_lockMonster)
                 {
-                    var monsterTilesRoot = this.monsterTiles.Select(x => x.Info.RootIdx).ToList();
+                    var monsterTilesRoot = _monsterTiles.Select(x => x.Info.RootIdx).ToList();
 
-                    var exceptContainTiles = this.backTiles
+                    var exceptContainTiles = backTiles
                         .Where((x, index) => monsterTilesRoot.Contains(index) == false)
                         .ToList();
 
@@ -451,7 +452,7 @@ public class MapManager : MonoBehaviour
                     var randomPos = new Vector2(targetTiles[random].position.x, targetTiles[random].position.y);
 
                     // 참조한 타일이 어느 타일인지
-                    int index = Array.FindIndex(this.backTiles, x => x == targetTiles[random]);
+                    int index = Array.FindIndex(backTiles, x => x == targetTiles[random]);
 
                     rootIdx = index;
                     pos = randomPos;
@@ -464,15 +465,15 @@ public class MapManager : MonoBehaviour
         return (rootIdx, pos);
     }
 
-    private void SaveStageToJson()
+    private async UniTask SaveStageToJson()
     {
-        List<TileData> seedDatas = seedTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
-        List<TileData> monsterDatas = monsterTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
-        int exitData = this.exitTile.Info.RootIdx;
+        List<TileData> seedDatas = _seedTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
+        List<TileData> monsterDatas = _monsterTiles.Select(tile => new TileData(tile.Info.SubType, tile.Info.SubTypeIndex, tile.Info.RootIdx)).ToList();
+        int exitData = _exitTile.Info.RootIdx;
 
         StageData newData = new StageData(seedDatas, monsterDatas, exitData);
         
-        JsonManager.Instance.SaveStageData(newData, CommonManager.Instance.CurStageIndex);
+        await JsonManager.Instance.SaveStageData(newData, CommonManager.Instance.CurStageIndex);
     }
 
     
@@ -481,15 +482,15 @@ public class MapManager : MonoBehaviour
 
     private void FadeMap()
     {
-        if (this.isFade.Value == true)
+        if (isFade.Value == true)
         {
-            this.blockRenderer.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));
+            blockRenderer.DOFade(1f, fadeTime).OnComplete(() => Debug.Log("### Fade Complete ###"));
         }
         else
         {
-            this.blockRenderer.DOKill(true);
+            blockRenderer.DOKill(true);
 
-            this.blockRenderer.color = new Color(1f, 1f, 1f, 0f);
+            blockRenderer.color = new Color(1f, 1f, 1f, 0f);
         }
     }
 
@@ -497,20 +498,20 @@ public class MapManager : MonoBehaviour
 
     //------------ Setting Stage Data
 
-    private void SetBackground(IReadOnlyList<Sprite> _StageSprites)
+    private void SetBackground(IReadOnlyList<Sprite> stageSprites)
     {
         // TODO : Modify (Background Sprite... Forest_Background)
-        this.backgroundImage.sprite = _StageSprites[1];
+        backgroundImage.sprite = stageSprites[1];
 
         // TODO : Modify (Background sprite.. Forest_Map)
-        this.tileBackRenderer.sprite = _StageSprites[2];
+        tileBackRenderer.sprite = stageSprites[2];
 
-        this.tileBackRenderer.size = this.mapSize;
-        var collider = this.tileBackRenderer.GetComponent<BoxCollider2D>();
-        collider.size = this.mapSize;
+        tileBackRenderer.size = mapSize;
+        var collider = tileBackRenderer.GetComponent<BoxCollider2D>();
+        collider.size = mapSize;
     }
 
-    private void SetOutlineTiles(IReadOnlyList<Sprite> _StageSprites)
+    private void SetOutlineTiles(IReadOnlyList<Sprite> stageSprites)
     {
         var index = (int)Define.TileSpriteName.Center;
 
@@ -533,12 +534,12 @@ public class MapManager : MonoBehaviour
                 index = (int)Define.TileSpriteName.Top;
             }
             
-            var sprite = _StageSprites[index];
+            var sprite = stageSprites[index];
 
-            var renderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
-            if (renderer != null)
+            var outlineRenderer = outlineTiles[i].GetChild(0).GetComponent<SpriteRenderer>();
+            if (outlineRenderer != null)
             {
-                renderer.sprite = sprite;
+                outlineRenderer.sprite = sprite;
             }
         }
 
@@ -546,22 +547,18 @@ public class MapManager : MonoBehaviour
         for (index = (int)Define.TileSpriteName.TopLeft; index <= (int)Define.TileSpriteName.BottomRight; index++)
         {
             var tileIndex = index - (int)Define.TileSpriteName.TopLeft;
-            this.edgeTiles[tileIndex].sprite = _StageSprites[index];
+            edgeTiles[tileIndex].sprite = stageSprites[index];
         }
     }
 
 
-    private void SetMask(IReadOnlyList<Sprite> _StageSprites)
+    private void SetMask(IReadOnlyList<Sprite> stageSprites)
     {
-        // var sprite = _StageSprites[(int)Define.TileSpriteName.Mask];
-        //
-        // this.blockRenderer.sprite = sprite;
-        
         // TODO : Modify (mask sprite)
-        this.blockRenderer.sprite = _StageSprites[0];
+        blockRenderer.sprite = stageSprites[0];
 
         float offset = 0.5f;
-        this.blockRenderer.size = new Vector2(this.mapSize.x + offset, this.mapSize.y + offset);
+        blockRenderer.size = new Vector2(mapSize.x + offset, mapSize.y + offset);
     }
 
     private bool CheckEqualStageDataAndStageTable(StageData localStageData, int curStageIndex)

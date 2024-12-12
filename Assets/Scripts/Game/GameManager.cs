@@ -16,11 +16,11 @@ public class GameManager : MonoSingleton<GameManager>
 
     [SerializeField]
     private StageManager stageManager;
-    public StageManager StageManager => this.stageManager;
+    public StageManager StageManager => stageManager;
 
     [SerializeField]
     private MapManager mapManager;
-    public MapManager MapManager => this.mapManager;
+    public MapManager MapManager => mapManager;
 
     [SerializeField]
     private float fadeDuration = 0f;
@@ -32,44 +32,39 @@ public class GameManager : MonoSingleton<GameManager>
 
 
 
-    private IReactiveProperty<bool> isGame = new ReactiveProperty<bool>(false);
-    public IReactiveProperty<bool> IsGame
-    {
-        get => this.isGame;
-        set => this.isGame = value;
-    }
+    public IReactiveProperty<bool> IsGame = new ReactiveProperty<bool>(false);
 
     [FormerlySerializedAs("seedCount")] [SerializeField]
     private IReactiveProperty<int> seedScore = new ReactiveProperty<int>();
     public IReactiveProperty<int> SeedScore
     {
-        get => this.seedScore;
-        set => this.seedScore = value;
+        get => seedScore;
+        set => seedScore = value;
     }
 
     private bool isReset = false;
     public bool IsReset 
     {
-        get => this.isReset;
-        set => this.isReset = value;
+        get => isReset;
+        set => isReset = value;
     }
 
     private bool isMonsterTrigger = false;
     public bool IsMonsterTrigger
     {
-        get => this.isMonsterTrigger;
-        set => this.isMonsterTrigger = value;
+        get => isMonsterTrigger;
+        set => isMonsterTrigger = value;
     }
 
     public string BgmPath { get; private set; }
     public string DragPath { get; private set; }
 
-    private int maxSeedCount = -1;
-    private int curStageIndex = -1;
+    private int _maxSeedCount = -1;
+    private int _curStageIndex = -1;
 
     // Game Result Popup GameObject
-    private GameObject resultPopup = null;
-    private UI_Popup_GameResult resultScript = null;
+    private GameObject _resultPopup = null;
+    private UI_Popup_GameResult _resultScript = null;
 
     private const int REWARD_MAX = 3;
     private const float BGM_VOLUME = 0.3f;
@@ -84,7 +79,7 @@ public class GameManager : MonoSingleton<GameManager>
         IsReset = false;
 
         // isGame 변수가 false가 되면 게임이 종료되었다는 것
-        this.isGame
+        IsGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
             .Where(x => x == false)
             .Subscribe(_ =>
@@ -93,12 +88,12 @@ public class GameManager : MonoSingleton<GameManager>
             }).AddTo(this);
 
 
-        this.curStageIndex = CommonManager.Instance.CurStageIndex;
-        Debug.Log($"### Current Stage Index : {this.curStageIndex}");
+        _curStageIndex = CommonManager.Instance.CurStageIndex;
+        Debug.Log($"### Current Stage Index : {_curStageIndex}");
 
-        Initialize(this.curStageIndex);
+        Initialize(_curStageIndex);
 
-        await SceneController.Instance.Fade(true, this.fadeDuration, false);
+        await SceneController.Instance.Fade(true, fadeDuration, false);
 
         GameStartFlow();
     }
@@ -108,15 +103,15 @@ public class GameManager : MonoSingleton<GameManager>
         DOTween.KillAll(true);
     }
 
-    public void EnablePressScreen(bool _Enable)
+    public void EnablePressScreen(bool isActive)
     {
-        this.pressScreenObj.SetActive(_Enable);
+        pressScreenObj.SetActive(isActive);
     }
 
-    private void Initialize(int _CurStageIndex)
+    private void Initialize(int curStageIndex)
     {
         // 데이터테이블 로드
-        var stageTable = DataContainer.Instance.StageTable.list[_CurStageIndex];
+        var stageTable = DataContainer.Instance.StageTable.list[curStageIndex];
 
         InitGameSound(stageTable.MapName);
 
@@ -124,7 +119,7 @@ public class GameManager : MonoSingleton<GameManager>
         var stageType = Enum.Parse<Define.StageType>(stageTable.StageType.Item1);
 
         // 해당 스테이지에서 먹을 수 있는 Seed 총 갯수 계산
-        this.maxSeedCount = stageTable.SeedData.SelectMany(data =>
+        _maxSeedCount = stageTable.SeedData.SelectMany(data =>
         {
             var targetSubType = data.Item1;     // eg. Default
             var targetSubTypeIndex = data.Item2;  // eg. Default_01 <- '01'
@@ -144,25 +139,25 @@ public class GameManager : MonoSingleton<GameManager>
         }).Sum();
 
         // 테이블 토대로 세팅
-        StageManager.SetStage(_CurStageIndex + 1, stageType, stageTable.StageType.Item2, this.maxSeedCount);
-        MapManager.SetMap(_CurStageIndex, DataContainer.Instance.StageSprites);
+        StageManager.SetStage(curStageIndex + 1, stageType, stageTable.StageType.Item2, _maxSeedCount);
+        MapManager.SetMap(curStageIndex, DataContainer.Instance.StageSprites);
     }
 
     private void GameStartFlow()
     {
-        var pressText = this.pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
+        var pressText = pressScreenObj.GetComponentInChildren<TextMeshProUGUI>();
 
         DOTween.Sequence()
             .Append(pressText?.transform.DOScale(1.2f, 0.3f))
             .Append(pressText?.transform.DOScale(Vector3.one, 0.3f))
             .SetLoops(-1, LoopType.Restart)
-            .ToUniTask(cancellationToken: this.destroyCancellationToken).Forget();
+            .ToUniTask(cancellationToken: destroyCancellationToken).Forget();
 
         // 게임 시작 할 수 있는 상태로 전환
         IsGame.Value = true;
         
         Debug.Log("Game BGM 재생");
-        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: this.fadeDuration, _Volume: BGM_VOLUME).Forget();
+        SoundManager.Instance.Play(BgmPath, _Loop: true, _FadeTime: fadeDuration, _Volume: BGM_VOLUME).Forget();
     }
 
     
@@ -176,25 +171,25 @@ public class GameManager : MonoSingleton<GameManager>
 
         SoundManager.Instance.Stop(DragPath);
 
-        var rewardCount = CalculateReward(this.seedScore.Value);
+        var rewardCount = CalculateReward(seedScore.Value);
 
         if (rewardCount > 0)
         {
-            UserDataManager.Instance.ClearStage(this.curStageIndex, rewardCount);
+            UserDataManager.Instance.ClearStage(_curStageIndex, rewardCount);
         }
         
-        if (this.resultPopup == null)
+        if (_resultPopup == null)
         {
             var popup = Resources.Load<GameObject>(POPUP_RESULT_PATH);
 
             if (popup != null)
             {
-                this.resultPopup = Instantiate<GameObject>(popup, this.UICanvas.transform);
-                this.resultScript = this.resultPopup.GetComponent<UI_Popup_GameResult>();
+                _resultPopup = Instantiate<GameObject>(popup, UICanvas.transform);
+                _resultScript = _resultPopup.GetComponent<UI_Popup_GameResult>();
             }
         }
 
-        this.resultScript?.Initialize(this.curStageIndex, rewardCount, this.seedScore.Value).Forget();
+        _resultScript?.Initialize(_curStageIndex, rewardCount, seedScore.Value).Forget();
     }
 
     private int CalculateReward(int value)
@@ -206,18 +201,18 @@ public class GameManager : MonoSingleton<GameManager>
         }
 
         // 먹을 수 있는 씨앗 갯수가 3보다 작거나 같을 때
-        if (this.maxSeedCount <= REWARD_MAX)
+        if (_maxSeedCount <= REWARD_MAX)
         {
-            if (value == this.maxSeedCount)
+            if (value == _maxSeedCount)
             {
                 return REWARD_MAX;
             }
 
-            return Math.Min(value, this.maxSeedCount);
+            return Math.Min(value, _maxSeedCount);
         }
         
         // 먹을 수 있는 seed 갯수가 3보다 클 땐, 3(REWARD_MAX)으로 나눠서 계산
-        var oneReward = maxSeedCount / REWARD_MAX; // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
+        var oneReward = _maxSeedCount / REWARD_MAX; // 총 별 3개 중 별 1개를 얻을 수 있는 씨앗 갯수
         if (value > oneReward * 2)
         {
             return REWARD_MAX;
@@ -225,28 +220,31 @@ public class GameManager : MonoSingleton<GameManager>
         return value > oneReward ? 2 : 1;
     }
 
-    private void InitGameSound(string _MapName)
+    private void InitGameSound(string mapName)
     {
         // Map 별로 다른 BGM 재생
-        BgmPath = $"{Define.SoundPath.BGM_GAME_.ToString()}{_MapName}";
+        BgmPath = $"{Define.SoundPath.BGM_GAME_.ToString()}{mapName}";
 
-        DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{_MapName}";
+        DragPath = $"{Define.SoundPath.SFX_DRAG_.ToString()}{mapName}";
     }
 
-    private bool RaycastGameScreen(Vector3 _MousePosition)
+    private bool RaycastGameScreen(Vector3 mousePosition)
     {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(_MousePosition);
+	    if (Camera.main != null)
+	    {
+		    Vector2 position = Camera.main.ScreenToWorldPoint(mousePosition);
 
-        var lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
-        var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, lineLayer);
+		    var lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
+		    var result = Physics2D.Raycast(position, Vector2.zero, Mathf.Infinity, lineLayer);
 
-        return raycastResult.collider != null ? true : false;
+		    return result.collider != null;
+	    }
+
+	    return false;
     }
 
     public void OnClick_PressScreen()
     {
-        Debug.Log("눌러따");
-
         if (RaycastGameScreen(Input.mousePosition) == true)
         {
             EnablePressScreen(false);
@@ -257,9 +255,9 @@ public class GameManager : MonoSingleton<GameManager>
     {
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_BACK_BUTTON.ToString()).Forget();
 
-        SoundManager.Instance.Stop(BgmPath, this.fadeDuration);
+        SoundManager.Instance.Stop(BgmPath, fadeDuration);
 
-        await SceneController.Instance.Fade(false, this.fadeDuration, false);
+        await SceneController.Instance.Fade(false, fadeDuration, false);
         
         SceneController.Instance.LoadScene(Define.Scene.Lobby, false).Forget();
     }
@@ -276,7 +274,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         Debug.Log("### Rewind Stage ###");
 
-        this.seedScore.Value = 0;
+        seedScore.Value = 0;
 
         IsReset = true;
 

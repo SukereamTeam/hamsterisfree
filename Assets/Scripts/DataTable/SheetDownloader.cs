@@ -47,14 +47,14 @@ public class SheetDownloader : MonoBehaviour
 
 
 
-    public async UniTaskVoid DownloadAll(Action _Oncomplete = null)
+    public async UniTaskVoid DownloadAll(Action onComplete = null)
     {
         foreach(var sheet in sheetDatas)
         {
             await Download(sheet, FILE_FORMAT);
         }
 
-        _Oncomplete?.Invoke();
+        onComplete?.Invoke();
 
         await UniTask.Yield();
 
@@ -70,9 +70,9 @@ public class SheetDownloader : MonoBehaviour
         AssetDatabase.Refresh();
     }
 
-    private async UniTask Download(SheetData _SheetData, string _Format)
+    private async UniTask Download(SheetData sheetData, string format)
     {
-        var url = $"https://docs.google.com/spreadsheets/d/{_SheetData.SheetId}/export?format={_Format}&sheet={_SheetData.SheetName}";
+        var url = $"https://docs.google.com/spreadsheets/d/{sheetData.SheetId}/export?format={format}&sheet={sheetData.SheetName}";
 
         using (var www = UnityWebRequest.Get(url))
         {
@@ -89,11 +89,11 @@ public class SheetDownloader : MonoBehaviour
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log($"### Failed Download CSV {_SheetData.SheetName} ###");
+                Debug.Log($"### Failed Download CSV {sheetData.SheetName} ###");
                 return;
             }
 
-            var fileUrl = $"{CSV_PATH}/{_SheetData.SheetName}.{_Format}";
+            var fileUrl = $"{CSV_PATH}/{sheetData.SheetName}.{format}";
 
             await UniTask.SwitchToMainThread();
             // 비동기 작업을 메인 스레드에서 실행되도록 전환해주는 함수
@@ -108,22 +108,22 @@ public class SheetDownloader : MonoBehaviour
         }
     }
 
-    private void CreateScriptableObject(SheetData _SheetData)
+    private void CreateScriptableObject(SheetData sheetData)
     {
         // eg) 1. StageTable 에서 Table 떼기
-        var tableName = _SheetData.SheetName.Split("Table")[0];
+        var tableName = sheetData.SheetName.Split("Table")[0];
 
         // eg) 2. 'Stage' 문자열이 들어간 클래스 찾기
         Type foundType = FindClassWithPartialString<Table_Base>(tableName);
 
         if (foundType == null)
         {
-            Debug.Log($"Not Found DataTable Type Class ---> {_SheetData.SheetName}");
+            Debug.Log($"Not Found DataTable Type Class ---> {sheetData.SheetName}");
             return;
         }
 
         // 데이터테이블 기반의 ScriptableObject 에셋 경로
-        string assetPath = $"{SO_PATH}/{_SheetData.SheetName}.asset";
+        string assetPath = $"{SO_PATH}/{sheetData.SheetName}.asset";
 
         // 위에서 찾은 클래스의 타입(foundType)을 기반으로 하는 ScriptableObject 로드
         var data = (ScriptableObject)AssetDatabase.LoadAssetAtPath(assetPath, foundType);
@@ -162,7 +162,7 @@ public class SheetDownloader : MonoBehaviour
 
 
         // CSV Path
-        var csvPath = $"{CSV_PATH}/{_SheetData.SheetName}.{FILE_FORMAT}";
+        var csvPath = $"{CSV_PATH}/{sheetData.SheetName}.{FILE_FORMAT}";
 
         using (FileStream stream = File.Open(csvPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
@@ -261,15 +261,15 @@ public class SheetDownloader : MonoBehaviour
     }
 
 
-    private void SetDataContainer(Type _Type, ScriptableObject _Data)
+    private void SetDataContainer(Type type, ScriptableObject data)
     {
         var script = this.dataContainer.GetComponent<DataContainer>();
 
         foreach (var field in script.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
         {
-            if (field.FieldType.Equals(_Type))
+            if (field.FieldType.Equals(type))
             {
-                field.SetValue(script, _Data);
+                field.SetValue(script, data);
                 break;
             }
         }

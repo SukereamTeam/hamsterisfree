@@ -14,18 +14,18 @@ public class Player : MonoBehaviour
     private LineManager lineManager = null;
 
 
-    private readonly float dragDistance = 0.5f;
+    private readonly float _dragDistance = 0.5f;
 
-    private float mouseDownTime = 0f;
-    private Vector3 mouseDownPos = Vector3.zero;
+    private float _mouseDownTime = 0f;
+    private Vector3 _mouseDownPos = Vector3.zero;
 
-    private int lineLayer = -1;
+    private int _lineLayer = -1;
     
 
 
     private void Start()
     {
-        this.lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
+        _lineLayer = (1 << LayerMask.NameToLayer("GameScreen"));
     }
 
     private void Update()
@@ -66,10 +66,10 @@ public class Player : MonoBehaviour
 
             StartTileAct();
 
-            this.mouseDownTime = Time.time;
-            this.mouseDownPos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
+            _mouseDownTime = Time.time;
+            _mouseDownPos = gameCamera.ScreenToWorldPoint(Input.mousePosition);
 
-            this.lineManager.BeginDraw();
+            lineManager.BeginDraw();
 
             PlayDragSound(true);
         }
@@ -101,12 +101,12 @@ public class Player : MonoBehaviour
                 return;
             }
 
-            var curMousePos = this.gameCamera.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 distance = curMousePos - this.mouseDownPos;
+            var curMousePos = gameCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 distance = curMousePos - _mouseDownPos;
             float sqrLen = distance.sqrMagnitude;
 
-            if (sqrLen > (dragDistance * dragDistance) &&
-                (Time.time - this.mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
+            if (sqrLen > (_dragDistance * _dragDistance) &&
+                (Time.time - _mouseDownTime) < GameManager.Instance.MapManager.FadeTime)
             {
                 // 화면이 아직 가려지지 않았는데 움직였을 경우 reset stage
                 DragEnd();
@@ -126,8 +126,8 @@ public class Player : MonoBehaviour
 
             GameManager.Instance.MapManager.Mask.transform.position = new Vector3(result.Item2.x, result.Item2.y, GameManager.Instance.MapManager.BlockRenderer.transform.position.z);
 
-            if (this.lineManager.CurrentLine != null)
-                this.lineManager.DrawLine(result.Item2);
+            if (lineManager.CurrentLine != null)
+                lineManager.DrawLine(result.Item2);
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -146,12 +146,12 @@ public class Player : MonoBehaviour
     {
         GameManager.Instance.MapManager.IsFade.Value = false;
 
-        this.lineManager.EndDraw();
+        lineManager.EndDraw();
 
         PlayDragSound(false);
     }
 
-    private void RewindAndDecreaseStage(bool _IsDown = false)
+    private void RewindAndDecreaseStage(bool isDown = false)
     {
         if (GameManager.Instance.IsMonsterTrigger == false)
         {
@@ -159,7 +159,7 @@ public class Player : MonoBehaviour
 
             // _IsDown 이 true라면 드래그 시작하려고 GetMouseButtonDown 한 상태인데,
             // 시작하려고 했을 때 Rewind 된 건 Try횟수 깎지 말고 봐주려고
-            if (_IsDown == false)
+            if (isDown == false)
             {
                 // LimitTry Stage인 경우 드래그를 끝내도 Try 횟수 1 감소
                 if (GameManager.Instance.StageManager.StageInfo.Type == Define.StageType.LimitTry)
@@ -172,7 +172,7 @@ public class Player : MonoBehaviour
 
     private TileBase RaycastTile(Vector3 _MousePosition)
     {
-        Ray ray = this.gameCamera.ScreenPointToRay(_MousePosition);
+        Ray ray = gameCamera.ScreenPointToRay(_MousePosition);
 
         var raycastResult = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, Physics.AllLayers);
 
@@ -186,20 +186,20 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    private (RaycastHit2D hit2D, Vector2 mousePos) RaycastGameScreen(Vector3 _MousePosition)
+    private (RaycastHit2D hit2D, Vector2 mousePos) RaycastGameScreen(Vector3 mousePosition)
     {
-        Vector2 mousePosition = this.gameCamera.ScreenToWorldPoint(_MousePosition);
+        Vector2 worldPoint = gameCamera.ScreenToWorldPoint(mousePosition);
 
-        var raycastResult = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, this.lineLayer);
+        var raycastResult = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, _lineLayer);
 
-        return (raycastResult, mousePosition);
+        return (raycastResult, worldPoint);
     }
 
     
 
-    private void PlayDragSound(bool _IsPlay)
+    private void PlayDragSound(bool isPlay)
     {
-        if (_IsPlay == false)
+        if (isPlay == false)
         {
             if (SoundManager.Instance.IsPlaying(GameManager.Instance.DragPath) == true)
             {

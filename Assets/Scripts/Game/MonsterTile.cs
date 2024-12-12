@@ -13,21 +13,21 @@ public class MonsterTile : TileBase
     [SerializeField]
     private Define.TileType_Sub subType = Define.TileType_Sub.Default;
     
-    private ITileActor tileActor;
-    private bool isMovingDone = false;
+    private ITileActor _tileActor;
+    private bool _isMovingDone = false;
 
-    private Vector2 originPos = new Vector2();
-    private Vector2 startPos = new Vector2();
-    private Vector2 endPos = new Vector2();
+    private Vector2 _originPos = new Vector2();
+    private Vector2 _startPos = new Vector2();
+    private Vector2 _endPos = new Vector2();
     
-    private Table_Monster.Param monsterData;
-    private Define.TileType_Sub bossFunc = Define.TileType_Sub.Default;
+    private Table_Monster.Param _monsterData;
+    private Define.TileType_Sub _bossFunc = Define.TileType_Sub.Default;
     
-    private CancellationTokenSource moveCts;
-    private CancellationTokenSource actCts;
-    private IDisposable actDisposable = null;
+    private CancellationTokenSource _moveCts;
+    private CancellationTokenSource _actCts;
+    private IDisposable _actDisposable = null;
 
-    private const float TWEEN_TIME = 0.25f;
+    private const float TweenTime = 0.25f;
 
     public bool IsFuncStart { get; private set; }
 
@@ -38,8 +38,8 @@ public class MonsterTile : TileBase
 
         IsFuncStart = false;
 
-        this.actCts = new CancellationTokenSource();
-        this.moveCts = new CancellationTokenSource();
+        _actCts = new CancellationTokenSource();
+        _moveCts = new CancellationTokenSource();
         
         GameManager.Instance.IsGame
             .Skip(TimeSpan.Zero)    // 첫 프레임 호출 스킵 (시작할 때 false 로 인해 호출되는 것 방지)
@@ -50,42 +50,42 @@ public class MonsterTile : TileBase
             }).AddTo(this);
     }
 
-    public override void Initialize(TileInfo _Info, Vector2 _Pos)
+    public override void Initialize(TileInfo info, Vector2 pos)
     {
-        var posTuple = GetStartEndPosition(_Pos);
-        this.startPos = posTuple._Start;
-        this.endPos = posTuple._End;
+        var posTuple = GetStartEndPosition(pos);
+        _startPos = posTuple._Start;
+        _endPos = posTuple._End;
 
-        this.originPos = _Pos;
+        _originPos = pos;
         
-        base.Initialize(_Info, this.startPos);
+        base.Initialize(info, _startPos);
         
-        this.subType = Enum.Parse<Define.TileType_Sub>(_Info.SubType);
+        subType = Enum.Parse<Define.TileType_Sub>(info.SubType);
 
-        var sprite = DataContainer.Instance.MonsterSprites[this.info.SubType];
+        var sprite = DataContainer.Instance.MonsterSprites[base._tileInfo.SubType];
         if (sprite != null)
         {
-            this.spriteRenderer.sprite = sprite;
+            spriteRenderer.sprite = sprite;
         }
         
-        this.monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(
-            this.info.SubType, this.info.SubTypeIndex);
+        _monsterData = DataContainer.Instance.MonsterTable.GetParamFromType(
+            base._tileInfo.SubType, base._tileInfo.SubTypeIndex);
 
-        if (this.monsterData.Func != string.Empty)
+        if (_monsterData.Func != string.Empty)
         {
-            this.bossFunc = Enum.Parse<Define.TileType_Sub>(this.monsterData.Func);
+            _bossFunc = Enum.Parse<Define.TileType_Sub>(_monsterData.Func);
         }
     }
 
     public override void Reset()
     {
-        this.transform.localScale = Vector3.one;
+        transform.localScale = Vector3.one;
 
         // Moving Type 경우 주기적으로 처음 위치와 다른 곳으로 이동하기 때문에
-        // Initialize에서 저장했던 this.originPos 값으로 다시 세팅해준다.
-        var posTuple = GetStartEndPosition(this.originPos);
-        this.startPos = posTuple._Start;
-        this.endPos = posTuple._End;
+        // Initialize에서 저장했던 originPos 값으로 다시 세팅해준다.
+        var posTuple = GetStartEndPosition(_originPos);
+        _startPos = posTuple._Start;
+        _endPos = posTuple._End;
 
         TileCollider.enabled = true;
 
@@ -109,56 +109,56 @@ public class MonsterTile : TileBase
             IsFuncStart = true;
         }
 
-        if (this.actCts == null || this.actCts.IsCancellationRequested == true)
+        if (_actCts == null || _actCts.IsCancellationRequested == true)
         {
-            this.actCts = new CancellationTokenSource();
+            _actCts = new CancellationTokenSource();
         }
 
-        if (this.moveCts == null || this.moveCts.IsCancellationRequested == true)
+        if (_moveCts == null || _moveCts.IsCancellationRequested == true)
         {
-            this.moveCts = new CancellationTokenSource();
+            _moveCts = new CancellationTokenSource();
         }
 
-        Move(this.info.ActiveTime, this.monsterData.MoveSpeed, this.moveCts).Forget();
+        Move(_tileInfo.ActiveTime, _monsterData.MoveSpeed, _moveCts).Forget();
         
-        this.tileActor = null;
+        _tileActor = null;
         
-        switch (this.subType)
+        switch (subType)
         {
             case Define.TileType_Sub.Disappear:
             {
-                this.tileActor = new TileActor_Disappear();
+                _tileActor = new TileActor_Disappear();
             }
                 break;
             case Define.TileType_Sub.Moving:
             {
-                this.tileActor = new TileActor_Moving();
+                _tileActor = new TileActor_Moving();
             }
                 break;
             case Define.TileType_Sub.Fade:
             {
-                this.tileActor = new TileActor_Fade();
+                _tileActor = new TileActor_Fade();
             }
                 break;
             case Define.TileType_Sub.Boss:
             {
-                if (bossFunc == Define.TileType_Sub.Moving)
+                if (_bossFunc == Define.TileType_Sub.Moving)
                 {
-                    this.tileActor = new TileActor_Moving();
+                    _tileActor = new TileActor_Moving();
                 }
             }
                 break;
         }
         
-        if (this.tileActor != null)
+        if (_tileActor != null)
         {
-            if (this.subType == Define.TileType_Sub.Moving || this.bossFunc == Define.TileType_Sub.Moving)
+            if (subType == Define.TileType_Sub.Moving || _bossFunc == Define.TileType_Sub.Moving)
             {
                 return;
             }
             
-            var task = this.tileActor.Act(this, this.actCts, this.info.ActiveTime);
-            this.actDisposable = task.ToObservable().Subscribe(x =>
+            var task = _tileActor.Act(this, _actCts, _tileInfo.ActiveTime);
+            _actDisposable = task.ToObservable().Subscribe(x =>
             {
                 IsFuncStart = x;
             });
@@ -180,9 +180,9 @@ public class MonsterTile : TileBase
                 progress += Time.deltaTime * _Speed; //elapsedTime / _Time;
                 progress = Mathf.Clamp01(progress);       // 0~1 사이 값 유지
             
-                var newPosition = Vector3.Lerp(this.startPos, this.endPos, progress);
+                var newPosition = Vector3.Lerp(_startPos, _endPos, progress);
             
-                this.transform.localPosition = new Vector3(newPosition.x, newPosition.y, -0.5f);
+                transform.localPosition = new Vector3(newPosition.x, newPosition.y, -0.5f);
             
                 if (progress >= 1f)
                 {
@@ -192,37 +192,37 @@ public class MonsterTile : TileBase
                     {
                         timer = 0f;
                         
-                        if (this.subType == Define.TileType_Sub.Moving ||
-                            this.bossFunc == Define.TileType_Sub.Moving)
+                        if (subType == Define.TileType_Sub.Moving ||
+                            _bossFunc == Define.TileType_Sub.Moving)
                         {
                             // 타일이 끝으로 완전히 간 다음 Position을 바꿔주고 싶어서 이렇게 구현
-                            if (this.tileActor != null)
+                            if (_tileActor != null)
                             {
-                                this.isMovingDone = false;
-                                var task = this.tileActor.Act(this, this.actCts);
-                                this.actDisposable = task.ToObservable().Subscribe(x =>
+                                _isMovingDone = false;
+                                var task = _tileActor.Act(this, _actCts);
+                                _actDisposable = task.ToObservable().Subscribe(x =>
                                 {
-                                    this.isMovingDone = true;
+                                    _isMovingDone = true;
                                     IsFuncStart = x;
                                 });
 
-                                await UniTask.WaitUntil(() => this.isMovingDone == true, cancellationToken: _Cts.Token);
+                                await UniTask.WaitUntil(() => _isMovingDone == true, cancellationToken: _Cts.Token);
 
-                                this.isMovingDone = false;
-                                Vector2 changePos = new Vector2(this.transform.localPosition.x,
-                                    this.transform.localPosition.y);
+                                _isMovingDone = false;
+                                Vector2 changePos = new Vector2(transform.localPosition.x,
+                                    transform.localPosition.y);
                                 var posTuple = GetStartEndPosition(changePos);
-                                this.startPos = posTuple._Start;
-                                this.endPos = posTuple._End;
+                                _startPos = posTuple._Start;
+                                _endPos = posTuple._End;
                         
-                                //this.originPos = changePos;
+                                //originPos = changePos;
                                 
                                 continue;
                             }
                         }
                     }
                     
-                    (this.startPos, this.endPos) = (this.endPos, this.startPos);
+                    (_startPos, _endPos) = (_endPos, _startPos);
                 }
             
                 await UniTask.Yield();
@@ -239,16 +239,16 @@ public class MonsterTile : TileBase
 
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log($"MonsterType : {this.info.SubType}_{this.info.SubTypeIndex} 닿음");
+        Debug.Log($"MonsterType : {_tileInfo.SubType}_{_tileInfo.SubTypeIndex} 닿음");
 
         TileCollider.enabled = false;
         GameManager.Instance.IsMonsterTrigger = true;
         
-        if (this.tileActor == null)
+        if (_tileActor == null)
         {
-            if (this.moveCts != null || this.moveCts?.IsCancellationRequested == false)
+            if (_moveCts != null || _moveCts?.IsCancellationRequested == false)
             {
-                this.moveCts.Cancel();
+                _moveCts.Cancel();
             }
 
             // Default 등 Func가 따로 없는 타일들을 위한
@@ -257,7 +257,7 @@ public class MonsterTile : TileBase
         else
         {
             ActClear();
-            this.tileActor = null;
+            _tileActor = null;
         }
         
         await UniTask.WaitUntil(() => IsFuncStart == false);
@@ -275,10 +275,10 @@ public class MonsterTile : TileBase
 
         // Trigger 연출
         await DOTween.Sequence()
-            .Append(this.transform.DOScale(1.5f, TWEEN_TIME))
-            .Append(this.transform.DOScale(Vector3.one, TWEEN_TIME))
+            .Append(transform.DOScale(1.5f, TweenTime))
+            .Append(transform.DOScale(Vector3.one, TweenTime))
             .SetLoops(2, LoopType.Restart)
-            .ToUniTask(cancellationToken: this.destroyCancellationToken);
+            .ToUniTask(cancellationToken: destroyCancellationToken);
 
         GameManager.Instance.RewindStage();
     }
@@ -327,26 +327,26 @@ public class MonsterTile : TileBase
             IsFuncStart = false;
         }
 
-        if (this.actCts != null || this.actCts?.IsCancellationRequested == false)
+        if (_actCts != null || _actCts?.IsCancellationRequested == false)
         {
-            this.actCts.Cancel();
+            _actCts.Cancel();
         }
 
-        if (this.moveCts != null || this.moveCts?.IsCancellationRequested == false)
+        if (_moveCts != null || _moveCts?.IsCancellationRequested == false)
         {
-            this.moveCts.Cancel();
+            _moveCts.Cancel();
         }
 
-        this.actDisposable?.Dispose();
+        _actDisposable?.Dispose();
 
-        this.transform?.DOKill(true);
+        transform?.DOKill(true);
     }
     
     private void OnDestroy()
     {
         ActClear();
 
-        this.actCts?.Dispose();
-        this.moveCts?.Dispose();
+        _actCts?.Dispose();
+        _moveCts?.Dispose();
     }
 }

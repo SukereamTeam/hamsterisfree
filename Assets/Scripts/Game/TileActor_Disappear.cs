@@ -8,21 +8,21 @@ using FadeTweener = DG.Tweening.Core.TweenerCore<UnityEngine.Color, UnityEngine.
 
 public class TileActor_Disappear : ITileActor
 {
-    private FadeTweener tweener = null;
+    private FadeTweener _tweener = null;
 
-    public async UniTask<bool> Act(TileBase _Tile, CancellationTokenSource _Cts, float _ActiveTime = 0)
+    public async UniTask<bool> Act(TileBase tile, CancellationTokenSource cts, float activeTime = 0)
     {
         try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
+            await UniTask.Delay(TimeSpan.FromSeconds(activeTime), cancellationToken: cts.Token);
 
             // TODO : 타일 사라지는 Ani 출력? 파티클도 출력?
 
-            _Tile.TileCollider.enabled = false;
+            tile.TileCollider.enabled = false;
 
-            this.tweener = _Tile.SpriteRenderer.DOFade(0f, TileBase.TILE_FADE_TIME);
+            _tweener = tile.SpriteRenderer.DOFade(0f, TileBase.TILE_FADE_TIME);
             
-            await tweener;
+            await _tweener;
         }
         catch (Exception ex)
         {
@@ -30,8 +30,8 @@ public class TileActor_Disappear : ITileActor
             {
                 Debug.Log($"Disappear Token Cancel : {ex.Message} / {ex.StackTrace} //");
 
-                tweener.Kill(true);
-                _Tile.SpriteRenderer.color = Color.white;
+                _tweener.Kill(true);
+                tile.SpriteRenderer.color = Color.white;
             }
             else
             {

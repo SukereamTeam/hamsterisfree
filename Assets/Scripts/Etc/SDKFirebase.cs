@@ -74,7 +74,7 @@ public class SDKFirebase : GlobalMonoSingleton<SDKFirebase>
             {
                 Debug.Log($"User signed in successfully ---> DisplayName: {signInTask.User.DisplayName} / UserId: ({signInTask.User.UserId})");
 
-                return await UserDataManager.Instance.CreateUserData();
+                return await UserDataManager.Instance.CreateUserDataForFirestore();
             }
             return false;
         }

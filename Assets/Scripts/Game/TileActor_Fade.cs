@@ -9,29 +9,29 @@ public class TileActor_Fade : ITileActor
 {
     private FadeTweener tweener = null;
 
-    public async UniTask<bool> Act(TileBase _Tile, CancellationTokenSource _Cts, float _ActiveTime = 0f)
+    public async UniTask<bool> Act(TileBase tile, CancellationTokenSource cts, float activeTime = 0f)
     {
         try
         {
-            while(_Cts.IsCancellationRequested == false)
+            while(cts.IsCancellationRequested == false)
             {
                 // while문이 종료되어도 Delay는 진행 중에 취소되지 않기 때문에, 취소 토큰 넣어줘야 함
-                await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
+                await UniTask.Delay(TimeSpan.FromSeconds(activeTime), cancellationToken: cts.Token);
 
-                this.tweener = _Tile.SpriteRenderer.DOFade(0f, TileBase.TILE_FADE_TIME).OnComplete(() =>
+                tweener = tile.SpriteRenderer.DOFade(0f, TileBase.TILE_FADE_TIME).OnComplete(() =>
                 {
-                    _Tile.TileCollider.enabled = false;
+                    tile.TileCollider.enabled = false;
                 });
 
-                await this.tweener;
+                await tweener;
 
-                await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
+                await UniTask.Delay(TimeSpan.FromSeconds(activeTime), cancellationToken: cts.Token);
 
-                _Tile.TileCollider.enabled = true;       // 조금이라도 보이면 충돌체크 될 수 있도록
+                tile.TileCollider.enabled = true;       // 조금이라도 보이면 충돌체크 될 수 있도록
 
-                this.tweener = _Tile.SpriteRenderer.DOFade(1f, TileBase.TILE_FADE_TIME);
+                tweener = tile.SpriteRenderer.DOFade(1f, TileBase.TILE_FADE_TIME);
 
-                await this.tweener;
+                await tweener;
             }
         }
         catch (Exception ex)// when (!(ex is OperationCanceledException))
@@ -41,7 +41,7 @@ public class TileActor_Fade : ITileActor
                 Debug.Log($"Fade Token Cancel : {ex.Message} / {ex.StackTrace} //");
 
                 tweener.Kill(true);
-                _Tile.SpriteRenderer.color = Color.white;
+                tile.SpriteRenderer.color = Color.white;
             }
             else
             {

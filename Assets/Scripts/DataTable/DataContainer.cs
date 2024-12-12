@@ -10,40 +10,38 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
 {
     [SerializeField]
     private Table_Stage stageTable;
-    public Table_Stage StageTable => this.stageTable;
+    public Table_Stage StageTable => stageTable;
 
     [SerializeField]
     private Table_Seed seedTable;
-    public Table_Seed SeedTable => this.seedTable;
+    public Table_Seed SeedTable => seedTable;
     
     [SerializeField]
     private Table_Monster monsterTable;
-    public Table_Monster MonsterTable => this.monsterTable;
+    public Table_Monster MonsterTable => monsterTable;
 
     [SerializeField]
     private Table_Sound soundTable;
-    public Table_Sound SoundTable => this.soundTable;
+    public Table_Sound SoundTable => soundTable;
 
 
 
-    private const string RootPath_Stage = "Images/Map";
-    private readonly int Tile_Sprite_Count = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
+    private const string RootPathStage = "Images/Map";
+    private readonly int _tileSpriteCount = Enum.GetValues(typeof(Define.TileSpriteName)).Length;
 
-    private List<Sprite> stageSprites;
-    public IReadOnlyList<Sprite> StageSprites => this.stageSprites;
+    private List<Sprite> _stageSprites;
+    public IReadOnlyList<Sprite> StageSprites => _stageSprites;
 
+    private Dictionary<string, Sprite> _seedSprites;
+    public IReadOnlyDictionary<string, Sprite> SeedSprites => _seedSprites;
     
-    private Sprite exitSprite;
-    public Sprite ExitSprite => this.exitSprite;
-
-    private Dictionary<string, Sprite> seedSprites;
-    public Dictionary<string, Sprite> SeedSprites => this.seedSprites;
+    private Dictionary<string, Sprite> _monsterSprites;
+    public IReadOnlyDictionary<string, Sprite> MonsterSprites => _monsterSprites;
     
-    private Dictionary<string, Sprite> monsterSprites;
-    public Dictionary<string, Sprite> MonsterSprites => this.monsterSprites;
+    public Sprite ExitSprite { get; private set; }
 
 
-    private CancellationTokenSource cts = null;
+    private CancellationTokenSource _cts = null;
 
 
 
@@ -54,44 +52,42 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             _instance = this;
         }
 
-        this.stageSprites = new List<Sprite>(this.Tile_Sprite_Count);
+        _stageSprites = new List<Sprite>(_tileSpriteCount);
 
-        this.cts = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
 
-        this.cts?.Cancel();
-        this.cts?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
-
-
-
-    public async UniTask LoadStageDatas(int _StageIndex)
+    
+    public async UniTask LoadStageDatas(int stageIndex)
     {
         Debug.Log("LoadStageDatas 시작");
 
         try
         {
-            var item = stageTable.list.Where(x => x.Index == _StageIndex).FirstOrDefault();
+            var item = stageTable.list.FirstOrDefault(x => x.Index == stageIndex);
 
             if (item != null)
             {
-                await LoadStageSprites(item.MapName, this.cts);
+                await LoadStageSprites(item.MapName, _cts);
 
-                this.exitSprite = await Resources.LoadAsync<Sprite>($"Images/Map/{item.MapName}/Exit") as Sprite;
-                if (this.exitSprite == null)
+                ExitSprite = await Resources.LoadAsync<Sprite>($"Images/Map/{item.MapName}/Exit") as Sprite;
+                if (ExitSprite == null)
                     Debug.Log("### ERROR ---> ExitSprite is Null ###");
 
-                await LoadSeedSprites(item, this.cts);
+                await LoadSeedSprites(item, _cts);
 
-                await LoadMonsterSprites(item, this.cts);
+                await LoadMonsterSprites(item, _cts);
             }
             else
             {
-                Debug.Log($"### Error ---> {_StageIndex} is Not ContainsKey ###");
+                Debug.Log($"### Error ---> {stageIndex} is Not ContainsKey ###");
             }
         }
         catch (Exception ex)
@@ -103,20 +99,20 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
     }
 
 
-    private async UniTask LoadStageSprites(string _MapName, CancellationTokenSource _Cts)
+    private async UniTask LoadStageSprites(string mapName, CancellationTokenSource cts)
     {
-        this.stageSprites.Clear();
+        _stageSprites.Clear();
 
         // eg. Images/Map/Forest/Forset_
-        var path = $"{RootPath_Stage}/{_MapName}/{_MapName}_";
+        var path = $"{RootPathStage}/{mapName}/{mapName}_";
 
         // Forest_Map 이라는 Sprite 한 장을 Multiple로 Slice해서, 각각 잘린 스프라이트들을 사용할것임
         // var mapSprites = Resources.LoadAll<Sprite>($"{path}Map");
 
         // TODO : Define.TileSpriteName의 Mask부터 시작하게 해놨는데, 추후 변경 필요
-        for (int spriteIndex = 9; spriteIndex < this.Tile_Sprite_Count; spriteIndex++)
+        for (int spriteIndex = 9; spriteIndex < _tileSpriteCount; spriteIndex++)
         {
-            if (_Cts.IsCancellationRequested)
+            if (cts.IsCancellationRequested)
             {
                 return;
             }
@@ -127,7 +123,7 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
             var resource = await Resources.LoadAsync<Sprite>(spritePath);
             if (resource is Sprite sprite)
             {
-                this.stageSprites.Add(sprite);
+                _stageSprites.Add(sprite);
             }
             else
                 Debug.Log("### Fail <Sprite> Type Casting ###");
@@ -173,52 +169,48 @@ public class DataContainer : GlobalMonoSingleton<DataContainer>
         */
     }
 
-    private async UniTask LoadSeedSprites(Table_Stage.Param item, CancellationTokenSource _Cts)
+    private async UniTask LoadSeedSprites(Table_Stage.Param item, CancellationTokenSource cts)
     {
         var seedCount = item.SeedData.Count;
-
-        this.seedSprites = new Dictionary<string, Sprite>(seedCount);
+        _seedSprites = new Dictionary<string, Sprite>(seedCount);
 
         for (int i = 0; i < seedCount; i++)
         {
-            if (_Cts.IsCancellationRequested)
+            if (cts.IsCancellationRequested)
             {
                 return;
             }
 
-            var seedData = this.seedTable.GetParamFromType(item.SeedData[i].Item1, item.SeedData[i].Item2);
+            var seedData = seedTable.GetParamFromType(item.SeedData[i].Item1, item.SeedData[i].Item2);
 
             var sprite = await Resources.LoadAsync<Sprite>(seedData.SpritePath) as Sprite;
 
             if (sprite != null)
-            {
-                this.seedSprites.Add(item.SeedData[i].Item1, sprite);
-            }
+	            _seedSprites.Add(item.SeedData[i].Item1, sprite);
             else
                 Debug.Log($"### ERROR LoadSeedSprites ---> {seedData.Type} ###");
         }
     }
     
-    private async UniTask LoadMonsterSprites(Table_Stage.Param item, CancellationTokenSource _Cts)
+    private async UniTask LoadMonsterSprites(Table_Stage.Param item, CancellationTokenSource cts)
     {
         var monsterCount = item.MonsterData.Count;
-
-        this.monsterSprites = new Dictionary<string, Sprite>(monsterCount);
+        _monsterSprites = new Dictionary<string, Sprite>(monsterCount);
 
         for (int i = 0; i < monsterCount; i++)
         {
-            if (_Cts.IsCancellationRequested)
+            if (cts.IsCancellationRequested)
             {
                 return;
             }
 
-            var monsterData = this.monsterTable.GetParamFromType(item.MonsterData[i].Item1, item.MonsterData[i].Item2);
+            var monsterData = monsterTable.GetParamFromType(item.MonsterData[i].Item1, item.MonsterData[i].Item2);
 
             var sprite = await Resources.LoadAsync<Sprite>(monsterData.SpritePath) as Sprite;
 
             if (sprite != null)
             {
-                this.monsterSprites.Add(item.MonsterData[i].Item1, sprite);
+	            _monsterSprites.Add(item.MonsterData[i].Item1, sprite);
             }
             else
                 Debug.Log($"### ERROR LoadMonsterSprites ---> {monsterData.Type} ###");

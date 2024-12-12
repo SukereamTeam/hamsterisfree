@@ -36,86 +36,75 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
 
     private void Awake()
     {
-        this.itemImage = this.GetComponent<Image>();
-        if (this.itemImage == null)
+        itemImage = GetComponent<Image>();
+        if (itemImage == null)
         {
             Debug.Log("### Not Found StageItem Image Component. ###");
         }
     }
 
-    private void ScrollCellIndex(int _Index)
+    private void ScrollCellIndex(int index)
     {
-        if (this.lobbyManager == null)
+        if (lobbyManager == null)
         {
-            this.lobbyManager = LobbyManager.Instance;
+            lobbyManager = LobbyManager.Instance;
         }
         
-        this.layoutElement.preferredWidth = STAGE_ITEM_SIZE;//itemWidths[Mathf.Abs(_Index) % 3];
-        this.layoutElement.preferredHeight = STAGE_ITEM_SIZE;//itemWidths[Mathf.Abs(_Index) % 3];
+        layoutElement.preferredWidth = STAGE_ITEM_SIZE;
+        layoutElement.preferredHeight = STAGE_ITEM_SIZE;
         
-        this.stageIndex = _Index;
+        stageIndex = index;
 
-        this.stageItemText.text = $"{_Index + 1}";
+        stageItemText.text = $"{index + 1}";
 
-        this.itemImage.color = Color.white;
+        itemImage.color = Color.white;
 
-        if (this.lockObject.activeSelf == true)
+        if (lockObject.activeSelf == true)
         {
-            this.lockObject.SetActive(false);
+            lockObject.SetActive(false);
         }
 
-        this.itemImage.color = Color.white;
-
-        //if (this.prevStageItem.activeSelf == true)
-        //{
-        //    this.prevStageItem.SetActive(false);
-        //}
-
+        itemImage.color = Color.white;
         
-
-        if (UserDataManager.Instance.CurUserData.CurrentStage < this.stageIndex)
+        if (UserDataManager.Instance.CurUserData.CurrentStage < stageIndex)
         {
             // 현재 깰 수 없는 스테이지 (남은 스테이지)
-            this.lockObject.SetActive(true);
-
-            //this.prevStageItem.SetActive(true);
-
-            this.itemImage.sprite = this.otherStageSprite;
-            this.itemImage.color = Color.grey;
+            lockObject.SetActive(true);
+            
+            itemImage.sprite = otherStageSprite;
+            itemImage.color = Color.grey;
         }
-        else if (UserDataManager.Instance.CurUserData.CurrentStage == this.stageIndex)
+        else if (UserDataManager.Instance.CurUserData.CurrentStage == stageIndex)
         {
             // 현재 깨야 하는 스테이지
-            this.layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
-            this.layoutElement.preferredHeight = STAGE_ITEM_SIZE_CUR;
+            layoutElement.preferredWidth = STAGE_ITEM_SIZE_CUR;
+            layoutElement.preferredHeight = STAGE_ITEM_SIZE_CUR;
 
-            this.itemImage.sprite = this.curStageSprite;
+            itemImage.sprite = curStageSprite;
             
         }
         else
         {
             // 깬 스테이지
-            this.itemImage.sprite = this.otherStageSprite;
-            //this.prevStageItem.SetActive(true);
+            itemImage.sprite = otherStageSprite;
         }
     }
 
     public async void OnClick_ItemAsync()
     {
-        if (UserDataManager.Instance.CurUserData.CurrentStage < this.stageIndex)
+        if (UserDataManager.Instance.CurUserData.CurrentStage < stageIndex)
         {
             Debug.Log("아직 이전 스테이지 클리어 안 함!");
-            
             return;
         }
 
         PlaySoundEnterStage();
 
-        CommonManager.Instance.CurStageIndex = this.stageIndex;
+        CommonManager.Instance.CurStageIndex = stageIndex;
         
-        await SceneController.Instance.Fade(false, this.lobbyManager.FadeDuration, false);
+        await SceneController.Instance.Fade(false, lobbyManager.FadeDuration, false);
 
-        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(this.stageIndex)));
+        SceneController.Instance.AddLoadingTask(UniTask.Defer(() => DataContainer.Instance.LoadStageDatas(stageIndex)));
 
         SceneController.Instance.LoadScene(Define.Scene.Game, false).Forget();
     }
@@ -125,6 +114,6 @@ public class ScrollIndexCallback_StageItem : MonoBehaviour
         SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_ENTER_STAGE.ToString()).Forget();
 
         SoundManager.Instance.Stop(Define.SoundPath.BGM_LOBBY.ToString(),
-            this.lobbyManager.FadeDuration);
+            lobbyManager.FadeDuration);
     }
 }

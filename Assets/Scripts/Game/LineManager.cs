@@ -29,10 +29,10 @@ public class LineManager : MonoBehaviour
         CurrentLine.SetLineWidth(this.lineWidth);
     }
 
-    public void DrawLine(Vector2 _Point)
+    public void DrawLine(Vector2 point)
     {
         if (CurrentLine != null)
-            CurrentLine.AddPoint(_Point);
+            CurrentLine.AddPoint(point);
     }
 
     public void EndDraw()

@@ -37,6 +37,6 @@ public class PopupLoginSelect : PopupBase
 
     private async UniTask<bool> SignInGuest()
     {
-        return await UserDataManager.Instance.CreateLocalUserData();
+        return await UserDataManager.Instance.CreateUserDataForLocal();
     }
 }

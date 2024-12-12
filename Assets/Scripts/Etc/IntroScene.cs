@@ -94,10 +94,6 @@ public class IntroScene : MonoBehaviour
         if (existData == true)
             return true;
         
-        // 로컬에도 데이터 없고, 로그인도 되어있지 않다면 sign 진행
-        JsonManager.Instance.RemoveData<UserData>();
-        JsonManager.Instance.RemoveData<StageData>();
-        
         var loginPopup = await CommonManager.Popup.CreateAsync<PopupLoginSelect>();
         var result = await loginPopup.ShowAsync();
         

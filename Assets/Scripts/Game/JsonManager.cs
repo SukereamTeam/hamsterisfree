@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -12,9 +13,8 @@ public class JsonManager : Singleton<JsonManager>
     private const string KEY_PATH = "aes.key";
 
     private byte[] _key = null;
-    private byte[] _iv = null;
 
-    public void SaveStageData(StageData data, int stageIndex)
+    public async UniTask SaveStageData(StageData data, int stageIndex)
     {
 	    var curUserData = UserDataManager.Instance.CurUserData;
 
@@ -22,14 +22,29 @@ public class JsonManager : Singleton<JsonManager>
 	    {
 		    curUserData.StageData[stageIndex] = data;
 	    }
+	    
+	    var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+	    if (auth.CurrentUser == null)
+	    {
+		    SaveLocalData(curUserData);
+	    }
+	    else
+	    {
+		    var encryptData = EncryptUserDataForFirestore(curUserData);
+		    if (encryptData.key == null || encryptData.data == null)
+		    {
+			    Debug.Log($"CreateUserData Error / data is null.");
+			    return;
+		    }
+		    
+		    var isSuccess = await SDKFirebase.Instance.SaveUserDataWithFirestore(auth.CurrentUser.UserId, encryptData.key, encryptData.data);
+		    if (isSuccess == false)
+			    Debug.Log($"SaveStageData -> SaveUserDataWithFirestore Error.");
+	    }
     }
 
     public bool SaveLocalData(UserData data)
     {
-	    // local 인지, 로그인했는지 확인
-	    // local 이면 persistentDataPath 경로에서 파일 읽어온 후 저장(업뎃)
-	    // 로그인했으면 ,, SaveUserDataWithFirestore 호출
-	    
 	    string path = Path.Combine(Application.persistentDataPath, $"{(typeof(UserData))}");
 	    try
 	    {
@@ -93,9 +108,13 @@ public class JsonManager : Singleton<JsonManager>
 		    }
 	    }
 	    
-	    if (keyValue is string base64String)
+	    if (keyValue is string keyToBytes)
 	    {
-		    return Convert.FromBase64String(base64String);
+		    if (string.IsNullOrEmpty(keyToBytes) == false)
+		    {
+			    _key = Convert.FromBase64String(keyToBytes);
+			    return _key;
+		    }
 	    }
 
 	    return null;

@@ -5,26 +5,26 @@ using UnityEngine;
 
 public class TileActor_Moving : ITileActor
 {
-    public async UniTask<bool> Act(TileBase _Tile, CancellationTokenSource _Cts, float _ActiveTime = 0f)
+    public async UniTask<bool> Act(TileBase tile, CancellationTokenSource cts, float activeTime = 0f)
     {
         try
         {
-            while(_Cts.IsCancellationRequested == false)
+            while(cts.IsCancellationRequested == false)
             {
                 // 다음 좌표 가져오기
-                var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(_Tile.Info.Type);
+                var nextData = GameManager.Instance.MapManager.GetRandomPosition_Next(tile.Info.Type);
 
-                if (_ActiveTime > 0f)
+                if (activeTime > 0f)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_ActiveTime), cancellationToken: _Cts.Token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(activeTime), cancellationToken: cts.Token);
                 }
                 
                 // TODO : 이동 Effect
 
                 // 다음 좌표로 이동, 다음 좌표를 _Tile의 TileInfo.Pos로 넣어주기(RootIdx도)
-                _Tile.SetPosition(nextData.rootIdx, nextData.pos);
+                tile.SetPosition(nextData.rootIdx, nextData.pos);
                 
-                if (_Tile.Info.Type == Define.TileType.Monster)
+                if (tile.Info.Type == Define.TileType.Monster)
                 {
                     return true;
                 }

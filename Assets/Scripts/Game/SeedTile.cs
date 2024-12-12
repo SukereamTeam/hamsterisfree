@@ -10,8 +10,8 @@ public class SeedTile : TileBase
 {
     private bool isTouch = false;
     public bool IsTouch {
-        get => this.isTouch;
-        set => this.isTouch = value;
+        get => isTouch;
+        set => isTouch = value;
     }
 
     [SerializeField]
@@ -23,7 +23,7 @@ public class SeedTile : TileBase
     private CancellationTokenSource cts;
     private IDisposable actDisposable = null;
 
-    private const float TWEEN_TIME = 0.25f;
+    private const float TweenTime = 0.25f;
 
     public bool IsFuncStart { get; private set; }
 
@@ -33,7 +33,7 @@ public class SeedTile : TileBase
     {
         base.Start();
 
-        this.cts = new CancellationTokenSource();
+        cts = new CancellationTokenSource();
         IsFuncStart = false;
 
 
@@ -46,20 +46,20 @@ public class SeedTile : TileBase
             }).AddTo(this);
     }
 
-    public override void Initialize(TileInfo _Info, Vector2 _Pos)
+    public override void Initialize(TileInfo info, Vector2 pos)
     {
-        base.Initialize(_Info, _Pos);
+        base.Initialize(info, pos);
 
-        this.subType = Enum.Parse<Define.TileType_Sub>(_Info.SubType);
+        subType = Enum.Parse<Define.TileType_Sub>(info.SubType);
 
-        var sprite = DataContainer.Instance.SeedSprites[this.info.SubType];
+        var sprite = DataContainer.Instance.SeedSprites[base._tileInfo.SubType];
         if (sprite != null)
         {
-            this.spriteRenderer.sprite = sprite;
+            spriteRenderer.sprite = sprite;
         }
 
-        this.seedData = DataContainer.Instance.SeedTable.GetParamFromType(
-            this.info.SubType, this.info.SubTypeIndex);
+        seedData = DataContainer.Instance.SeedTable.GetParamFromType(
+            base._tileInfo.SubType, base._tileInfo.SubTypeIndex);
     }
 
     public void TileFuncStart()
@@ -68,48 +68,34 @@ public class SeedTile : TileBase
         // 그 때 타일 타입마다 부여된 액션 실행
         
         if (IsFuncStart == true)
-        {
             return;
-        }
-        else if (IsFuncStart == false)
-        {
-            //Debug.Log("SeedTile Func Start !!!");
-            IsFuncStart = true;
-        }
+        
+        IsFuncStart = true;
+        tileActor = null;
+        
+        if (cts == null || cts.IsCancellationRequested == true)
+            cts = new CancellationTokenSource();
 
-        if (this.tileActor != null)
-        {
-            this.tileActor = null;
-        }
-
-        if (this.cts == null || this.cts.IsCancellationRequested == true)
-        {
-            this.cts = new CancellationTokenSource();
-        }
-
-        switch (this.subType)
+        switch (subType)
         {
             case Define.TileType_Sub.Disappear:
             {
-                this.tileActor = new TileActor_Disappear();
-            }
-                break;
+                tileActor = new TileActor_Disappear();
+            }break;
             case Define.TileType_Sub.Moving:
             {
-                this.tileActor = new TileActor_Moving();
-            }
-                break;
+                tileActor = new TileActor_Moving();
+            }break;
             case Define.TileType_Sub.Fade:
             {
-                this.tileActor = new TileActor_Fade();
-            }
-                break;
+                tileActor = new TileActor_Fade();
+            }break;
         }
 
-        if (this.tileActor != null)
+        if (tileActor != null)
         {
-            var task = this.tileActor.Act(this, this.cts, this.info.ActiveTime);
-            this.actDisposable = task.ToObservable().Subscribe(x =>
+            var task = tileActor.Act(this, cts, _tileInfo.ActiveTime);
+            actDisposable = task.ToObservable().Subscribe(x =>
             {
                 IsFuncStart = x;
             });
@@ -119,13 +105,13 @@ public class SeedTile : TileBase
     
     public override async UniTaskVoid TileTrigger()
     {
-        Debug.Log($"SeedType : {this.info.SubType}, SeedValue : {this.seedData.SeedValue} 먹음");
+        Debug.Log($"SeedType : {_tileInfo.SubType}, SeedValue : {seedData.SeedValue} 먹음");
 
         TileCollider.enabled = false;
         
-        TriggerEvent(this.subType);
+        TriggerEvent(subType);
 
-        if (this.tileActor == null)
+        if (tileActor == null)
         {
             // Default 등 Func가 따로 없는 타일들을 위한
             IsFuncStart = false;
@@ -133,17 +119,17 @@ public class SeedTile : TileBase
         else
         {
             ActClear();
-            this.tileActor = null;
+            tileActor = null;
         }
 
-        await UniTask.WaitUntil(() => IsFuncStart == false/*, cancellationToken: this.cts.Token*/);
+        await UniTask.WaitUntil(() => IsFuncStart == false/*, cancellationToken: cts.Token*/);
 
-        await this.transform.DOScale(0f, TWEEN_TIME).SetEase(Ease.InOutBack);
+        await transform.DOScale(0f, TweenTime).SetEase(Ease.InOutBack);
     }
 
     public override void Reset()
     {
-        this.transform.DOScale(1f, TWEEN_TIME).SetEase(Ease.Linear);
+        transform.DOScale(1f, TweenTime).SetEase(Ease.Linear);
         TileCollider.enabled = true;
 
         ActClear();
@@ -151,11 +137,11 @@ public class SeedTile : TileBase
         base.Reset();
     }
 
-    private void TriggerEvent(Define.TileType_Sub _type)
+    private void TriggerEvent(Define.TileType_Sub type)
     {
-        if (_type == Define.TileType_Sub.Heart || _type == Define.TileType_Sub.Fake)
+        if (type == Define.TileType_Sub.Heart || type == Define.TileType_Sub.Fake)
         {
-            if (this.seedData.SeedValue < 0)
+            if (seedData.SeedValue < 0)
             {
                 SoundManager.Instance.PlayOneShot(Define.SoundPath.SFX_SEED_STAGETYPE_DEC.ToString()).Forget();
             }
@@ -165,7 +151,7 @@ public class SeedTile : TileBase
             }
 
 
-            GameManager.Instance.StageManager.ChangeStageValue(this.seedData.SeedValue);
+            GameManager.Instance.StageManager.ChangeStageValue(seedData.SeedValue);
         }
         else
         {
@@ -182,20 +168,20 @@ public class SeedTile : TileBase
             IsFuncStart = false;
         }
 
-        if (this.cts != null || this.cts?.IsCancellationRequested == false)
+        if (cts != null || cts?.IsCancellationRequested == false)
         {
-            this.cts.Cancel();
+            cts.Cancel();
         }
 
-        this.transform?.DOKill(true);
+        transform?.DOKill(true);
         
-        this.actDisposable?.Dispose();
+        actDisposable?.Dispose();
     }
 
     private void OnDestroy()
     {
         ActClear();
 
-        this.cts?.Dispose();
+        cts?.Dispose();
     }
 }

@@ -12,11 +12,11 @@ public struct TileData
     public int SubTypeIndex;
     public int RootIdx;
 
-    public TileData(string _SubType, int _SubTypeIndex, int _RootIdx)
+    public TileData(string subType, int subTypeIndex, int rootIdx)
     {
-        SubType = _SubType;
-        SubTypeIndex = _SubTypeIndex;
-        RootIdx = _RootIdx;
+        SubType = subType;
+        SubTypeIndex = subTypeIndex;
+        RootIdx = rootIdx;
     }
 }
 
@@ -27,11 +27,11 @@ public class StageData
     public List<TileData> monsterDatas;
     public int exitDataRootIdx;
 
-    public StageData(List<TileData> _Seed, List<TileData> _Monster, int _Exit)
+    public StageData(List<TileData> seed, List<TileData> monster, int exit)
     {
-        seedDatas = _Seed;
-        monsterDatas = _Monster;
-        exitDataRootIdx = _Exit;
+        seedDatas = seed;
+        monsterDatas = monster;
+        exitDataRootIdx = exit;
     }
 
     public bool EqualsWithStageParam(Table_Stage.Param stageTable)

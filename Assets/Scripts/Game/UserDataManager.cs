@@ -10,12 +10,14 @@ public class UserDataManager : Singleton<UserDataManager>
     
     public async UniTask<bool> LoadUserData()
     {
-        var userData = JsonManager.Instance.LoadUserDataWithLocal();
-        if (userData == null)
+	    UserData userData = null;
+	    var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+	    if (auth.CurrentUser == null)
+	    {
+		    userData = JsonManager.Instance.LoadUserDataWithLocal();
+	    }
+        else
         {
-            var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-            if (auth.CurrentUser == null) return false;
-            
             userData = await SDKFirebase.Instance.LoadUserDataWithFirestore(auth.CurrentUser.UserId);
         }
 
@@ -23,27 +25,24 @@ public class UserDataManager : Singleton<UserDataManager>
         return userData != null;
     }
 
-    public async UniTask<bool> CreateLocalUserData()
+    public async UniTask<bool> CreateUserDataForLocal()
     {
         UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
         
-        try
+        var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
+        var isSuccess = JsonManager.Instance.SaveLocalData(newData);
+        if (isSuccess)
         {
-            var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
-            JsonManager.Instance.SaveLocalData(newData);
-            CurUserData = newData;
-            completionSource.TrySetResult(true);
+	        CurUserData = newData;
+	        completionSource.TrySetResult(true);
         }
-        catch (Exception e)
-        {
-            Debug.Log($"CreateUserData Error ---> {e.Message} / {e.StackTrace} ");
-            completionSource.TrySetResult(false);
-        }
+        else
+	        completionSource.TrySetResult(false);
 
         return await completionSource.Task;
     }
 
-    public async UniTask<bool> CreateUserData()
+    public async UniTask<bool> CreateUserDataForFirestore()
     {
 	    UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
 	    var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
@@ -52,23 +51,57 @@ public class UserDataManager : Singleton<UserDataManager>
 		    Debug.Log($"auth.CurrentUser is null");
 		    return false;
 	    }
-        
-	    try
+	    
+	    var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
+	    var data = JsonManager.Instance.EncryptUserDataForFirestore(newData);
+	    if (data.key == null || data.data == null)
 	    {
-		    var newData = new UserData { CurrentStage = 0, RewardCount = 0, StageData = new Dictionary<int, StageData>()};
-		    var data = JsonManager.Instance.EncryptUserDataForFirestore(newData);
-		    
-		    await SDKFirebase.Instance.SaveUserDataWithFirestore(auth.CurrentUser.UserId, data.key, data.data);
-		    CurUserData = newData;
-		    
-		    completionSource.TrySetResult(true);
-	    }
-	    catch (Exception e)
-	    {
-		    Debug.Log($"CreateUserData Error ---> {e.Message} / {e.StackTrace} ");
+		    Debug.Log($"CreateUserData Error / data is null.");
 		    completionSource.TrySetResult(false);
 	    }
+	    else
+	    {
+		    var isSuccess = await SDKFirebase.Instance.SaveUserDataWithFirestore(auth.CurrentUser.UserId, data.key, data.data);
+		    if (isSuccess)
+		    {
+			    CurUserData = newData;
+			    completionSource.TrySetResult(true);
+		    }
+		    else
+			    completionSource.TrySetResult(false);
+	    }
+	    
+	    return await completionSource.Task;
+    }
 
+    public async UniTask<bool> SaveUserDataForFirestore(UserData userData)
+    {
+	    UniTaskCompletionSource<bool> completionSource = new UniTaskCompletionSource<bool>();
+	    var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+	    if (auth.CurrentUser == null)
+	    {
+		    Debug.Log($"auth.CurrentUser is null");
+		    return false;
+	    }
+	    
+	    var data = JsonManager.Instance.EncryptUserDataForFirestore(userData);
+	    if (data.key == null || data.data == null)
+	    {
+		    Debug.Log($"CreateUserData Error / data is null.");
+		    completionSource.TrySetResult(false);
+	    }
+	    else
+	    {
+		    var isSuccess = await SDKFirebase.Instance.SaveUserDataWithFirestore(auth.CurrentUser.UserId, data.key, data.data);
+		    if (isSuccess)
+		    {
+			    CurUserData = userData;
+			    completionSource.TrySetResult(true);
+		    }
+		    else
+			    completionSource.TrySetResult(false);
+	    }
+	    
 	    return await completionSource.Task;
     }
     
