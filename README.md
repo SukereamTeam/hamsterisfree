@@ -3,8 +3,6 @@
 - [프로젝트 개요](#프로젝트-개요)
 - [작업](#작업)
   - [완료한 작업](#완료한-작업)
-  - [현재 진행 중인 작업](#현재-진행-중인-작업)
-  - [남아있는 작업](#남아있는-작업)
 
 <br>
 
@@ -62,38 +60,6 @@
   - 연출 작업
       - Start Screen (Press the Screen)
       - End UI -> GameResult Popup, 스코어 연출
-
-
-현재 진행 중인 작업
---------------------
-
-- 연출 및 리소스 작업
-	- 씨앗, 몬스터, 스테이지+배경, UI 리소스
- 	- Trigger 파티클 
-
-
-남아있는 작업
---------------------
-- 시스템옵션 메뉴 기능 (BGM, SFX Volume 조절, 로그인 등)
-
-- Google Play Games 연동
-
-- Resources.Load -> Addressable 로 변환
-
-- 버전 체크 (웹 통신 필요)
-
-- 광고 SDK
-        - Unity LevelPlay(구 IronSource) 사용하여 구현
-	- Mask 이미지 알파값 0으로 바꿔주는 효과를 얻을 수 있음
-
-- InApp 결제
-	- 스테이지 별 3개로 클리어 해주도록 하는 아이템 구매 넣기
-
-- Firebase
-	- 앱 푸시
-	- Oauth 로그인
-
-- Localization
   
 
 <p align="center">
